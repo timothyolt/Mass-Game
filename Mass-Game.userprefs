@@ -1,0 +1,20 @@
+﻿<Properties>
+  <AuthorInfo Name="Timothy Oltjenbruns" Email="timothyolt@gmail.com" Copyright="Timothy Oltjenbruns" Company="" Trademark="" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="MassGame\Polygon.cs">
+    <Files>
+      <File FileName="MassGame\AppMain.cs" Line="27" Column="11" />
+      <File FileName="MassGame\CubeParticle.cs" Line="5" Column="32" />
+      <File FileName="MassGame\Element.cs" Line="25" Column="32" />
+      <File FileName="MassGame\Emitter.cs" Line="3" Column="32" />
+      <File FileName="MassGame\Enemy.cs" Line="26" Column="32" />
+      <File FileName="MassGame\Particle.cs" Line="26" Column="32" />
+      <File FileName="MassGame\Player.cs" Line="26" Column="32" />
+      <File FileName="MassGame\Polygon.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

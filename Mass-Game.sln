@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassGame", "MassGame\MassGame.csproj", "{F51FE676-F629-4FFE-96E2-D582AAB60A0A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F51FE676-F629-4FFE-96E2-D582AAB60A0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F51FE676-F629-4FFE-96E2-D582AAB60A0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F51FE676-F629-4FFE-96E2-D582AAB60A0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F51FE676-F629-4FFE-96E2-D582AAB60A0A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = MassGame\MassGame.csproj
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = None
+		$1.ResourceNamePolicy = FileFormatDefault
+		$0.StandardHeader = $2
+		$2.Text = @/*\n *\tCopyright (C) 2015 Timothy A. Oltjenbruns\n *\n *\tThis program is free software; you can redistribute it and/or modify\n *\tit under the terms of the GNU General Public License as published by\n *\tthe Free Software Foundation; either version 2 of the License, or\n *\t(at your option) any later version.\n *\t\n *\tThis program is distributed in the hope that it will be useful,\n *\tbut WITHOUT ANY WARRANTY; without even the implied warranty of\n *\tMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n *\tGNU General Public License for more details.\n *\t\n *\tYou should have received a copy of the GNU General Public License along\n *\twith this program; if not, write to the Free Software Foundation, Inc.,\n *\t51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.\n */
+		$2.IncludeInNewFiles = True
+		description = Proof of Concept
+	EndGlobalSection
+EndGlobal
