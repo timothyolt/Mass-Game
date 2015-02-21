@@ -22,70 +22,25 @@ using Sce.PlayStation.Core;
 using Sce.PlayStation.Core.Graphics;
 using Sce.PlayStation.Core.Imaging;
 
-namespace TOltjenbruns.MassGame{
+namespace Polarity{
 	public class Element{
 		//TODO: move update flagging to this class and out of player
 		private const bool DEBUG = false;
 		
+		//TODO: YES I know, I probably broke encapsulation with my arrays. These were not meant to be changed by a client
 		public Polygon[] polygons {get; private set;}
 		public int[] vPolyIndex {get; private set;}
 		public Primitive[] primitives {get; private set;}
 		public VertexBuffer vertexBuffer {get; private set;}
 		
+		public double rotation {get; set;}
+		public Rgba colorMaster {get; set;}
 		
-		private double rotation;
-		private bool rotUpdate;
-		public double Rotation {
-			get {return rotation;}
-			set {
-				rotUpdate = true;
-				rotation = value;
-			}
-		}
-		
-		private Rgba colorMask;
-		private bool cMaskUpdate;
-		public Rgba ColorMask {
-			get {return colorMask;}
-			set {
-				cMaskUpdate = true;
-				colorMask = value;
-			}
-		}
-		
-		private Vector3 position;
-		private bool posUpdate;
-		public Vector3 Position {
-			get {return position;}
-			set {
-				posUpdate = true;
-				position = value;
-			}
-		}
-		
-		private Vector3 scale;
-		private bool scaleUpdate;
-		public Vector3 Scale {
-			get {return scale;}
-			set {
-				scaleUpdate = true;
-				scale = value;
-			}
-		}
-		
-		private Vector3 center;
-		private bool cenUpdate;
-		public Vector3 Center {
-			get {return center;}
-			set {
-				cenUpdate = true;
-				center = value;
-			}
-		}
-		
-		public float LineWidth {get; set;}
-		
+		public Vector3 position {get; set;}
+		public Vector2 scale {get; set;}
 		//TODO: Center does NOT work as intended
+		public Vector2 center {get; set;}
+		public float lineWidth {get; set;}
 		
 		public Element (Polygon polygon)
 			: this(new Polygon[] {polygon}){}
@@ -99,39 +54,40 @@ namespace TOltjenbruns.MassGame{
 			createBuffer();
 			
 			rotation = 0.0;
-			colorMask = new Rgba(255, 255, 255, 255);
+			colorMaster = new Rgba(255, 255, 255, 255);
 			
 			position = Vector3.Zero;
-			scale = Vector3.One;
-			center = Vector3.Zero;
-			LineWidth = 1;
+			scale = Vector2.One;
+			center = Vector2.Zero;
+			lineWidth = 1;
 			
 			//updateTransBuffer();
 			//updateColorBuffer();
 		}
 			
 		private void createBuffer(){
+		
 			int bufferLength = 0;
 			for (int i = 0; i < polygons.Length; i++){
 				vPolyIndex[i] = bufferLength;
 				primitives[i] = new Primitive(
-					polygons[i].DrawMode, bufferLength, polygons[i].vertexCount, 0);
+					polygons[i].drawMode, bufferLength, polygons[i].vertexCount, 0);
 				bufferLength += polygons[i].vertexCount;
 			}
 			
 			//TODO: Check all poly's for indicies and generate sets for unindexed poly's
-			if (polygons[0].Indicies != null){
+			if (polygons[0].indicies != null){
 				int indexCount = 0;
 				int[] iPolyIndex = new int[polygons.Length];
 				for (int i = 0; i < polygons.Length; i++){
 					iPolyIndex[i] = indexCount;
-					primitives[i].Count = (ushort) polygons[i].indexCount;
-					indexCount += polygons[i].indexCount;
+					primitives[i].Count = (ushort) polygons[i].indicies.Length;
+					indexCount += polygons[i].indicies.Length;
 				}
 				ushort[] indicies = new ushort[indexCount];
 				for (int poly = 0; poly < polygons.Length; poly++)
-					for (int i = 0; i < polygons[poly].indexCount; i++)
-						indicies[iPolyIndex[poly] + i] = polygons[poly].Indicies[i];
+					for (int i = 0; i < polygons[poly].indicies.Length; i++)
+						indicies[iPolyIndex[poly] + i] = polygons[poly].indicies[i];
 				vertexBuffer = new VertexBuffer(
 				bufferLength, indexCount, VertexFormat.Float3, VertexFormat.Float4);
 				vertexBuffer.SetIndices(indicies);
@@ -146,14 +102,12 @@ namespace TOltjenbruns.MassGame{
 		}
 	
 		public void updateTransBuffer(int pIndex){
-			Vector3[] aVerts = new Vector3[polygons[pIndex].vertexCount];
-			polygons[pIndex].Verticies.CopyTo(aVerts, 0);
+			Vector3[] aVerts = (Vector3[]) polygons[pIndex].verticies.Clone();
 			
 			for (int vIndex = 0; vIndex < aVerts.Length; vIndex++){
 				aVerts[vIndex] = calcRotation (polygons[pIndex], aVerts[vIndex]);
 				aVerts[vIndex] = calcScale (polygons[pIndex], aVerts[vIndex]);
-				//put position first
-				aVerts[vIndex] += polygons[pIndex].Position + position;
+				aVerts[vIndex] += polygons[pIndex].position + position;
 			}
 			
 			if (DEBUG) foreach (Vector3 v in aVerts)
@@ -163,17 +117,15 @@ namespace TOltjenbruns.MassGame{
 				0, expandVerticies(aVerts), vPolyIndex[pIndex], 0, polygons[pIndex].vertexCount);
 		}
 		
-		//Will assume position has already been updated
-		//uses center and position vectors to find center of rotation/scale
-		private Vector3 calcRotation(Polygon poly, Vector3 vertex){
+		protected Vector3 calcRotation(Polygon poly, Vector3 vertex){
 			float xPoly;
 			float yPoly;
 			
-			if (poly.Rotation != 0){
+			if (poly.rotation != 0){
 				double angle = Math.Atan2(
-					vertex.Y - poly.Center.Y, 
-					vertex.X - poly.Center.X);
-				angle += poly.Rotation;
+					vertex.Y - poly.center.Y, 
+					vertex.X - poly.center.X);
+				angle += poly.rotation;
 				
 				float magnitude = vertex.Length();
 				xPoly = (float) (magnitude * Math.Cos(angle));
@@ -200,22 +152,21 @@ namespace TOltjenbruns.MassGame{
 			}
 			else return new Vector3(xPoly, yPoly, 0);
 		}
-		//Will assume position has already been updated
-		//uses center and position vectors to find center of rotation/scale
-		private Vector3 calcScale(Polygon poly, Vector3 vertex){
+		
+		protected Vector3 calcScale(Polygon poly, Vector3 vertex){
 			float xPoly;
 			float yPoly;
 			
-			if (poly.Scale != Vector3.One){
-				xPoly = poly.Scale.X * (vertex.X - poly.Center.X);
-				yPoly = poly.Scale.Y * (vertex.Y - poly.Center.Y);
+			if (poly.scale != Vector2.One){
+				xPoly = poly.scale.X * (vertex.X - poly.center.X);
+				yPoly = poly.scale.Y * (vertex.Y - poly.center.Y);
 			}
 			else {
 				xPoly = vertex.X;
 				yPoly = vertex.Y;
 			}
 			
-			if (scale != Vector3.One){
+			if (scale != Vector2.One){
 				return new Vector3(
 					scale.X * (xPoly - center.X),
 					scale.Y * (yPoly - center.Y),
@@ -230,11 +181,10 @@ namespace TOltjenbruns.MassGame{
 		}
 		
 		public void updateColorBuffer(int pIndex){
-			Rgba[] aColors = new Rgba[polygons[pIndex].vertexCount];
-			polygons[pIndex].Colors.CopyTo(aColors, 0);
+			Rgba[] aColors = (Rgba[]) polygons[pIndex].colors.Clone();
 			for (int cIndex = 0; cIndex < polygons[pIndex].vertexCount; cIndex++){
-				Vector4 pColor = polygons[pIndex].ColorMask.ToVector4();
-				Vector4 eColor = colorMask.ToVector4();
+				Vector4 pColor = polygons[pIndex].colorMaster.ToVector4();
+				Vector4 eColor = colorMaster.ToVector4();
 				aColors[cIndex] = new Rgba(aColors[cIndex].ToVector4() * pColor * eColor);
 			}
 			if (DEBUG) foreach (Rgba c in aColors)
@@ -244,7 +194,7 @@ namespace TOltjenbruns.MassGame{
 		
 		public void draw(GraphicsContext graphics){
 			graphics.SetVertexBuffer(0, vertexBuffer);
-			graphics.SetLineWidth(LineWidth);
+			graphics.SetLineWidth(lineWidth);
 			graphics.DrawArrays(primitives, 0, primitives.Length);
 		}
 		
