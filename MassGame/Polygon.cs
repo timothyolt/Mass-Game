@@ -17,31 +17,94 @@
  */
 
 using System;
+using System.Collections.ObjectModel;
 
 using Sce.PlayStation.Core;
 using Sce.PlayStation.Core.Graphics;
 
-namespace Polarity{
+namespace TOltjenbruns.MassGame {
 	public struct Polygon{
-		public Vector3[] verticies {get; private set;}
-		public Rgba[] colors {get; private set;}
-		public ushort[] indicies {get; private set;}
-		public DrawMode drawMode {get; private set;}
-		public int vertexCount {get {
-			//if (indicies == null) return verticies.Length;
-			//else return indicies.Length;}}
-			return verticies.Length;}}
+		#region Readonly Properties
+		private Vector3[] verticies;
+		public ReadOnlyCollection<Vector3> Verticies {
+			get {return Array.AsReadOnly<Vector3>(verticies);}
+		}
+		public int vertexCount {
+			get {return verticies.Length;}
+		}
 		
-		public double rotation {get; set;}
-		public Rgba colorMaster {get; set;}
+		private Rgba[] colors;
+		public ReadOnlyCollection<Rgba> Colors {
+			get {return Array.AsReadOnly<Rgba>(colors);}
+		}
 		
-		public Vector3 position {get; set;}
-		public Vector2 scale {get; set;}
-		public Vector2 center {get; set;}
+		private ushort[] indicies;
+		public ReadOnlyCollection<ushort> Indicies {
+			get {return Array.AsReadOnly<ushort>(indicies);}
+		}
+		public int indexCount {
+			get {return indicies.Length;}
+		}
 		
+		public readonly DrawMode DrawMode;
+		#endregion
+		
+		#region Properties
+		private double rotation;
+		private bool rotUpdate;
+		public double Rotation {
+			get {return rotation;}
+			set {
+				rotUpdate = true;
+				rotation = value;
+			}
+		}
+		
+		private Rgba colorMask;
+		private bool cMaskUpdate;
+		public Rgba ColorMask {
+			get {return colorMask;}
+			set {
+				cMaskUpdate = true;
+				colorMask = value;
+			}
+		}
+		
+		private Vector3 position;
+		private bool posUpdate;
+		public Vector3 Position {
+			get {return position;}
+			set {
+				posUpdate = true;
+				position = value;
+			}
+		}
+		
+		private Vector3 scale;
+		private bool scaleUpdate;
+		public Vector3 Scale {
+			get {return scale;}
+			set {
+				scaleUpdate = true;
+				scale = value;
+			}
+		}
+		
+		private Vector3 center;
+		private bool cenUpdate;
+		public Vector3 Center {
+			get {return center;}
+			set {
+				cenUpdate = true;
+				center = value;
+			}
+		}
+		#endregion
+		
+		#region Constructors
 		public Polygon (Vector3[] verticies, Rgba[] colors, ushort[] indicies, DrawMode drawMode,
 		                double rotation, Rgba colorMaster,
-		                Vector3 position, Vector2 scale, Vector2 center)
+		                Vector3 position, Vector3 scale, Vector3 center)
 			: this(verticies, colors, indicies, drawMode, rotation, colorMaster){
 			this.position = position;
 			this.scale = scale;
@@ -52,7 +115,7 @@ namespace Polarity{
 		                double rotation, Rgba colorMaster)
 			: this(verticies, colors, indicies, drawMode){
 			this.rotation = rotation;
-			this.colorMaster = colorMaster;
+			this.colorMask = colorMaster;
 		}
 		
 		public Polygon (Vector3[] verticies, Rgba[] colors, ushort[] indicies, DrawMode drawMode)
@@ -62,7 +125,7 @@ namespace Polarity{
 		
 		public Polygon (Vector3[] verticies, Rgba[] colors, DrawMode drawMode,
 		                double rotation, Rgba colorMaster,
-		                Vector3 position, Vector2 scale, Vector2 center)
+		                Vector3 position, Vector3 scale, Vector3 center)
 			: this(verticies, colors, drawMode, rotation, colorMaster){
 			this.position = position;
 			this.scale = scale;
@@ -73,20 +136,20 @@ namespace Polarity{
 		                double rotation, Rgba colorMaster)
 			: this(verticies, colors, drawMode){
 			this.rotation = rotation;
-			this.colorMaster = colorMaster;
+			this.colorMask = colorMaster;
 		}
 		
 		public Polygon (Vector3[] verticies, Rgba[] colors, DrawMode drawMode)
 			: this(){
 			this.verticies = verticies;
 			this.colors = colors;
-			this.drawMode = drawMode;
+			this.DrawMode = drawMode;
 		
 			rotation = 0.0;
-			colorMaster = new Rgba(255, 255, 255, 255);
+			colorMask = new Rgba(255, 255, 255, 255);
 			position = Vector3.Zero;
-			scale = Vector2.One;
-			center = Vector2.Zero;
+			scale = Vector3.One;
+			center = Vector3.Zero;
 		}
 		
 		public Polygon (Vector3[] verticies, Rgba[] colors)
@@ -101,6 +164,7 @@ namespace Polarity{
 		
 		public Polygon (Vector3[] verticies)
 			: this(verticies, DefaultColors(verticies.Length)){}
+		#endregion
 		
 	}
 }
