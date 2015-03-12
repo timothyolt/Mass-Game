@@ -156,6 +156,7 @@ namespace TOltjenbruns.MassGame {
 				velocity = velocity.Normalize();
 				velocity = velocity.Multiply(120 * delta);
 				Position += velocity;
+				loopScreen();
 			}
 			
 			Vector3 aim = Vector3.Zero;
@@ -217,6 +218,24 @@ namespace TOltjenbruns.MassGame {
 		
 		public void dispose(){
 			element.dispose();	
+		}
+		#endregion
+		
+		#region additional meathods
+		public void loopScreen ()
+		{
+			if (position.X > 200) {
+				position.X -= 400;
+			}
+			if (position.X <= -200) {
+				position.X += 400;
+			}
+			if (position.Y > 200) {
+				position.Y -= 400;
+			}
+			if (position.Y <= -200) {
+				position.Y += 400;
+			}
 		}
 		#endregion
 	}
