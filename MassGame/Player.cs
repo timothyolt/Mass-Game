@@ -188,7 +188,7 @@ namespace TOltjenbruns.MassGame {
 							break;
 						default:
 							Vector3 diff = p.Position - position;
-							if (diff.Length() > 20){
+							if (diff.Length() < 20){
 								takeDamage (1);
 								p.Polarity = 0;
 							}
