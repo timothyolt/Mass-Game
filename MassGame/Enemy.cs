@@ -131,9 +131,9 @@ namespace TOltjenbruns.MassGame {
 						case 1:
 							p.repel (position, emitter, field, delta);
 							break;
-						default:
+						case 2:
 							Vector3 partDiff = p.Position - position;
-							if (partDiff.Length() > 20){
+							if (partDiff.Length() < 20){
 								takeDamage (1);
 								p.Polarity = 0;
 							}

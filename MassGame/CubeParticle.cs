@@ -20,6 +20,8 @@ namespace TOltjenbruns.MassGame{
 			Polarity = 0;
 			Element.LineWidth = 2;
 			Element.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+			Element.ColorMask = new Rgba(255, 255, 0, 255);
+			Element.updateColorBuffer();
 		}
 		#endregion
 		
@@ -36,18 +38,18 @@ namespace TOltjenbruns.MassGame{
 					break;
 				case 1:
 					cooldown = 5;
-					Element.ColorMask = new Rgba(255, 0, 0, 255);
-					Element.updateColorBuffer();
+//					Element.ColorMask = new Rgba(255, 0, 0, 255);
+//					Element.updateColorBuffer();
 					break;
 				case 2:
 					cooldown = 5;
-					Element.ColorMask = new Rgba(0, 255, 0, 255);
-					Element.updateColorBuffer();
+//					Element.ColorMask = new Rgba(0, 255, 0, 255);
+//					Element.updateColorBuffer();
 					break;
 				}
 			}
 			if (cooldown > 0){
-				byte fade = (byte)(106 + (cooldown * 30));
+				int fade = (int)((cooldown/5.0f) * 256.0f);
 				switch (Polarity){
 					case 1:
 						Element.ColorMask = new Rgba(256, 256-fade, 0, 255);
@@ -62,6 +64,8 @@ namespace TOltjenbruns.MassGame{
 				if (cooldown <= 0){
 					cooldown = 0;
 					Polarity = 0;
+					Element.ColorMask = new Rgba(255, 255, 0, 255);
+					Element.updateColorBuffer();
 				}
 			}
 			foreach (Particle p in Particles)
