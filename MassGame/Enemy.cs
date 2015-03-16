@@ -60,6 +60,8 @@ namespace TOltjenbruns.MassGame {
 		
 		private float maxSpd;
 		
+		private float maxHealth;
+		
 		#endregion
 		
 		#region Properties
@@ -105,9 +107,10 @@ namespace TOltjenbruns.MassGame {
 			gunEmitter = new Emitter(gunPower, gunSustain);
 			
 			polarity = 1;
-			health = 20;
+			maxHealth = 200;
 			position = Vector3.Zero;
 			rotation = 0.0;
+			health = maxHealth;
 		}
 		#endregion
 		
@@ -182,7 +185,7 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		public virtual void Move (float delta){
-			Vector3 acceleration = target.Multiply(1f/500) + avoidVector.Multiply(1f/50);
+			Vector3 acceleration = target.Multiply(1f/250) + avoidVector.Multiply(1f/80);
 			acceleration *= delta;
 			
 			if (acceleration.LengthSquared() > delta*delta) {

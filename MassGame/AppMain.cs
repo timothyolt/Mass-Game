@@ -68,7 +68,7 @@ namespace TOltjenbruns.MassGame {
 				particle.Position = new Vector3((float)(r.NextDouble() * 400) - 200, (float)(r.NextDouble() * 400) - 200, 0f);
 				particles.Add (particle);
 			}
-			for (int i = 0; i < 10; i++){
+			for (int i = 0; i < 3; i++){
 				Enemy e = new Enemy(player, particles, enemies);
 				e.Position = new Vector3((float)(r.NextDouble() * 400) - 200, (float)(r.NextDouble() * 400) - 200, 0f);
 				enemies.Add(e);
