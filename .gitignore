@@ -1,6 +1,8 @@
 # Compiler Stuff
 MassGame/obj
 MassGame/bin
+*.pidb
+*.userprefs
 
 # Windows image file caches
 Thumbs.db
