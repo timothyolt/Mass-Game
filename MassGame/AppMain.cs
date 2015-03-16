@@ -52,6 +52,11 @@ namespace TOltjenbruns.MassGame {
 	    }
 	
 	    static bool Init() {
+			Console.WriteLine(Color.WHITE.ToRgba());
+			Console.WriteLine(Color.RED.ToRgba());
+			Console.WriteLine(Color.GREEN.ToRgba());
+			Console.WriteLine(Color.BLUE.ToRgba());
+			Console.WriteLine(Color.BLACK.ToRgba());
 	        graphics = new GraphicsContext();
 	        shader = new ShaderProgram("/Application/shaders/Primitive.cgx");
 			r = new Random();
@@ -63,7 +68,7 @@ namespace TOltjenbruns.MassGame {
 	        shader.SetAttributeBinding(1, "iColor");
 			
 			player = new Player(particles);
-			for (int i = 0; i < 100; i++){
+			for (int i = 0; i < 500; i++){
 				Particle particle = new CubeParticle(Player.playerPoly, player, particles);
 				particle.Position = new Vector3((float)(r.NextDouble() * 400) - 200, (float)(r.NextDouble() * 400) - 200, 0f);
 				particles.Add (particle);

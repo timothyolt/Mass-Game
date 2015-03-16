@@ -52,5 +52,6 @@
     <Compile Include="Particle.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Polygon.cs" />
+    <Compile Include="Colors.cs" />
   </ItemGroup>
 </Project>
