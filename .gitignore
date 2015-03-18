@@ -1,6 +1,8 @@
 # Compiler Stuff
 MassGame/obj
 MassGame/bin
+*.pidb
+*.userprefs
 
 # Windows image file caches
 Thumbs.db
@@ -45,3 +47,6 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+
+*.pidb

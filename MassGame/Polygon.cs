@@ -44,7 +44,7 @@ namespace TOltjenbruns.MassGame {
 		}
 		public int indexCount {
 			get {return indicies.Length;}
-		}
+		} 
 		
 		public readonly DrawMode DrawMode;
 		#endregion

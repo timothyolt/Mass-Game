@@ -27,28 +27,25 @@ namespace TOltjenbruns.MassGame{
 		//TODO: move update flagging to this class and out of player
 		private const bool DEBUG = false;
 		
+		#region Properties
 		public Polygon[] polygons {get; private set;}
 		public int[] vPolyIndex {get; private set;}
 		public Primitive[] primitives {get; private set;}
 		public VertexBuffer vertexBuffer {get; private set;}
 		
-		
 		private double rotation;
-		private bool rotUpdate;
+		private double rotUpdate = 0;
 		public double Rotation {
 			get {return rotation;}
-			set {
-				rotUpdate = true;
-				rotation = value;
-			}
+			set {rotUpdate = value;}
 		}
 		
 		private Rgba colorMask;
-		private bool cMaskUpdate;
+		private Rgba cMaskUpdate = Color.WHITE.ToRgba();
 		public Rgba ColorMask {
 			get {return colorMask;}
 			set {
-				cMaskUpdate = true;
+				cMaskUpdate = value;
 				colorMask = value;
 			}
 		}
@@ -84,9 +81,11 @@ namespace TOltjenbruns.MassGame{
 		}
 		
 		public float LineWidth {get; set;}
+		#endregion
 		
 		//TODO: Center does NOT work as intended
 		
+		#region Constructors
 		public Element (Polygon polygon)
 			: this(new Polygon[] {polygon}){}
 		
@@ -109,7 +108,9 @@ namespace TOltjenbruns.MassGame{
 			//updateTransBuffer();
 			//updateColorBuffer();
 		}
+		#endregion
 			
+		#region Original Methods
 		private void createBuffer(){
 			int bufferLength = 0;
 			for (int i = 0; i < polygons.Length; i++){
@@ -251,7 +252,9 @@ namespace TOltjenbruns.MassGame{
 		public void dispose(){
 	 		vertexBuffer.Dispose();
 		}
+		#endregion
 		
+		#region Static Methods
 		public static float[] expandVerticies(Vector3[] verticies){
 			float[] output  = new float[verticies.Length * 3];
 			for (int i = 0; i < verticies.Length; i++){
@@ -302,5 +305,6 @@ namespace TOltjenbruns.MassGame{
 			}
 			return output;
 		}
+		#endregion
 	}
 }

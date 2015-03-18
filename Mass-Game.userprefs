@@ -1,6 +1,7 @@
 ﻿<Properties>
   <AuthorInfo Name="Timothy Oltjenbruns" Email="timothyolt@gmail.com" Copyright="Timothy Oltjenbruns" Company="" Trademark="" />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+<<<<<<< HEAD
   <MonoDevelop.Ide.Workbench ActiveDocument="MassGame\E_Spray.cs">
     <Files>
       <File FileName="MassGame\AppMain.cs" Line="71" Column="25" />
@@ -12,6 +13,18 @@
       <File FileName="MassGame\Player.cs" Line="227" Column="9" />
       <File FileName="MassGame\Polygon.cs" Line="1" Column="1" />
       <File FileName="MassGame\E_Spray.cs" Line="47" Column="3" />
+=======
+  <MonoDevelop.Ide.Workbench ActiveDocument="MassGame\Element.cs">
+    <Files>
+      <File FileName="MassGame\AppMain.cs" Line="66" Column="25" />
+      <File FileName="MassGame\CubeParticle.cs" Line="51" Column="23" />
+      <File FileName="MassGame\Element.cs" Line="312" Column="13" />
+      <File FileName="MassGame\Emitter.cs" Line="3" Column="32" />
+      <File FileName="MassGame\Enemy.cs" Line="51" Column="3" />
+      <File FileName="MassGame\Particle.cs" Line="27" Column="24" />
+      <File FileName="MassGame\Player.cs" Line="19" Column="14" />
+      <File FileName="MassGame\Polygon.cs" Line="155" Column="10" />
+>>>>>>> 7cd4ecd62c4a9426b9a0039413b4dab9022344a5
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
