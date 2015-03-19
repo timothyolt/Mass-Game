@@ -132,8 +132,8 @@ namespace TOltjenbruns.MassGame {
 			element.LineWidth = 4;
 			element.ColorMask = colorMask;
 			
-			emitter = new Emitter(power, sustain);
-			gunEmitter = new Emitter(gunPower, gunSustain);
+			emitter = new Emitter(power, sustain, 2, EmitterType.MAG);
+			gunEmitter = new Emitter(gunPower, gunSustain, 2, EmitterType.FORCE);
 			
 			health = 20;
 			position = Vector3.Zero;
@@ -181,10 +181,8 @@ namespace TOltjenbruns.MassGame {
 				foreach (Particle p in particles)
 					switch(p.Polarity){
 						case 0:
-							p.attract (position, emitter, field, delta);
-							break;
 						case 2:
-							p.repel (position, emitter, field, delta);
+							p.attract (position, emitter, field, delta);
 							break;
 						default:
 							Vector3 diff = p.Position - position;

@@ -22,6 +22,7 @@ using Sce.PlayStation.Core.Graphics;
 
 namespace TOltjenbruns.MassGame {
 	public static class Game {
+		//TODO: add dictionary keyed by string (polarity name) with a simple struct holding a color and byte
 		
 		private static Player player = null;
 		public static Player Player {

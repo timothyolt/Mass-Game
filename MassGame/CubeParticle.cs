@@ -15,7 +15,7 @@ namespace TOltjenbruns.MassGame{
 		
 		#region Constructors
 		public CubeParticle ()
-			: base(Player.playerPoly, new Emitter(power, sustain, 0, ParticleType.BIT)) {
+			: base(Player.playerPoly, new Emitter(power, sustain, 0, EmitterType.BIT)) {
 			Element.LineWidth = 2;
 			Element.Scale = new Vector3(0.5f, 0.5f, 0.5f);
 			Element.ColorMask = new Rgba(255, 255, 0, 255);

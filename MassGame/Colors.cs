@@ -28,6 +28,7 @@ namespace TOltjenbruns.MassGame {
 		BLUE = 0x0000FFFF
 	}
 	
+	//TODO: fix red channel not working
 	public static class ColorRgba {
 		public static Rgba ToRgba(this Color c){
 			ulong i = (ulong) c;
