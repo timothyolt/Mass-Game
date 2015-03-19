@@ -26,6 +26,8 @@ using Sce.PlayStation.Core.Input;
 
 namespace TOltjenbruns.MassGame {
 	class AppMain {
+		public static Random Rand = new Random();
+		
 	    private static bool running = true;
 	    private static GraphicsContext graphics;
 	    private static ShaderProgram shader;
@@ -68,7 +70,7 @@ namespace TOltjenbruns.MassGame {
 	        shader.SetAttributeBinding(1, "iColor");
 			
 			player = new Player(particles);
-			for (int i = 0; i < 500; i++){
+			for (int i = 0; i < 100; i++){
 				Particle particle = new CubeParticle(Player.playerPoly, player, particles);
 				particle.Position = new Vector3((float)(r.NextDouble() * 400) - 200, (float)(r.NextDouble() * 400) - 200, 0f);
 				particles.Add (particle);
@@ -105,8 +107,8 @@ namespace TOltjenbruns.MassGame {
 			//TODO: convert to orthographic camera maybe?
 			//Matrix4 proj = Matrix4.Ortho(0f, aspect, 1f, 0f, 1f, -1f);;
 	        Matrix4 proj = Matrix4.Perspective(fov, aspect, 1.0f, 1000000.0f);
-	        Matrix4 view = Matrix4.LookAt(new Vector3(0.0f, 0.0f, 5.0f),//*/new Vector3(0.0f, -2.5f, 3.0f),
-	                                    new Vector3(0.0f, 0.0f, 0.0f),//*/new Vector3(0.0f, -0.50f, 0.0f),
+	        Matrix4 view = Matrix4.LookAt(/*new Vector3(0.0f, 0.0f, 5.0f),//*/new Vector3(0.0f, -2.5f, 3.0f),
+	                                    /*new Vector3(0.0f, 0.0f, 0.0f),//*/new Vector3(0.0f, -0.50f, 0.0f),
 	                                    Vector3.UnitY);
 			//Matrix4 worldViewProj = proj;	
 			Matrix4 worldViewProj = proj * view;	

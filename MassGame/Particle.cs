@@ -228,10 +228,7 @@ namespace TOltjenbruns.MassGame {
 			acceleration = Velocity.Multiply(-1/2f);
 			Position += velocity;
 			
-			if (position.X < -200) position.X = 200;
-			if (position.X > 200) position.X = -200;
-			if (position.Y < -200) position.Y = 200;
-			if (position.Y > 200) position.Y = -200;
+			Position = LoopScreen(position);
 			
 			if (updateTransform) {
 				updateTransform = false;
@@ -247,6 +244,17 @@ namespace TOltjenbruns.MassGame {
 			
 		}
 		#endregion
+		
+		#region Additional Methods
+		public Vector3 LoopScreen(Vector3 v){
+			if (v.X < -200) v.X = 200;
+			if (v.X > 200) v.X = -200;
+			if (v.Y < -200) v.Y = 200;
+			if (v.Y > 200) v.Y = -200;
+			return v;
+		}
+		#endregion
+		
 	}
 }
 

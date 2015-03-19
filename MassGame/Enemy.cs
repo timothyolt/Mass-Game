@@ -24,7 +24,7 @@ using Sce.PlayStation.Core.Graphics;
 using Sce.PlayStation.Core.Input;
 
 namespace TOltjenbruns.MassGame {
-	public class Enemy {
+	public class Enemy : Particle {
 		
 		#region Protected Fields
 		
@@ -123,65 +123,12 @@ namespace TOltjenbruns.MassGame {
 			AvoidPlusTarget(position, player, enemies, ref target, ref avoidVector, ref targetDist);
 		}
 		
-		public virtual void update (float delta){
+		public override void update (float delta){
 			preUpdate(delta);
 			Move(delta);
 			Fire(delta);
 			
-//			Vector3 diff = player.Position - position;
-//			float distance = diff.Length();
-//			if (distance > 150){
-//				Vector3 velocity = diff.Normalize();
-//				velocity = velocity.Multiply(120 * delta);
-//				Position += velocity;
-//			}
-//			else if (distance < 50){
-//				Vector3 velocity = diff.Normalize();
-//				velocity = velocity.Multiply(-120 * delta);
-//				Position += velocity;
-//			}
-			
-//			if (gunCooldown <= 0){
-//				gunCooldown	= 5;
-//				Vector3 aim = diff.Normalize();
-//				aim = aim.Multiply(gunPower * delta);
-//				foreach (Particle p in particles)
-//					if ((p.Position - position).Length() < gunField){
-//						p.Polarity = 1;
-//						p.applyForce(aim, gunEmitter);
-//					}
-//			}
-//			else 
-//				foreach (Particle p in particles)
-//					switch(p.Polarity){
-//						case 0:
-//							p.attract (position, emitter, field, delta);
-//							break;
-//						case 1:
-//							p.repel (position, emitter, field, delta);
-//							break;
-//						case 2:
-//							Vector3 partDiff = p.Position - position;
-//							if (partDiff.Length() < 20){
-//								takeDamage (1);
-//								p.Polarity = 0;
-//							}
-//							break;
-//					}
-			
-			Position += velocity;
-			loopScreen();
-			if (updateTransform) {
-				updateTransform = false;
-				//TODO: Fix element center
-				element.Position = position.Multiply(0.01f).Add(new Vector3(-0.125f, -0.125f, 0));
-				element.Rotation = rotation;
-				element.updateTransBuffer();
-			}
-			if (updateColor) {
-				updateColor = false;
-				element.updateColorBuffer();
-			}
+			base.update();
 		}
 		
 		public virtual void Move (float delta){
@@ -204,9 +151,8 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		public virtual void Fire (float delta){
-			gunCooldown -= delta;
 			if (gunCooldown <= 0){
-				gunCooldown	= 5;
+				gunCooldown	= (float)(AppMain.Rand.NextDouble()*5+2.5);
 				Vector3 aim = target.Normalize();
 				aim = aim.Multiply(gunPower * delta);
 				float gunFieldSq = gunField*gunField;
@@ -233,6 +179,17 @@ namespace TOltjenbruns.MassGame {
 							}
 							break;
 					}
+		}
+		
+		public override void transform ()
+		{
+			element.Position = position.Multiply(0.01f).Add(new Vector3(-0.125f, -0.125f, 0));
+			element.Rotation = rotation;
+		}
+		
+		public override void color ()
+		{
+			
 		}
 		
 		public virtual void takeDamage(float damage){
@@ -298,35 +255,8 @@ namespace TOltjenbruns.MassGame {
 		public Vector3 Offset (Vector3 offsetPoint, Vector3 perspectivePoint){
 			Vector3 diff = offsetPoint-perspectivePoint;
 			//assuming a 400x400 loop screen.
-			if (diff.X > 200) 
-				diff.X -= 400;
-			if (diff.X < -200)
-				diff.X += 400;
-			if (diff.Y > 200) 
-				diff.Y -= 400;
-			if (diff.Y < -200)
-				diff.Y += 400;
+			diff = LoopScreen(diff);
 			return diff;
-		}
-		
-		public void loopScreen ()
-		{
-			if (position.X > 200) {
-				position.X -= 400;
-				updateTransform = true;
-			}
-			if (position.X <= -200) {
-				position.X += 400;
-				updateTransform = true;
-			}
-			if (position.Y > 200) {
-				position.Y -= 400;
-				updateTransform = true;
-			}
-			if (position.Y <= -200) {
-				position.Y += 400;
-				updateTransform = true;
-			}
 		}
 		#endregion
 	}
