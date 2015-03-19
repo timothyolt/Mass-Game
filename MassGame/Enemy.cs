@@ -33,6 +33,10 @@ namespace TOltjenbruns.MassGame {
 		protected Vector3 velocity;
 		protected Vector3 target;
 		protected Vector3 avoidVector;
+		protected float maxSpd;
+		protected float rangeCooldown;
+		protected float minCooldown;
+		protected float gunCooldown;
 		
 		protected Player player;
 		protected HashSet<Particle> particles;
@@ -55,11 +59,7 @@ namespace TOltjenbruns.MassGame {
 		//TODO: move update polling to Element
 		private bool updateTransform = true;
 		private bool updateColor = true;
-		
-		private float gunCooldown = 5;
-		
-		private float maxSpd;
-		
+				
 		private float maxHealth;
 		
 		#endregion
@@ -128,7 +128,7 @@ namespace TOltjenbruns.MassGame {
 			Move(delta);
 			Fire(delta);
 			
-			base.update();
+			base.update(delta);
 		}
 		
 		public virtual void Move (float delta){
@@ -152,7 +152,7 @@ namespace TOltjenbruns.MassGame {
 		
 		public virtual void Fire (float delta){
 			if (gunCooldown <= 0){
-				gunCooldown	= (float)(AppMain.Rand.NextDouble()*5+2.5);
+				gunCooldown = (float)(AppMain.Rand.NextDouble()*rangeCooldown)+minCooldown;
 				Vector3 aim = target.Normalize();
 				aim = aim.Multiply(gunPower * delta);
 				float gunFieldSq = gunField*gunField;
