@@ -38,7 +38,7 @@ namespace TOltjenbruns.MassGame{
 		{
 			//TODO: initialize health
 			
-			//TODO: a lot ...
+			//TODO: 
 		}
 		#endregion
 		

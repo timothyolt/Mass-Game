@@ -212,8 +212,8 @@ namespace TOltjenbruns.MassGame {
 			
 		}
 		
-		public void render (GraphicsContext graphics){
-			element.draw(graphics);
+		public void render (){
+			element.draw(Game.Graphics);
 		}
 		
 		public void dispose(){
