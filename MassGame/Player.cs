@@ -172,44 +172,27 @@ namespace TOltjenbruns.MassGame {
 				aim = aim.Normalize();
 				aim = aim.Multiply(gunPower * delta);
 				foreach (Particle p in particles)
-					// only able to fire the BITs
-					if(p.EmitterType == EmitterType.BIT){
-						switch(p.Polarity){
-							case 0:
-							case 2:
-								// fires only the yellow and green bits
-								if ((p.Position - position).Length() < gunField){
-									p.Polarity = 2;
-									p.applyForce(aim, gunEmitter);
-								}
-								break;
-							default:
-								break;
-						}
+					if ((p.Position - position).Length() < gunField){
+						p.Polarity = 2;
+						p.applyForce(aim, gunEmitter);
 					}
 			}
-			//else
-			//This loop is for attracting particles and taking damage, shouldn't that happen regardless of aim
-			foreach (Particle p in particles){
-				if(p.EmitterType == EmitterType.BIT){
-					// since now attract checks polarity,
-					// shouldn't it run regardles of polarity
-					p.attract (position, emitter, field, delta);
-					
+			else 
+				foreach (Particle p in particles)
 					switch(p.Polarity){
 						case 0:
 						case 2:
+							p.attract (position, emitter, field, delta);
 							break;
 						default:
 							Vector3 diff = p.Position - position;
-							if (diff.LengthSquared() < 400){
+							if (diff.Length() < 20){
 								takeDamage (1);
 								p.Polarity = 0;
 							}
 							break;
 					}
-				}
-			}
+			
 			if (updateTransform) {
 				updateTransform = false;
 				//TODO: Fix element center

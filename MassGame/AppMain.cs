@@ -26,9 +26,18 @@ using Sce.PlayStation.Core.Input;
 
 namespace TOltjenbruns.MassGame {
 	class AppMain {
+		public static Random Rand = new Random();
+		
 	    private static bool running = true;
+	    private static GraphicsContext graphics;
+	    private static ShaderProgram shader;
+		private static Random r;
+		
+		private static Player player;
+		private static HashSet<Particle> particles;
+		private static HashSet<Enemy> enemies;
 	
-	    private static void Main(string[] args) {
+	    static void Main(string[] args) {
 			Stopwatch s = new Stopwatch();
 			s.Start();
 	        Init();
@@ -44,79 +53,79 @@ namespace TOltjenbruns.MassGame {
 	        Dispose();
 	    }
 	
-	    private static bool Init() {
-			//TODO: Test Colors
+	    static bool Init() {
 			Console.WriteLine(Color.WHITE.ToRgba());
 			Console.WriteLine(Color.RED.ToRgba());
 			Console.WriteLine(Color.GREEN.ToRgba());
 			Console.WriteLine(Color.BLUE.ToRgba());
 			Console.WriteLine(Color.BLACK.ToRgba());
-			
-			
-	        Game.Graphics = new GraphicsContext();
-	        Game.Shader = new ShaderProgram("/Application/shaders/Primitive.cgx");
-			Game.Rand = new Random();
-			Game.Particles = new HashSet<Particle>();
+	        graphics = new GraphicsContext();
+	        shader = new ShaderProgram("/Application/shaders/Primitive.cgx");
+			r = new Random();
+			particles = new HashSet<Particle>();
+			enemies = new HashSet<Enemy>();
 				
-	        Game.Shader.SetUniformBinding(0, "WorldViewProj");
-	        Game.Shader.SetAttributeBinding(0, "iPosition");
-	        Game.Shader.SetAttributeBinding(1, "iColor");
+	        shader.SetUniformBinding(0, "WorldViewProj");
+	        shader.SetAttributeBinding(0, "iPosition");
+	        shader.SetAttributeBinding(1, "iColor");
 			
-			Game.Player = new Player(Game.Particles);
+			player = new Player(particles);
 			for (int i = 0; i < 100; i++){
-				Particle particle = new CubeParticle();
-				particle.Position = new Vector3(
-					(float)(Game.Rand.NextDouble() * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH/2, 
-					(float)(Game.Rand.NextDouble() * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT/2, 0f);
-				Game.Particles.Add (particle);
+				Particle particle = new CubeParticle(Player.playerPoly, player, particles);
+				particle.Position = new Vector3((float)(r.NextDouble() * 400) - 200, (float)(r.NextDouble() * 400) - 200, 0f);
+				particles.Add (particle);
 			}
-			for (int i = 0; i < 10; i++){
-				Enemy e = new Enemy();
-				e.Position = new Vector3(
-					(float)(Game.Rand.NextDouble() * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH/2, 
-					(float)(Game.Rand.NextDouble() * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT/2, 0f);
-				Game.Particles.Add(e);
+			for (int i = 0; i < 3; i++){
+				Enemy e = new Enemy(player, particles, enemies);
+				e.Position = new Vector3((float)(r.NextDouble() * 400) - 200, (float)(r.NextDouble() * 400) - 200, 0f);
+				enemies.Add(e);
 			}
 			
 	        return true;
 	    }
 
-	    private static void Dispose() {
-			Game.Dispose();
+	    static void Dispose() {
+	        shader.Dispose();
+	        graphics.Dispose();
+			player.dispose();
+			foreach (Particle p in particles) p.dispose();
+			foreach (Enemy e in enemies) e.dispose();
 	    }
 	
-	    private static bool Update(float delta) {
+	    static bool Update(float delta) {
 			//TODO: ADD STUFF
 			GamePadData gamePadData = GamePad.GetData(0);
-			Game.Player.update(delta, gamePadData);
-			foreach (Particle p in Game.Particles) p.update(delta);
+			player.update(delta, gamePadData);
+			foreach (Particle p in particles) p.update(delta);
+			foreach (Enemy e in enemies) e.update(delta);
 	        return true;
 	    }
 	
-	    private static bool Render() {
-		    float aspect = Game.Graphics.Screen.AspectRatio;
+	    static bool Render() {
+		    float aspect = graphics.Screen.AspectRatio;
 	        float fov = FMath.Radians(45.0f);
 			//TODO: convert to orthographic camera maybe?
 			//Matrix4 proj = Matrix4.Ortho(0f, aspect, 1f, 0f, 1f, -1f);;
 	        Matrix4 proj = Matrix4.Perspective(fov, aspect, 1.0f, 1000000.0f);
-	        Matrix4 view = Matrix4.LookAt(new Vector3(0.0f, 0.0f, 5.0f),//*/new Vector3(0.0f, -2.5f, 3.0f),
-	                                    new Vector3(0.0f, 0.0f, 0.0f),//*/new Vector3(0.0f, -0.50f, 0.0f),
+	        Matrix4 view = Matrix4.LookAt(/*new Vector3(0.0f, 0.0f, 5.0f),//*/new Vector3(0.0f, -2.5f, 3.0f),
+	                                    /*new Vector3(0.0f, 0.0f, 0.0f),//*/new Vector3(0.0f, -0.50f, 0.0f),
 	                                    Vector3.UnitY);
 			//Matrix4 worldViewProj = proj;	
 			Matrix4 worldViewProj = proj * view;	
 			
-	        Game.Shader.SetUniformValue(0, ref worldViewProj);
+	        shader.SetUniformValue(0, ref worldViewProj);
 	
 	        //graphics.SetViewport(0, 0, graphics.Screen.Height, graphics.Screen.Height);
-	        Game.Graphics.SetViewport(0, 0, Game.Graphics.Screen.Width, Game.Graphics.Screen.Height);
-	        Game.Graphics.SetClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-	        Game.Graphics.Clear();
+	        graphics.SetViewport(0, 0, graphics.Screen.Width, graphics.Screen.Height);
+	        graphics.SetClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+	        graphics.Clear();
 	
-	        Game.Graphics.SetShaderProgram(Game.Shader);
-			foreach (Particle p in Game.Particles) p.render();
-			Game.Player.render();
+	        graphics.SetShaderProgram(shader);
+			foreach (Particle p in particles) p.render(graphics);
+			foreach (Enemy e in enemies) e.render(graphics);
+			player.render(graphics);
 	
-	        Game.Graphics.SwapBuffers();
+	        graphics.SwapBuffers();
 	
 	        return true;
 	    }

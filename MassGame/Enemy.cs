@@ -24,11 +24,27 @@ using Sce.PlayStation.Core.Graphics;
 using Sce.PlayStation.Core.Input;
 
 namespace TOltjenbruns.MassGame {
-	public class Enemy : Particle{
+	public class Enemy : Particle {
+		
+		#region Protected Fields
+		
+		protected byte polarity;
+		
+		protected Vector3 velocity;
+		protected Vector3 target;
+		protected Vector3 avoidVector;
+		protected float maxSpd;
+		protected float rangeCooldown;
+		protected float minCooldown;
+		protected float gunCooldown;
+		
+		protected Player player;
+		protected HashSet<Particle> particles;
+		protected HashSet<Enemy> enemies;
+		#endregion
 		
 		#region Private Fields
-		private static Random rand = new Random();
-		private readonly Emitter boidEmitter;
+		private readonly Emitter emitter;
 		private const float power = 1000;
 		private const float sustain = 0.99f;
 		private const float field = 50;
@@ -38,16 +54,35 @@ namespace TOltjenbruns.MassGame {
 		private const float gunSustain = 0.75f;
 		private const float gunField = 50;
 		
+		private Element element;
 		//new player objects should always completely buffer the element on first update
 		//TODO: move update polling to Element
 		private bool updateTransform = true;
 		private bool updateColor = true;
+				
+		private float maxHealth;
 		
-		private float gunCooldown = 5;
-		private Vector3 target;
 		#endregion
 		
 		#region Properties
+		private Vector3 position;
+		public Vector3 Position {
+			get {return position;}
+			set {
+				updateTransform = true;
+				position = value;
+			}
+		}
+		
+		private double rotation;
+		public double Rotation {
+			get {return rotation;}
+			set {
+				updateTransform = true;
+				rotation = value;
+			}
+		}
+		
 		private float health;
 		public float Health {
 			get {return health;}
@@ -55,23 +90,37 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Constructors
-		public Enemy ()
-			: this (new Rgba(255, 0, 0, 255)){
+		public Enemy (Player player, HashSet<Particle> particles, HashSet<Enemy> enemies)
+			: this (player, particles, enemies, new Rgba(255, 0, 0, 255)){
 		}
 		
-		public Enemy(Rgba colorMask) 
-			: base (Player.playerPoly, new Emitter(power, sustain, 1, EmitterType.MAG)){
-			ColorMask = colorMask;
-			gunEmitter = new Emitter(gunPower, gunSustain, 1, EmitterType.FORCE);
-			boidEmitter = new Emitter(5, 0.1f, 1, EmitterType.MAG);
-			Element.LineWidth = 4;
-			health = 20;
+		public Enemy(Player player, HashSet<Particle> particles, HashSet<Enemy> enemies, Rgba colorMask){
+			this.enemies = enemies;
+			this.particles = particles;
+			this.player = player;
+			
+			element = new Element(Player.playerPoly);
+			element.LineWidth = 4;
+			element.ColorMask = colorMask;
+			
+			emitter = new Emitter(power, sustain);
+			gunEmitter = new Emitter(gunPower, gunSustain);
+			
+			polarity = 1;
+			maxHealth = 200;
+			position = Vector3.Zero;
+			rotation = 0.0;
+			health = maxHealth;
 		}
 		#endregion
 		
 		#region Original Methods
 		public virtual void preUpdate (float delta){
+			maxSpd = 100*delta;
 			gunCooldown -= delta;
+			
+			float targetDist = 0;
+			AvoidPlusTarget(position, player, enemies, ref target, ref avoidVector, ref targetDist);
 		}
 		
 		public override void update (float delta){
@@ -79,112 +128,68 @@ namespace TOltjenbruns.MassGame {
 			Move(delta);
 			Fire(delta);
 			
-//			Vector3 diff = player.Position - position;
-//			float distance = diff.Length();
-//			if (distance > 150){
-//				Vector3 velocity = diff.Normalize();
-//				velocity = velocity.Multiply(120 * delta);
-//				Position += velocity;
-//			}
-//			else if (distance < 50){
-//				Vector3 velocity = diff.Normalize();
-//				velocity = velocity.Multiply(-120 * delta);
-//				Position += velocity;
-//			}
-			
-//			if (gunCooldown <= 0){
-//				gunCooldown	= 5;
-//				Vector3 aim = diff.Normalize();
-//				aim = aim.Multiply(gunPower * delta);
-//				foreach (Particle p in particles)
-//					if ((p.Position - position).Length() < gunField){
-//						p.Polarity = 1;
-//						p.applyForce(aim, gunEmitter);
-//					}
-//			}
-//			else 
-//				foreach (Particle p in particles)
-//					switch(p.Polarity){
-//						case 0:
-//							p.attract (position, emitter, field, delta);
-//							break;
-//						case 1:
-//							p.repel (position, emitter, field, delta);
-//							break;
-//						case 2:
-//							Vector3 partDiff = p.Position - position;
-//							if (partDiff.Length() < 20){
-//								takeDamage (1);
-//								p.Polarity = 0;
-//							}
-//							break;
-//					}
 			base.update(delta);
 		}
 		
-		public override void transform (){
-			Element.Position = Position.Multiply(0.01f).Add(new Vector3(-0.0625f,-0.0625f,0));
-			Element.Rotation = Rotation;
-		}
-		
-		public override void color () {
-			Element.ColorMask = ColorMask;
-		}
-		
 		public virtual void Move (float delta){
-			foreach (Particle p in Game.Particles){
-				if (p.EmitterType == EmitterType.MAG) {
-					//Vector3 diff = Position.LoopDiff(p.Position);
-					//diff = diff.Normalize();
-					//diff /= diff.LengthSquared();
-					//diff *= delta;
-					attract(p.Position, boidEmitter, field, delta);
-				}
+			Vector3 acceleration = target.Multiply(1f/250) + avoidVector.Multiply(1f/80);
+			acceleration *= delta;
+			
+			if (acceleration.LengthSquared() > delta*delta) {
+				acceleration = acceleration.Normalize();
+				acceleration.Multiply(delta);
+			}
+			//Console.WriteLine(avoidVector);
+			velocity += acceleration;
+			
+			//limits the velocity
+			float maxSpdSq = maxSpd*maxSpd;
+			if (velocity.LengthSquared() > maxSpdSq) {
+				velocity = velocity.Normalize();
+				velocity *= maxSpd;
 			}
 		}
 		
 		public virtual void Fire (float delta){
-			target = Position.LoopDiff(Game.Player.Position);
 			if (gunCooldown <= 0){
-				gunCooldown	= (float)(3+(rand.NextDouble()*4));
+				gunCooldown = (float)(AppMain.Rand.NextDouble()*rangeCooldown)+minCooldown;
 				Vector3 aim = target.Normalize();
 				aim = aim.Multiply(gunPower * delta);
 				float gunFieldSq = gunField*gunField;
-				//TODO: we are doing a lot of duplicate distance tests, lets make a HashSet<Particle,DistDiffPair>
-				//and a private subclass DistDiffPair which holds a public vector3 (the diff) and a public float (distance)
-				//Putting this in particle and making a method to populate the set each tick would be a good idea
-				//Dont worry about clearing it, there can only be one data stored under a key (a particle in this case)
-				//Last update's distances will be overriten when the HashSet is repopulated
-				foreach (Particle p in Game.Particles)
-					if (
-				    	(!p.EmitterType.Equals(EmitterType.MAG)) && 
-						(p.Position - Position).LengthSquared() < gunFieldSq
-					){
-						p.Polarity = Polarity;
+				foreach (Particle p in particles)
+					if ((p.Position - position).LengthSquared() < gunFieldSq){
+						p.Polarity = polarity;
 						p.applyForce(aim, gunEmitter);
 					}
 			}
-			//else
-			//This loop is for attracting particles and taking damage, shouldn't that happen regardless of firing
-			foreach (Particle p in Game.Particles){
-				//to limit the force effects only to BIT types
-				if(p.EmitterType == EmitterType.BIT){
-					p.attract (Position, Emitter, field, delta);
-					
+			else 
+				foreach (Particle p in particles)
 					switch(p.Polarity){
 						case 0:
+							p.attract (position, emitter, field, delta);
+							break;
 						case 1:
+							p.repel (position, emitter, field, delta);
 							break;
 						default:
-							Vector3 partDiff = Position.LoopDiff(p.Position);
+							Vector3 partDiff = p.Position - position;
 							if (partDiff.LengthSquared() < 400){
 								takeDamage (1);
 								p.Polarity = 0;
 							}
 							break;
 					}
-				}
-			}
+		}
+		
+		public override void transform ()
+		{
+			element.Position = position.Multiply(0.01f).Add(new Vector3(-0.125f, -0.125f, 0));
+			element.Rotation = rotation;
+		}
+		
+		public override void color ()
+		{
+			
 		}
 		
 		public virtual void takeDamage(float damage){
@@ -192,10 +197,17 @@ namespace TOltjenbruns.MassGame {
 			//TODO: Change Color
 			//TODO: Check if dead
 		}
+		
+		public void render (GraphicsContext graphics){
+			element.draw(graphics);
+		}
+		
+		public void dispose(){
+			element.dispose();	
+		}
 		#endregion
 		
 		#region AI Methods
-		/*
 		public void AvoidPlusTarget (Vector3 pos, Player player, HashSet<Enemy> enemies,
 		                             ref Vector3 target, ref Vector3 avoidVector, ref float targetDist){
 			//not sure if we want to avoid the oppposite polar particles as well
@@ -240,27 +252,12 @@ namespace TOltjenbruns.MassGame {
 		/// <param name='perspectivePoint'>
 		/// Perspective point, the center of the parspective.
 		/// </param>
-		
-		public void loopScreen ()
-		{
-			if (position.X > 200) {
-				position.X -= 400;
-				updateTransform = true;
-			}
-			if (position.X <= -200) {
-				position.X += 400;
-				updateTransform = true;
-			}
-			if (position.Y > 200) {
-				position.Y -= 400;
-				updateTransform = true;
-			}
-			if (position.Y <= -200) {
-				position.Y += 400;
-				updateTransform = true;
-			}
+		public Vector3 Offset (Vector3 offsetPoint, Vector3 perspectivePoint){
+			Vector3 diff = offsetPoint-perspectivePoint;
+			//assuming a 400x400 loop screen.
+			diff = LoopScreen(diff);
+			return diff;
 		}
-		*/
 		#endregion
 	}
 }

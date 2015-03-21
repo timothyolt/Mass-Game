@@ -67,10 +67,7 @@ namespace TOltjenbruns.MassGame{
 				}
 			}
 			foreach (Particle p in Game.Particles)
-				if (p is CubeParticle) {
-					if (p != this) p.attract (Position, Emitter, field, delta);
-				}
-				
+				if (p != this) p.attract (Position, Emitter, field, delta);
 			//TODO: Fix element center
 			//Rotation = Math.Atan2(velocity.Y, velocity.X);
 			base.update (delta);
