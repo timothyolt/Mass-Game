@@ -1,4 +1,4 @@
- /*Copyright (C) 2015 Timothy A. Oltjenbruns
+﻿ /*Copyright (C) 2015 Timothy A. Oltjenbruns
   *
   *	This program is free software; you can redistribute it and/or modify
   *	it under the terms of the GNU General Public License as published by
@@ -50,6 +50,8 @@ namespace TOltjenbruns.MassGame{
 			minCooldown = 3;
 			rangeCooldown = 4;
 			gunCooldown = (float)(AppMain.Rand.NextDouble()*rangeCooldown)+minCooldown;
+			
+			//TODO: 
 		}
 		#endregion
 		

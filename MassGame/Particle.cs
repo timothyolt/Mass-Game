@@ -25,9 +25,10 @@ using Sce.PlayStation.Core.Input;
 
 namespace TOltjenbruns.MassGame {
 	public abstract class Particle {
+		
 		#region Private Fields
 		private static Vector3 gravity = new Vector3(0, -30, 0);
-		private static Emitter gEmit = new Emitter(30, 0.5f);
+		//private static Emitter gEmit = new Emitter(30, 0.5f, 0, null);
 
 		//new particle objects should always completely buffer the element on first update
 		//TODO: move update polling to Element
@@ -48,19 +49,17 @@ namespace TOltjenbruns.MassGame {
 			get {return element;}
 		}
 		
-		private byte polarity;
-		protected bool polarityUpdate = true;
-		public byte Polarity {
-			get { return polarity; }
-			set { 
-				polarityUpdate = true;
-				polarity = value;
-			}
+		public EmitterType EmitterType {
+			get	{ return emitter.etype; }
 		}
 		
-		private HashSet<Particle> particles;
-		protected HashSet<Particle> Particles{
-			get { return particles; }
+		protected bool polarityUpdate = true;
+		public byte Polarity {
+			get { return emitter.polarity; }
+			set { 
+				polarityUpdate = true;
+				emitter.polarity = value;
+			}
 		}
 		
 //		private float volatilily;
@@ -111,10 +110,9 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Constructors
-		public Particle(Polygon poly, Emitter emitter, HashSet<Particle> particles){
+		public Particle(Polygon poly, Emitter emitter){
 			element = new Element(poly);
 			this.emitter = emitter;
-			this.particles = particles;
 			
 			forces = new SortedList<Emitter, Vector3>();
 			
@@ -131,31 +129,14 @@ namespace TOltjenbruns.MassGame {
 			if (diffLength < netSize){
 				Vector3 force = Vector3.Zero;
 				if (diffLength > power)
-					force += diff.Multiply(power/(diffLength*diffLength));
+					force += diff.Multiply(power/(diffLength * diffLength));
 				else 
 					force += diff.Multiply(1/power);
 				//if (force.Length() > netSize)
 				//	force = Vector3.Zero;
-				applyForce(-force, e);
+				applyForce((e.polarity == this.emitter.polarity) ? force : -force, e);
 			}
 		}
-		
-		public void repel(Vector3 pos, Emitter e, float netSize, float delta){
-			Vector3 diff = Position + Velocity - pos;
-			float power = e.power * delta;
-			float diffLength = diff.Length();
-			if (diffLength < netSize){
-				Vector3 force = Vector3.Zero;
-				if (diffLength > power)
-					force += diff.Multiply(power/(diffLength*diffLength));
-				else 
-					force += diff.Multiply(1/power);
-				//if (force.Length() > netSize)
-				//	force = Vector3.Zero;
-				applyForce(force, e);
-			}
-		}
-		
 //		public void attract(Vector3 pos, float power, float netSize){
 //			Vector3 diff = pos - Position;
 //			Vector3 force = Vector3.Zero;
@@ -192,8 +173,8 @@ namespace TOltjenbruns.MassGame {
 				forces.Add (e, f);
 		}
 		
-		public void render (GraphicsContext graphics){
-			element.draw(graphics);
+		public void render (){
+			element.draw(Game.Graphics);
 		}
 		
 		public void dispose(){

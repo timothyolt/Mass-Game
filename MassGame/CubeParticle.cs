@@ -14,10 +14,8 @@ namespace TOltjenbruns.MassGame{
 		#endregion
 		
 		#region Constructors
-		public CubeParticle (Polygon poly, Player player, HashSet<Particle> particles)
-			: base(poly, new Emitter(power, sustain), particles) {
-			this.player = player;
-			Polarity = 0;
+		public CubeParticle ()
+			: base(Player.playerPoly, new Emitter(power, sustain, 0, EmitterType.BIT)) {
 			Element.LineWidth = 2;
 			Element.Scale = new Vector3(0.5f, 0.5f, 0.5f);
 			Element.ColorMask = new Rgba(255, 255, 0, 255);
@@ -68,8 +66,8 @@ namespace TOltjenbruns.MassGame{
 					Element.updateColorBuffer();
 				}
 			}
-			foreach (Particle p in Particles)
-				if (p != this) p.repel (Position, Emitter, field, delta);
+			foreach (Particle p in Game.Particles)
+				if (p != this) p.attract (Position, Emitter, field, delta);
 			//TODO: Fix element center
 			//Rotation = Math.Atan2(velocity.Y, velocity.X);
 			base.update (delta);

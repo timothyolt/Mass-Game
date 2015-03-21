@@ -16,29 +16,13 @@
 //  *	51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //  */
 using System;
-using Sce.PlayStation.Core;
 
-namespace TOltjenbruns.MassGame {
-	public enum Color : ulong {
-		TRANS = 0x00000000,
-		BLACK = 0x000000FF,
-		WHITE = 0xFFFFFFFF,
-		RED = 0xFF0000FF,
-		GREEN = 0x00FF00FF,
-		BLUE = 0x0000FFFF
-	}
-	
-	//TODO: fix red channel not working
-	public static class ColorRgba {
-		public static Rgba ToRgba(this Color c){
-			ulong i = (ulong) c;
-			Console.WriteLine("{0:X}", i);
-			return new Rgba(
-				(int)(i & 0xFF000000)/0x1000000, 
-				(int)(i & 0x00FF0000)/0x10000,
-				(int)(i & 0x0000FF00)/0x100,
-				(int)(i & 0x000000FF)
-			);
+namespace MassGame
+{
+	public class ParticleBit
+	{
+		public ParticleBit ()
+		{
 		}
 	}
 }
