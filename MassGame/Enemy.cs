@@ -28,7 +28,7 @@ namespace TOltjenbruns.MassGame {
 		
 		#region Private Fields
 		private const float power = 1000;
-		private const float sustain = 0.99f;
+		private const float sustain = 0.5f;
 		private const float field = 50;
 		
 		private readonly Emitter gunEmitter;
@@ -145,17 +145,19 @@ namespace TOltjenbruns.MassGame {
 				//Putting this in particle and making a method to populate the set each tick would be a good idea
 				//Dont worry about clearing it, there can only be one data stored under a key (a particle in this case)
 				//Last update's distances will be overriten when the HashSet is repopulated
-				foreach (Particle p in Game.Particles)
-					if (
-				    	(!p.EmitterType.Equals(EmitterType.MAG)) && 
-						(p.Position - Position).LengthSquared() < gunFieldSq
-					){
-						p.Polarity = Polarity;
-						p.applyForce(aim, gunEmitter);
-					}
+//				foreach (Particle p in Game.Particles)
+//					if (
+//				    	(p.EmitterType.Equals(EmitterType.MAG)) && 
+//						(p.Position - Position).LengthSquared() < gunFieldSq
+//					){
+//						p.Polarity = Polarity;
+//						p.applyForce(aim, gunEmitter);
+//					}
 			}
 			else 
-				foreach (Particle p in Game.Particles)
+				foreach (Particle p in Game.Particles){
+					if (p == this)
+						return;
 					switch(p.Polarity){
 						case 0:
 						case 1:
@@ -169,6 +171,7 @@ namespace TOltjenbruns.MassGame {
 							}
 							break;
 					}
+			}
 		}
 		
 		public virtual void takeDamage(float damage){
