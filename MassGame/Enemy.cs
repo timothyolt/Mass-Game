@@ -59,9 +59,9 @@ namespace TOltjenbruns.MassGame {
 		
 		public Enemy(Rgba colorMask) 
 			: base (Player.playerPoly, new Emitter(power, sustain, 1, EmitterType.MAG)){
-			
+			ColorMask = colorMask;
 			gunEmitter = new Emitter(gunPower, gunSustain, 1, EmitterType.FORCE);
-			
+			Element.LineWidth = 4;
 			health = 20;
 		}
 		#endregion
@@ -146,7 +146,10 @@ namespace TOltjenbruns.MassGame {
 				//Dont worry about clearing it, there can only be one data stored under a key (a particle in this case)
 				//Last update's distances will be overriten when the HashSet is repopulated
 				foreach (Particle p in Game.Particles)
-					if (p != this && (p.Position - Position).LengthSquared() < gunFieldSq){
+					if (
+				    	(!p.EmitterType.Equals(EmitterType.MAG)) && 
+						(p.Position - Position).LengthSquared() < gunFieldSq
+					){
 						p.Polarity = Polarity;
 						p.applyForce(aim, gunEmitter);
 					}

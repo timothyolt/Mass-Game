@@ -49,10 +49,13 @@ namespace TOltjenbruns.MassGame {
 			get {return element;}
 		}
 		
-		private byte polarity;
+		public EmitterType EmitterType {
+			get	{ return emitter.etype; }
+		}
+		
 		protected bool polarityUpdate = true;
 		public byte Polarity {
-			get { return polarity; }
+			get { return emitter.polarity; }
 			set { 
 				polarityUpdate = true;
 				emitter.polarity = value;
@@ -123,8 +126,6 @@ namespace TOltjenbruns.MassGame {
 			Vector3 diff = Position + Velocity - pos;
 			float power = e.power * delta;
 			float diffLength = diff.Length();
-			if (emitter.etype.Equals(EmitterType.MAG) && (!e.etype.Equals(EmitterType.FORCE)))
-				return;
 			if (diffLength < netSize){
 				Vector3 force = Vector3.Zero;
 				if (diffLength > power)

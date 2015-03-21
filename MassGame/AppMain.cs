@@ -63,7 +63,7 @@ namespace TOltjenbruns.MassGame {
 	        Game.Shader.SetAttributeBinding(1, "iColor");
 			
 			Game.Player = new Player(Game.Particles);
-			for (int i = 0; i < 500; i++){
+			for (int i = 0; i < 100; i++){
 				Particle particle = new CubeParticle();
 				particle.Position = new Vector3(
 					(float)(Game.Rand.NextDouble() * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH/2, 
