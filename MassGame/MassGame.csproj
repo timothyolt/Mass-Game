@@ -53,6 +53,6 @@
     <Compile Include="Player.cs" />
     <Compile Include="Polygon.cs" />
     <Compile Include="Colors.cs" />
-    <Compile Include="E_Spray.cs" />
+    <Compile Include="Game.cs" />
   </ItemGroup>
 </Project>

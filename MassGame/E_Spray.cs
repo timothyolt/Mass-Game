@@ -1,4 +1,4 @@
-﻿ /*Copyright (C) 2015 Timothy A. Oltjenbruns
+ /*Copyright (C) 2015 Timothy A. Oltjenbruns
   *
   *	This program is free software; you can redistribute it and/or modify
   *	it under the terms of the GNU General Public License as published by
@@ -24,16 +24,6 @@ using Sce.PlayStation.Core.Input;
 namespace TOltjenbruns.MassGame{
 	public class E_Spray : Enemy
 	{
-		// Fast moving
-		// Targets anything
-		// Fire speed 5±2
-		
-		/* Enemies should be broken into their behaviors
-		 * 			E_spray		E_cannon	E_BlackWhole
-		 * Movement	fast		groupie		avoids everything
-		 * Targets	anything	non-cannon	nothing
-		 * FireSpd	5±2s		10±4s		20±8s
-		 */
 		#region Private Fields
 		
 		#endregion
@@ -47,35 +37,13 @@ namespace TOltjenbruns.MassGame{
 			: base (player, particles, enemies, colorMask)
 		{
 			//TODO: initialize health
-			minCooldown = 3;
-			rangeCooldown = 4;
-			gunCooldown = (float)(AppMain.Rand.NextDouble()*rangeCooldown)+minCooldown;
 			
 			//TODO: 
 		}
 		#endregion
 		
 		#region Original Methods
-		public override void preUpdate (float delta)
-		{
-			base.preUpdate (delta);
-			maxSpd *= 1.2f;
-		}
 		
-		public override void update (float delta)
-		{
-			base.update (delta);
-		}
-		
-		public override void Move (float delta)
-		{
-			base.Move (delta);
-		}
-		
-		public override void Fire (float delta)
-		{
-			base.Fire (delta);
-		}
 		
 		#endregion
 		
