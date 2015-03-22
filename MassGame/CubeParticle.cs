@@ -6,11 +6,11 @@ namespace TOltjenbruns.MassGame{
 	public class CubeParticle : Particle {
 		#region Private Fields
 		private const float power = 60;
-		private const float sustain = 0.90f;
-		private const float field = 5;
+		private const float sustain = 0.75f;
+	private const float field = 1;
 		
-		private float cooldown = 0;
-		private Player player;
+		private const float polarityFadeReset = 5;
+		private float polarityFade = 0;
 		#endregion
 		
 		#region Constructors
@@ -25,8 +25,12 @@ namespace TOltjenbruns.MassGame{
 		
 		#region Override Methods
 		public override void update (float delta){
-			//TODO: move attract call to player
-			//attract (player.Position, pEmit, pField, delta);
+			fadePolarity(delta);
+			polarize(delta);
+			base.update (delta);
+		}
+		
+		private void fadePolarity(float delta){
 			if (polarityUpdate){
 				polarityUpdate = false;
 				switch (Polarity){
@@ -35,19 +39,19 @@ namespace TOltjenbruns.MassGame{
 					Element.updateColorBuffer();
 					break;
 				case 1:
-					cooldown = 5;
+					polarityFade = polarityFadeReset;
 //					Element.ColorMask = new Rgba(255, 0, 0, 255);
 //					Element.updateColorBuffer();
 					break;
 				case 2:
-					cooldown = 5;
+					polarityFade = polarityFadeReset;
 //					Element.ColorMask = new Rgba(0, 255, 0, 255);
 //					Element.updateColorBuffer();
 					break;
 				}
 			}
-			if (cooldown > 0){
-				int fade = (int)((cooldown/5.0f) * 256.0f);
+			if (polarityFade > 0){
+				int fade = (int)((polarityFade/5.0f) * 256.0f);
 				switch (Polarity){
 					case 1:
 						Element.ColorMask = new Rgba(256, 256-fade, 0, 255);
@@ -58,20 +62,20 @@ namespace TOltjenbruns.MassGame{
 						Element.updateColorBuffer();
 						break;
 				}
-				cooldown -= delta;
-				if (cooldown <= 0){
-					cooldown = 0;
+				polarityFade -= delta;
+				if (polarityFade <= 0){
+					polarityFade = 0;
 					Polarity = 0;
 					Element.ColorMask = new Rgba(255, 255, 0, 255);
 					Element.updateColorBuffer();
 				}
 			}
+		}
+		
+		private void polarize(float delta){
 			foreach (Particle p in Game.Particles)
-				if (p != this && (!p.EmitterType.Equals(EmitterType.MAG)))
+				if (p != this && p.Polarity == Polarity && (!p.EmitterType.Equals(EmitterType.MAG)))
 					p.attract (Position, Emitter, field, delta);
-			//TODO: Fix element center
-			//Rotation = Math.Atan2(velocity.Y, velocity.X);
-			base.update (delta);
 		}
 		
 		public override void transform (){

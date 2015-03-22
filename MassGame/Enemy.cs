@@ -29,7 +29,7 @@ namespace TOltjenbruns.MassGame {
 		#region Private Fields
 		private const float power = 1000;
 		private const float sustain = 0.5f;
-		private const float field = 50;
+		private const float field = 35;
 		
 		private readonly Emitter gunEmitter;
 		private const float gunPower = 1000;
@@ -38,8 +38,6 @@ namespace TOltjenbruns.MassGame {
 		
 		//new player objects should always completely buffer the element on first update
 		//TODO: move update polling to Element
-		private bool updateTransform = true;
-		private bool updateColor = true;
 		
 		private float gunCooldown = (float)(3 + (Game.Rand.NextDouble() * 4));
 		private Vector3 target;
@@ -75,47 +73,7 @@ namespace TOltjenbruns.MassGame {
 			preUpdate(delta);
 			Move(delta);
 			Fire(delta);
-			
-//			Vector3 diff = player.Position - position;
-//			float distance = diff.Length();
-//			if (distance > 150){
-//				Vector3 velocity = diff.Normalize();
-//				velocity = velocity.Multiply(120 * delta);
-//				Position += velocity;
-//			}
-//			else if (distance < 50){
-//				Vector3 velocity = diff.Normalize();
-//				velocity = velocity.Multiply(-120 * delta);
-//				Position += velocity;
-//			}
-			
-//			if (gunCooldown <= 0){
-//				gunCooldown	= 5;
-//				Vector3 aim = diff.Normalize();
-//				aim = aim.Multiply(gunPower * delta);
-//				foreach (Particle p in particles)
-//					if ((p.Position - position).Length() < gunField){
-//						p.Polarity = 1;
-//						p.applyForce(aim, gunEmitter);
-//					}
-//			}
-//			else 
-//				foreach (Particle p in particles)
-//					switch(p.Polarity){
-//						case 0:
-//							p.attract (position, emitter, field, delta);
-//							break;
-//						case 1:
-//							p.repel (position, emitter, field, delta);
-//							break;
-//						case 2:
-//							Vector3 partDiff = p.Position - position;
-//							if (partDiff.Length() < 20){
-//								takeDamage (1);
-//								p.Polarity = 0;
-//							}
-//							break;
-//					}
+			polarize(delta);
 			base.update(delta);
 		}
 		
@@ -128,26 +86,25 @@ namespace TOltjenbruns.MassGame {
 			Element.ColorMask = ColorMask;
 		}
 		
-		public virtual void Move (float delta){
+		protected virtual void Move (float delta){
 			foreach (Particle p in Game.Particles){
 				if (p.EmitterType == EmitterType.MAG) {
 					//Vector3 diff = Position.LoopDiff(p.Position);
 					//diff = diff.Normalize();
 					//diff /= diff.LengthSquared();
 					//diff *= delta;
-					p.attract(Position, Emitter, field, delta);
+					//p.attract(Position, Emitter, field, delta);
 				}
 			}
 		}
 		
-		public virtual void Fire (float delta){
+		protected virtual void Fire (float delta){
 			target = Position.LoopDiff(Game.Player.Position);
 			gunCooldown -= delta;
 			if (gunCooldown <= 0){
 				gunCooldown	= (float)(3 + (Game.Rand.NextDouble() * 4));
 				Vector3 aim = target.Normalize();
 				aim = aim.Multiply(gunPower * delta);
-				float gunFieldSq = gunField*gunField;
 				//TODO: we are doing a lot of duplicate distance tests, lets make a HashSet<Particle,DistDiffPair>
 				//and a private subclass DistDiffPair which holds a public vector3 (the diff) and a public float (distance)
 				//Putting this in particle and making a method to populate the set each tick would be a good idea
@@ -162,31 +119,29 @@ namespace TOltjenbruns.MassGame {
 //						p.applyForce(aim, gunEmitter);
 //					}'
 				foreach (Particle p in Game.Particles)
-					if (
-						(p != this) &&
-				    	(!p.EmitterType.Equals(EmitterType.MAG)) && 
-						((p.Position - Position).LengthSquared() < gunFieldSq)
+					if(
+						p != this && 
+						p.EmitterType == EmitterType.BIT && 
+						Position.LoopDiff(p.Position).Length() <= gunField
 					){
 						p.Polarity = Polarity;
+						p.clearForces();
 						p.applyForce(aim, gunEmitter);
 					}
 			}
-			else 
-				foreach (Particle p in Game.Particles){
-					if (p == this)
-						return;
-					switch(p.Polarity){
-						case 0:
-						case 1:
-							p.attract (Position, Emitter, field, delta);
-							break;
-						default:
-							Vector3 partDiff = Position.LoopDiff(p.Position);
-							if (partDiff.LengthSquared() < 400){
-								takeDamage (1);
-								p.Polarity = 0;
-							}
-							break;
+		}
+		
+		protected virtual void polarize (float delta){
+			foreach (Particle p in Game.Particles){
+				if (p != this && p.EmitterType.Equals(EmitterType.BIT)){
+					p.attract (Position, Emitter, field, delta);
+					if (p.Polarity != 0 && p.Polarity != Polarity){
+						Vector3 partDiff = Position.LoopDiff(p.Position);
+						if (partDiff.LengthSquared() < 400){
+							takeDamage (1);
+							p.Polarity = 0;
+						}
+					}
 				}
 			}
 		}

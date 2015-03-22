@@ -62,9 +62,9 @@ namespace TOltjenbruns.MassGame {
 	        Game.Shader.SetAttributeBinding(0, "iPosition");
 	        Game.Shader.SetAttributeBinding(1, "iColor");
 			
-			Game.Player = new Player(Game.Particles);
+			Game.Player = new Player();
 			Game.Particles.Add(Game.Player);
-			for (int i = 0; i < 100; i++){
+			for (int i = 0; i < 20; i++){
 				Particle particle = new CubeParticle();
 				particle.Position = new Vector3(
 					(float)(Game.Rand.NextDouble() * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH/2, 
@@ -88,8 +88,8 @@ namespace TOltjenbruns.MassGame {
 	
 	    private static bool Update(float delta) {
 			//TODO: ADD STUFF
-			GamePadData gamePadData = GamePad.GetData(0);
-			Game.Player.Pupdate(delta, gamePadData);
+			Game.GamePadData = GamePad.GetData(0);
+			Game.Player.update(delta);
 			foreach (Particle p in Game.Particles) p.update(delta);
 	        return true;
 	    }

@@ -79,14 +79,16 @@ namespace TOltjenbruns.MassGame {
 		private readonly Emitter emitter;
 		private const float power = 1000;
 		private const float sustain = 0.99f;
-		private const float field = 50;
+		private const float field = 35;
 		
 		private readonly Emitter gunEmitter;
 		private const float gunPower = 1000;
 		private const float gunSustain = 0.75f;
-		private const float gunField = 50;
+		private const float gunField = 35;
 		
-		private HashSet<Particle> particles;
+		private const float sprayCooldownReset = 0.3f;
+		private float sprayCooldown = 0;
+		
 		#endregion
 		
 		#region Properties
@@ -106,14 +108,13 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Constructors
-		public Player (HashSet<Particle> particles)
-			: this (particles, new Rgba(0, 255, 0, 255)){
+		public Player ()
+			: this (new Rgba(0, 255, 0, 255)){
 		}
 		
-		public Player(HashSet<Particle> particles, Rgba colorMask) 
+		public Player(Rgba colorMask) 
 			:base(playerPoly, new Emitter(power,sustain,2,EmitterType.MAG))
 		{
-			this.particles = particles;
 			
 			//element = new Element(playerPoly);
 			Element.LineWidth = 4;
@@ -128,7 +129,16 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Original Methods
-		public void Pupdate (float delta, GamePadData gamePad){
+		public override void update (float delta){
+			GamePadData gamePad = Game.GamePadData;
+			move (delta, gamePad);
+			if (sprayCooldown <= 0) fire (delta, gamePad);
+			else sprayCooldown -= delta;
+			polarize(delta);
+			base.update(delta);
+		}
+		
+		private void move(float delta, GamePadData gamePad){
 			Vector3 velocity = Vector3.Zero;
 			if ((gamePad.Buttons & GamePadButtons.Up) != 0)
 				velocity.Y += 1;
@@ -142,9 +152,10 @@ namespace TOltjenbruns.MassGame {
 				velocity = velocity.Normalize();
 				velocity = velocity.Multiply(120 * delta);
 				Position += velocity;
-				//loopScreen();
 			}
-			
+		}
+		
+		private void fire(float delta, GamePadData gamePad){
 			Vector3 aim = Vector3.Zero;
 			if ((gamePad.Buttons & GamePadButtons.Triangle) != 0)
 				aim.Y += 1;
@@ -157,48 +168,33 @@ namespace TOltjenbruns.MassGame {
 			if (aim != Vector3.Zero){
 				aim = aim.Normalize();
 				aim = aim.Multiply(gunPower * delta);
-				foreach (Particle p in particles)
-					// only able to fire the BITs
-					if(p.EmitterType == EmitterType.BIT){
-						switch(p.Polarity){
-							case 0:
-							case 2:
-								// fires only the yellow and green bits
-								//p.attract(Position, gunEmitter, gunField, delta);
-								if ((p.Position - Position).Length() < gunField){
-									p.Polarity = 2;
-									p.applyForce(aim, gunEmitter);
-								}
-								break;
-							default:
-								break;
+				foreach (Particle p in Game.Particles)
+					if(
+						p != this && 
+						p.EmitterType == EmitterType.BIT && 
+						Position.LoopDiff(p.Position).Length() <= gunField
+					){
+						p.Polarity = Polarity;
+						p.clearForces();
+						p.applyForce(aim, gunEmitter);
+					}
+				sprayCooldown = sprayCooldownReset;
+			}
+		}
+		
+		private void polarize(float delta){
+			foreach (Particle p in Game.Particles){
+				if (p != this && p.EmitterType.Equals(EmitterType.BIT)){
+					p.attract (Position, Emitter, field, delta);
+					if (p.Polarity != 0 && p.Polarity != Polarity){
+						Vector3 partDiff = Position.LoopDiff(p.Position);
+						if (partDiff.LengthSquared() < 400){
+							takeDamage (1);
+							p.Polarity = 0;
 						}
 					}
-			}
-			//else
-			//This loop is for attracting particles and taking damage, shouldn't that happen regardless of aim
-			foreach (Particle p in particles){
-					// since now attract checks polarity,
-					// shouldn't it run regardles of polarity
-					p.attract (Position, emitter, field, delta);
-					
-					switch(p.Polarity){
-						case 0:
-						case 2:
-							p.attract (Position, Emitter, field, delta);
-							break;
-						default:
-							if(p.EmitterType == EmitterType.BIT){
-								Vector3 diff = p.Position - Position;
-								if (diff.LengthSquared() < 400){
-									takeDamage (1);
-									p.Polarity = 0;
-								}
-							}	
-							break;	
 				}
 			}
-			base.update(delta);
 		}
 		
 		public void takeDamage(float damage){
@@ -207,10 +203,6 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Override Methods
-		public override void update (float delta)
-		{
-			base.update (delta);
-		}
 		public override void transform ()
 		{
 			//TODO: Fix element center

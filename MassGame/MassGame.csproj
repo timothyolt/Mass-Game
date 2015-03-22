@@ -55,5 +55,6 @@
     <Compile Include="Colors.cs" />
     <Compile Include="E_Spray.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="MagParticle.cs" />
   </ItemGroup>
 </Project>

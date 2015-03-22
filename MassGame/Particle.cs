@@ -27,8 +27,6 @@ namespace TOltjenbruns.MassGame {
 	public abstract class Particle {
 		
 		#region Private Fields
-		private static Vector3 gravity = new Vector3(0, -30, 0);
-		//private static Emitter gEmit = new Emitter(30, 0.5f, 0, null);
 
 		//new particle objects should always completely buffer the element on first update
 		//TODO: move update polling to Element
@@ -61,15 +59,6 @@ namespace TOltjenbruns.MassGame {
 				emitter.polarity = value;
 			}
 		}
-		
-//		private float volatilily;
-//		public float Volatility {
-//			get { return volatilily; }
-//			set { 
-//				volatilily = value;
-//				if (
-//			}
-//		}
 		
 		private Rgba colorMask;
 		public Rgba ColorMask {
@@ -134,7 +123,7 @@ namespace TOltjenbruns.MassGame {
 					force += diff.Multiply(1/power);
 				//if (force.Length() > netSize)
 				//	force = Vector3.Zero;
-				applyForce((e.polarity == this.emitter.polarity) ? force : -force, e);
+				applyForce((e.polarity == emitter.polarity) ? force : -force, e);
 			}
 		}
 //		public void attract(Vector3 pos, float power, float netSize){
@@ -171,6 +160,10 @@ namespace TOltjenbruns.MassGame {
 				forces [e] += f;
 			else 
 				forces.Add (e, f);
+		}
+		
+		public void clearForces(){
+			forces.Clear();	
 		}
 		
 		public void render (){

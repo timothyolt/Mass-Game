@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using Sce.PlayStation.Core;
 using Sce.PlayStation.Core.Graphics;
+using Sce.PlayStation.Core.Input;
 
 namespace TOltjenbruns.MassGame {
 	public static class Game {
@@ -40,6 +41,12 @@ namespace TOltjenbruns.MassGame {
 				if (particles == null)
 					particles = value;
 			}
+		}
+		
+		private static GamePadData gamePadData;
+		public static GamePadData GamePadData {
+			get {return gamePadData;}
+			set {gamePadData = value;}
 		}
 		
 	    private static GraphicsContext graphics = null;
@@ -91,10 +98,10 @@ namespace TOltjenbruns.MassGame {
 	        graphics.Dispose();
 			player.dispose();
 			foreach (Particle p in Game.Particles) p.dispose();
-			shader = null;
-			graphics = null;
 			player = null;
 			particles = null;
+			graphics = null;
+			shader = null;
 			random = null;
 	    }
 	}
