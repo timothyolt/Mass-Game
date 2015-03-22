@@ -24,7 +24,7 @@ using Sce.PlayStation.Core.Graphics;
 using Sce.PlayStation.Core.Input;
 
 namespace TOltjenbruns.MassGame {
-	public class Player {
+	public class Player : Particle {
         #region PlayerPolygon
         private static readonly float[] verticies = {
         0.333f, 0.000f, 0f, //Vericies
@@ -86,33 +86,18 @@ namespace TOltjenbruns.MassGame {
 		private const float gunSustain = 0.75f;
 		private const float gunField = 50;
 		
-		private Element element;
-		//new player objects should always completely buffer the element on first update
-		//TODO: move update polling to Element
-		private bool updateTransform = true;
-		private bool updateColor = true;
-		
 		private HashSet<Particle> particles;
 		#endregion
 		
 		#region Properties
-		private Vector3 position;
-		public Vector3 Position {
-			get {return position;}
-			set {
-				updateTransform = true;
-				position = value;
-			}
-		}
-		
-		private double rotation;
-		public double Rotation {
-			get {return rotation;}
-			set {
-				updateTransform = true;
-				rotation = value;
-			}
-		}
+//		private Vector3 Position;
+//		public Vector3 Position {
+//			get {return Position;}
+//			set {
+//				updateTransform = true;
+//				Position = value;
+//			}
+//		}
 		
 		private float health;
 		public float Health {
@@ -125,24 +110,25 @@ namespace TOltjenbruns.MassGame {
 			: this (particles, new Rgba(0, 255, 0, 255)){
 		}
 		
-		public Player(HashSet<Particle> particles, Rgba colorMask){
+		public Player(HashSet<Particle> particles, Rgba colorMask) 
+			:base(playerPoly, new Emitter(power,sustain,2,EmitterType.MAG))
+		{
 			this.particles = particles;
 			
-			element = new Element(playerPoly);
-			element.LineWidth = 4;
-			element.ColorMask = colorMask;
+			//element = new Element(playerPoly);
+			Element.LineWidth = 4;
+			Element.ColorMask = colorMask;
 			
 			emitter = new Emitter(power, sustain, 2, EmitterType.MAG);
 			gunEmitter = new Emitter(gunPower, gunSustain, 2, EmitterType.FORCE);
 			
 			health = 20;
-			position = Vector3.Zero;
-			rotation = 0.0;
+			Position = Vector3.Zero;
 		}
 		#endregion
 		
 		#region Original Methods
-		public void update (float delta, GamePadData gamePad){
+		public void Pupdate (float delta, GamePadData gamePad){
 			Vector3 velocity = Vector3.Zero;
 			if ((gamePad.Buttons & GamePadButtons.Up) != 0)
 				velocity.Y += 1;
@@ -156,7 +142,7 @@ namespace TOltjenbruns.MassGame {
 				velocity = velocity.Normalize();
 				velocity = velocity.Multiply(120 * delta);
 				Position += velocity;
-				loopScreen();
+				//loopScreen();
 			}
 			
 			Vector3 aim = Vector3.Zero;
@@ -172,69 +158,87 @@ namespace TOltjenbruns.MassGame {
 				aim = aim.Normalize();
 				aim = aim.Multiply(gunPower * delta);
 				foreach (Particle p in particles)
-					if ((p.Position - position).Length() < gunField){
-						p.Polarity = 2;
-						p.applyForce(aim, gunEmitter);
+					// only able to fire the BITs
+					if(p.EmitterType == EmitterType.BIT){
+						switch(p.Polarity){
+							case 0:
+							case 2:
+								// fires only the yellow and green bits
+								//p.attract(Position, gunEmitter, gunField, delta);
+								if ((p.Position - Position).Length() < gunField){
+									p.Polarity = 2;
+									p.applyForce(aim, gunEmitter);
+								}
+								break;
+							default:
+								break;
+						}
 					}
 			}
-			else 
-				foreach (Particle p in particles)
+			//else
+			//This loop is for attracting particles and taking damage, shouldn't that happen regardless of aim
+			foreach (Particle p in particles){
+				if(p.EmitterType == EmitterType.BIT){
+					// since now attract checks polarity,
+					// shouldn't it run regardles of polarity
+					p.attract (Position, emitter, field, delta);
+					
 					switch(p.Polarity){
 						case 0:
 						case 2:
-							p.attract (position, emitter, field, delta);
+							p.attract (Position, Emitter, field, delta);
 							break;
 						default:
-							Vector3 diff = p.Position - position;
-							if (diff.Length() < 20){
+							Vector3 diff = p.Position - Position;
+							if (diff.LengthSquared() < 400){
 								takeDamage (1);
 								p.Polarity = 0;
 							}
 							break;
 					}
-			
-			if (updateTransform) {
-				updateTransform = false;
-				//TODO: Fix element center
-				element.Position = position.Multiply(0.01f).Add(new Vector3(-0.125f, -0.125f, 0));
-				element.Rotation = rotation;
-				element.updateTransBuffer();
+				}
 			}
-			if (updateColor) {
-				updateColor = false;
-				element.updateColorBuffer();
-			}
+			base.update(delta);
 		}
 		
 		public void takeDamage(float damage){
 			
 		}
+		#endregion
 		
-		public void render (){
-			element.draw(Game.Graphics);
+		#region Override Methods
+		public override void update (float delta)
+		{
+			base.update (delta);
 		}
-		
-		public void dispose(){
-			element.dispose();	
+		public override void transform ()
+		{
+			//TODO: Fix element center
+			Element.Position = Position.Multiply(0.01f).Add(new Vector3(-0.125f, -0.125f, 0));
+			Element.Rotation = Rotation;
+		}
+		public override void color ()
+		{
+			
 		}
 		#endregion
 		
 		#region additional meathods
-		public void loopScreen ()
-		{
-			if (position.X > 200) {
-				position.X -= 400;
-			}
-			if (position.X <= -200) {
-				position.X += 400;
-			}
-			if (position.Y > 200) {
-				position.Y -= 400;
-			}
-			if (position.Y <= -200) {
-				position.Y += 400;
-			}
-		}
+//		public void loopScreen ()
+//		{
+//			if (Position.X > 200) {
+//				Position.X -= 400;
+//			}
+//			if (Position.X <= -200) {
+//				Position.X += 400;
+//			}
+//			if (Position.Y > 200) {
+//				Position.Y -= 400;
+//			}
+//			if (Position.Y <= -200) {
+//				Position.Y += 400;
+//			}
+//		}
 		#endregion
 	}
 }

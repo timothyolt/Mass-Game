@@ -123,7 +123,7 @@ namespace TOltjenbruns.MassGame {
 		
 		#region Original Methods
 		public void attract(Vector3 pos, Emitter e, float netSize, float delta){
-			Vector3 diff = Position + Velocity - pos;
+			Vector3 diff = pos.LoopDiff(Position + Velocity);
 			float power = e.power * delta;
 			float diffLength = diff.Length();
 			if (diffLength < netSize){

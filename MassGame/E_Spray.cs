@@ -34,7 +34,7 @@ namespace TOltjenbruns.MassGame{
 		}
 		
 		public E_Spray (Player player, HashSet<Particle> particles, HashSet<Enemy> enemies,  Rgba colorMask)
-			: base (player, particles, enemies, colorMask)
+			: base ()
 		{
 			//TODO: initialize health
 			

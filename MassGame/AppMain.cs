@@ -63,6 +63,7 @@ namespace TOltjenbruns.MassGame {
 	        Game.Shader.SetAttributeBinding(1, "iColor");
 			
 			Game.Player = new Player(Game.Particles);
+			Game.Particles.Add(Game.Player);
 			for (int i = 0; i < 100; i++){
 				Particle particle = new CubeParticle();
 				particle.Position = new Vector3(
@@ -70,7 +71,7 @@ namespace TOltjenbruns.MassGame {
 					(float)(Game.Rand.NextDouble() * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT/2, 0f);
 				Game.Particles.Add (particle);
 			}
-			for (int i = 0; i < 10; i++){
+			for (int i = 0; i < 100; i++){
 				Enemy e = new Enemy();
 				e.Position = new Vector3(
 					(float)(Game.Rand.NextDouble() * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH/2, 
@@ -88,7 +89,7 @@ namespace TOltjenbruns.MassGame {
 	    private static bool Update(float delta) {
 			//TODO: ADD STUFF
 			GamePadData gamePadData = GamePad.GetData(0);
-			Game.Player.update(delta, gamePadData);
+			Game.Player.Pupdate(delta, gamePadData);
 			foreach (Particle p in Game.Particles) p.update(delta);
 	        return true;
 	    }
@@ -99,8 +100,8 @@ namespace TOltjenbruns.MassGame {
 			//TODO: convert to orthographic camera maybe?
 			//Matrix4 proj = Matrix4.Ortho(0f, aspect, 1f, 0f, 1f, -1f);;
 	        Matrix4 proj = Matrix4.Perspective(fov, aspect, 1.0f, 1000000.0f);
-	        Matrix4 view = Matrix4.LookAt(new Vector3(0.0f, 0.0f, 5.0f),//*/new Vector3(0.0f, -2.5f, 3.0f),
-	                                    new Vector3(0.0f, 0.0f, 0.0f),//*/new Vector3(0.0f, -0.50f, 0.0f),
+	        Matrix4 view = Matrix4.LookAt(/*new Vector3(0.0f, 0.0f, 5.0f),//*/new Vector3(0.0f, -2.5f, 3.0f),
+	                                    /*new Vector3(0.0f, 0.0f, 0.0f),//*/new Vector3(0.0f, -0.50f, 0.0f),
 	                                    Vector3.UnitY);
 			//Matrix4 worldViewProj = proj;	
 			Matrix4 worldViewProj = proj * view;	
