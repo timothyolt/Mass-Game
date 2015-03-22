@@ -48,6 +48,12 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Properties
+		//Speed property
+		
+		//target property
+		
+		//
+		
 		private float health;
 		public float Health {
 			get {return health;}
@@ -79,46 +85,6 @@ namespace TOltjenbruns.MassGame {
 			Move(delta);
 			Fire(delta);
 			
-//			Vector3 diff = player.Position - position;
-//			float distance = diff.Length();
-//			if (distance > 150){
-//				Vector3 velocity = diff.Normalize();
-//				velocity = velocity.Multiply(120 * delta);
-//				Position += velocity;
-//			}
-//			else if (distance < 50){
-//				Vector3 velocity = diff.Normalize();
-//				velocity = velocity.Multiply(-120 * delta);
-//				Position += velocity;
-//			}
-			
-//			if (gunCooldown <= 0){
-//				gunCooldown	= 5;
-//				Vector3 aim = diff.Normalize();
-//				aim = aim.Multiply(gunPower * delta);
-//				foreach (Particle p in particles)
-//					if ((p.Position - position).Length() < gunField){
-//						p.Polarity = 1;
-//						p.applyForce(aim, gunEmitter);
-//					}
-//			}
-//			else 
-//				foreach (Particle p in particles)
-//					switch(p.Polarity){
-//						case 0:
-//							p.attract (position, emitter, field, delta);
-//							break;
-//						case 1:
-//							p.repel (position, emitter, field, delta);
-//							break;
-//						case 2:
-//							Vector3 partDiff = p.Position - position;
-//							if (partDiff.Length() < 20){
-//								takeDamage (1);
-//								p.Polarity = 0;
-//							}
-//							break;
-//					}
 			base.update(delta);
 		}
 		
@@ -134,10 +100,6 @@ namespace TOltjenbruns.MassGame {
 		public virtual void Move (float delta){
 			foreach (Particle p in Game.Particles){
 				if (p.EmitterType == EmitterType.MAG) {
-					//Vector3 diff = Position.LoopDiff(p.Position);
-					//diff = diff.Normalize();
-					//diff /= diff.LengthSquared();
-					//diff *= delta;
 					attract(p.Position, boidEmitter, field, delta);
 				}
 			}

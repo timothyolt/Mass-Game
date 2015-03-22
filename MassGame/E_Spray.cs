@@ -29,16 +29,15 @@ namespace TOltjenbruns.MassGame{
 		#endregion
 		
 		#region Constructor
-		public E_Spray (Player player, HashSet<Particle> particles, HashSet<Enemy> enemies)
-			: this (player, particles, enemies, new Rgba(255, 0, 0, 255)){
+		public E_Spray ()
+			: this (new Rgba(255, 0, 0, 255)){
 		}
 		
-		public E_Spray (Player player, HashSet<Particle> particles, HashSet<Enemy> enemies,  Rgba colorMask)
-			: base ()
+		public E_Spray (Rgba colorMask)
+			: base (colorMask)
 		{
 			//TODO: initialize health
 			
-			//TODO: 
 		}
 		#endregion
 		

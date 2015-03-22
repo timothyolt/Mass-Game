@@ -71,7 +71,7 @@ namespace TOltjenbruns.MassGame {
 					(float)(Game.Rand.NextDouble() * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT/2, 0f);
 				Game.Particles.Add (particle);
 			}
-			for (int i = 0; i < 100; i++){
+			for (int i = 0; i < 5; i++){
 				Enemy e = new Enemy();
 				e.Position = new Vector3(
 					(float)(Game.Rand.NextDouble() * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH/2, 
