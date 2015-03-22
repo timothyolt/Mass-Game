@@ -178,7 +178,6 @@ namespace TOltjenbruns.MassGame {
 			//else
 			//This loop is for attracting particles and taking damage, shouldn't that happen regardless of aim
 			foreach (Particle p in particles){
-				if(p.EmitterType == EmitterType.BIT){
 					// since now attract checks polarity,
 					// shouldn't it run regardles of polarity
 					p.attract (Position, emitter, field, delta);
@@ -189,13 +188,14 @@ namespace TOltjenbruns.MassGame {
 							p.attract (Position, Emitter, field, delta);
 							break;
 						default:
-							Vector3 diff = p.Position - Position;
-							if (diff.LengthSquared() < 400){
-								takeDamage (1);
-								p.Polarity = 0;
-							}
-							break;
-					}
+							if(p.EmitterType == EmitterType.BIT){
+								Vector3 diff = p.Position - Position;
+								if (diff.LengthSquared() < 400){
+									takeDamage (1);
+									p.Polarity = 0;
+								}
+							}	
+							break;	
 				}
 			}
 			base.update(delta);
