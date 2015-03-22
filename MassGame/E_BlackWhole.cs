@@ -22,23 +22,23 @@ using Sce.PlayStation.Core.Graphics;
 using Sce.PlayStation.Core.Input;
 
 namespace TOltjenbruns.MassGame{
-	public class E_Spray : Enemy
+	public class E_BlackWhole : Enemy
 	{
 		#region Private Fields
-		private Emitter targetEmitter;
+		private Emitter avoidEmitter;
 		#endregion
 		
 		#region Constructor
-		public E_Spray ()
-			: this (new Rgba(255, 0, 0, 255)){
+		public E_BlackWhole ()
+			: this (new Rgba(0, 0, 0, 255)){
 		}
 		
-		public E_Spray (Rgba colorMask)
+		public E_BlackWhole (Rgba colorMask)
 			: base (colorMask)
 		{
 			//TODO: initialize health
 			
-			targetEmitter = new Emitter(300,0.7f,2,EmitterType.FORCE);
+			avoidEmitter = new Emitter(100,0.3f,0,EmitterType.FORCE);
 		}
 		#endregion
 		
@@ -47,7 +47,15 @@ namespace TOltjenbruns.MassGame{
 		{
 			base.preUpdate (delta);
 			//Vector3 diff = Game.Player.Position.LoopDiff(Position);
-			attract(Game.Player.Position,targetEmitter,300,delta);
+			//attract(Game.Player.Position,targetEmitter,300,delta);
+			foreach(Particle p in Game.Particles){
+				if(!(p is E_BlackWhole)){
+					attract(p.Position,avoidEmitter,300,delta);
+				}
+				else if(p!=this){
+					attract(p.Position,avoidEmitter,300,delta);
+				}
+			}
 		}
 		
 		#endregion

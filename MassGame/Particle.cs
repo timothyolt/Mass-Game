@@ -190,6 +190,7 @@ namespace TOltjenbruns.MassGame {
 		public abstract void color();
 		
 		public virtual void update (float delta){
+			
 			//applyForce(gravity.Multiply(delta), gEmit);
 			
 			int fCount = forces.Count;

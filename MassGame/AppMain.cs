@@ -71,12 +71,31 @@ namespace TOltjenbruns.MassGame {
 					(float)(Game.Rand.NextDouble() * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT/2, 0f);
 				Game.Particles.Add (particle);
 			}
-			for (int i = 0; i < 5; i++){
-				Enemy e = new Enemy();
-				e.Position = new Vector3(
-					(float)(Game.Rand.NextDouble() * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH/2, 
-					(float)(Game.Rand.NextDouble() * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT/2, 0f);
-				Game.Particles.Add(e);
+			for (int i = 0; i < 30; i++){
+				switch(Game.Rand.Next(3)){
+				case 0:
+					E_Cannon e = new E_Cannon();
+					e.Position = new Vector3(
+						(float)(Game.Rand.NextDouble() * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH/2, 
+						(float)(Game.Rand.NextDouble() * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT/2, 0f);
+					Game.Particles.Add(e);
+					break;
+				case 1:
+					E_BlackWhole e3 = new E_BlackWhole();
+					e3.Position = new Vector3(
+						(float)(Game.Rand.NextDouble() * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH/2, 
+						(float)(Game.Rand.NextDouble() * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT/2, 0f);
+					Game.Particles.Add(e3);
+					break;
+				default:
+					E_Spray e2 = new E_Spray();
+					e2.Position = new Vector3(
+						(float)(Game.Rand.NextDouble() * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH/2, 
+						(float)(Game.Rand.NextDouble() * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT/2, 0f);
+					Game.Particles.Add(e2);
+					break;
+				}
+				
 			}
 			
 	        return true;
