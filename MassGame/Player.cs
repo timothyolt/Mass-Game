@@ -24,7 +24,7 @@ using Sce.PlayStation.Core.Graphics;
 using Sce.PlayStation.Core.Input;
 
 namespace TOltjenbruns.MassGame {
-	public class Player {
+	public class Player : Particle {
         #region PlayerPolygon
         private static readonly float[] verticies = {
         0.333f, 0.000f, 0f, //Vericies
@@ -96,14 +96,14 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Properties
-		private Vector3 position;
-		public Vector3 Position {
-			get {return position;}
-			set {
-				updateTransform = true;
-				position = value;
-			}
-		}
+//		private Vector3 Position;
+//		public Vector3 Position {
+//			get {return Position;}
+//			set {
+//				updateTransform = true;
+//				Position = value;
+//			}
+//		}
 		
 		private double rotation;
 		public double Rotation {
@@ -125,24 +125,26 @@ namespace TOltjenbruns.MassGame {
 			: this (particles, new Rgba(0, 255, 0, 255)){
 		}
 		
-		public Player(HashSet<Particle> particles, Rgba colorMask){
+		public Player(HashSet<Particle> particles, Rgba colorMask) 
+			:base(playerPoly, new Emitter(power,sustain,2,EmitterType.MAG))
+		{
 			this.particles = particles;
 			
-			element = new Element(playerPoly);
-			element.LineWidth = 4;
-			element.ColorMask = colorMask;
+			//element = new Element(playerPoly);
+			Element.LineWidth = 4;
+			Element.ColorMask = colorMask;
 			
 			emitter = new Emitter(power, sustain, 2, EmitterType.MAG);
 			gunEmitter = new Emitter(gunPower, gunSustain, 2, EmitterType.FORCE);
 			
 			health = 20;
-			position = Vector3.Zero;
+			Position = Vector3.Zero;
 			rotation = 0.0;
 		}
 		#endregion
 		
 		#region Original Methods
-		public void update (float delta, GamePadData gamePad){
+		public void Pupdate (float delta, GamePadData gamePad){
 			Vector3 velocity = Vector3.Zero;
 			if ((gamePad.Buttons & GamePadButtons.Up) != 0)
 				velocity.Y += 1;
@@ -156,7 +158,7 @@ namespace TOltjenbruns.MassGame {
 				velocity = velocity.Normalize();
 				velocity = velocity.Multiply(120 * delta);
 				Position += velocity;
-				loopScreen();
+				//loopScreen();
 			}
 			
 			Vector3 aim = Vector3.Zero;
@@ -178,7 +180,8 @@ namespace TOltjenbruns.MassGame {
 							case 0:
 							case 2:
 								// fires only the yellow and green bits
-								if ((p.Position - position).Length() < gunField){
+								//p.attract(Position, gunEmitter, gunField, delta);
+								if ((p.Position - Position).Length() < gunField){
 									p.Polarity = 2;
 									p.applyForce(aim, gunEmitter);
 								}
@@ -194,14 +197,14 @@ namespace TOltjenbruns.MassGame {
 				if(p.EmitterType == EmitterType.BIT){
 					// since now attract checks polarity,
 					// shouldn't it run regardles of polarity
-					p.attract (position, emitter, field, delta);
+					p.attract (Position, emitter, field, delta);
 					
 					switch(p.Polarity){
 						case 0:
 						case 2:
 							break;
 						default:
-							Vector3 diff = p.Position - position;
+							Vector3 diff = p.Position - Position;
 							if (diff.LengthSquared() < 400){
 								takeDamage (1);
 								p.Polarity = 0;
@@ -210,17 +213,7 @@ namespace TOltjenbruns.MassGame {
 					}
 				}
 			}
-			if (updateTransform) {
-				updateTransform = false;
-				//TODO: Fix element center
-				element.Position = position.Multiply(0.01f).Add(new Vector3(-0.125f, -0.125f, 0));
-				element.Rotation = rotation;
-				element.updateTransBuffer();
-			}
-			if (updateColor) {
-				updateColor = false;
-				element.updateColorBuffer();
-			}
+			base.update(delta);
 		}
 		
 		public void takeDamage(float damage){
@@ -228,30 +221,47 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		public void render (){
-			element.draw(Game.Graphics);
+			Element.draw(Game.Graphics);
 		}
 		
 		public void dispose(){
-			element.dispose();	
+			Element.dispose();	
+		}
+		#endregion
+		
+		#region Override Methods
+		public override void update (float delta)
+		{
+			base.update (delta);
+		}
+		public override void transform ()
+		{
+			//TODO: Fix element center
+			Element.Position = Position.Multiply(0.01f).Add(new Vector3(-0.125f, -0.125f, 0));
+			Element.Rotation = rotation;
+		}
+		public override void color ()
+		{
+			
 		}
 		#endregion
 		
 		#region additional meathods
-		public void loopScreen ()
-		{
-			if (position.X > 200) {
-				position.X -= 400;
-			}
-			if (position.X <= -200) {
-				position.X += 400;
-			}
-			if (position.Y > 200) {
-				position.Y -= 400;
-			}
-			if (position.Y <= -200) {
-				position.Y += 400;
-			}
-		}
+//		public void loopScreen ()
+//		{
+//			if (Position.X > 200) {
+//				Position.X -= 400;
+//			}
+//			if (Position.X <= -200) {
+//				Position.X += 400;
+//			}
+//			if (Position.Y > 200) {
+//				Position.Y -= 400;
+//			}
+//			if (Position.Y <= -200) {
+//				Position.Y += 400;
+//			}
+//		}
 		#endregion
 	}
 }

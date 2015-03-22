@@ -1,10 +1,11 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="MassGame\E_Spray.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="MassGame\Enemy.cs">
     <Files>
-      <File FileName="MassGame\E_Spray.cs" Line="62" Column="3" />
-      <File FileName="MassGame\Enemy.cs" Line="97" Column="10" />
-      <File FileName="MassGame\Particle.cs" Line="205" Column="3" />
+      <File FileName="MassGame\E_Spray.cs" Line="29" Column="13" />
+      <File FileName="MassGame\Enemy.cs" Line="81" Column="4" />
+      <File FileName="MassGame\Particle.cs" Line="204" Column="1" />
+      <File FileName="MassGame\AppMain.cs" Line="74" Column="15" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
