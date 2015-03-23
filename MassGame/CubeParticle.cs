@@ -6,22 +6,33 @@ namespace TOltjenbruns.MassGame{
 	public class CubeParticle : Particle {
 		#region Private Fields
 		private const float power = 60;
-		private const float sustain = 0.5f;
-		private const float field = 3;
+		private const float sustain = 0.75f;
+		private const float field = 5;
 		private Emitter sprayEmitter;
 		
 		private const float cpower = 60;
-		private const float csustain = 0.75f;
-		private const float cfield = 8;
+		private const float csustain = 0.5f;
+		private const float cfield = 1;
 		private Emitter cannonEmitter;
+		private bool cannonState = false;
+		
+		private const float epower = 250;
+		private const float esustain = 0.8f;
+		private const float efield = 15;
+		private Emitter explodeEmitter;
 		
 		private const float polarityFadeReset = 5;
+		private const float polarityFadeCannon = 4.85f;
 		private float polarityFade = 0;
 		#endregion
 		
 		#region Constructors
+		
 		public CubeParticle ()
-			: base(Player.playerPoly, sprayEmitter) {
+			: base(Player.playerPoly, new Emitter(power, sustain, field, 0, EmitterType.BIT)) {
+			sprayEmitter = Emitter;
+			cannonEmitter = new Emitter(cpower, csustain, cfield, 0, EmitterType.BIT);
+			explodeEmitter = new Emitter(epower, esustain, efield, 0, EmitterType.BIT);
 			Element.LineWidth = 2;
 			Element.Scale = new Vector3(0.5f, 0.5f, 0.5f);
 			Element.ColorMask = new Rgba(255, 255, 0, 255);
@@ -44,19 +55,17 @@ namespace TOltjenbruns.MassGame{
 					Element.ColorMask = new Rgba(255, 255, 0, 255);
 					Element.updateColorBuffer();
 					break;
-				case 1:
+				default:
 					polarityFade = polarityFadeReset;
-//					Element.ColorMask = new Rgba(255, 0, 0, 255);
-//					Element.updateColorBuffer();
-					break;
-				case 2:
-					polarityFade = polarityFadeReset;
-//					Element.ColorMask = new Rgba(0, 255, 0, 255);
-//					Element.updateColorBuffer();
 					break;
 				}
 			}
+			
 			if (polarityFade > 0){
+				if (cannonState && polarityFade < polarityFadeCannon){
+					Console.WriteLine(Polarity);
+					Emitter = explodeEmitter;
+				}
 				int fade = (int)((polarityFade/5.0f) * 256.0f);
 				switch (Polarity){
 					case 1:
@@ -69,7 +78,8 @@ namespace TOltjenbruns.MassGame{
 						break;
 				}
 				polarityFade -= delta;
-				if (polarityFade <= 0){
+				if (polarityFade <= 0){	
+					Emitter = sprayEmitter;
 					polarityFade = 0;
 					Polarity = 0;
 					Element.ColorMask = new Rgba(255, 255, 0, 255);
@@ -81,7 +91,12 @@ namespace TOltjenbruns.MassGame{
 		private void polarize(float delta){
 			foreach (Particle p in Game.Particles)
 				if (p != this && p.Polarity == Polarity && (!p.EmitterType.Equals(EmitterType.MAG)))
-					p.attract (Position, Emitter, field, delta);
+					p.attract (Position, Emitter, delta);
+		}
+		
+		public void fireCannon(){
+			cannonState = true;
+			Emitter = cannonEmitter;
 		}
 		
 		public override void transform (){

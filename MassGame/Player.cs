@@ -77,7 +77,7 @@ namespace TOltjenbruns.MassGame {
 		
 		#region Private Fields
 		private const float power = 1000;
-		private const float sustain = 0.5f;
+		private const float sustain = 0.75f;
 		private const float field = 35;
 		
 		private readonly Emitter gunEmitter;
@@ -112,14 +112,14 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		public Player(Rgba colorMask) 
-			:base(playerPoly, new Emitter(power,sustain,2,EmitterType.MAG))
+			:base(playerPoly, new Emitter(power, sustain, field, 2, EmitterType.MAG))
 		{
 			
 			//element = new Element(playerPoly);
 			Element.LineWidth = 4;
 			Element.ColorMask = colorMask;
 			
-			gunEmitter = new Emitter(gunPower, gunSustain, 2, EmitterType.FORCE);
+			gunEmitter = new Emitter(gunPower, gunSustain, gunField, 2, EmitterType.FORCE);
 			
 			health = 20;
 			Position = Vector3.Zero;
@@ -172,6 +172,7 @@ namespace TOltjenbruns.MassGame {
 						p.EmitterType == EmitterType.BIT && 
 						Position.LoopDiff(p.Position).Length() <= gunField
 					){
+						((CubeParticle) p).fireCannon();
 						p.Polarity = Polarity;
 						p.clearForces();
 						p.applyForce(aim, gunEmitter);
@@ -183,7 +184,7 @@ namespace TOltjenbruns.MassGame {
 		private void polarize(float delta){
 			foreach (Particle p in Game.Particles){
 				if (p != this && p.EmitterType.Equals(EmitterType.BIT)){
-					p.attract (Position, Emitter, field, delta);
+					p.attract (Position, Emitter, delta);
 					if (p.Polarity != 0 && p.Polarity != Polarity){
 						Vector3 partDiff = Position.LoopDiff(p.Position);
 						if (partDiff.LengthSquared() < 400){

@@ -32,7 +32,7 @@ namespace TOltjenbruns.MassGame {
 	public static class ColorRgba {
 		public static Rgba ToRgba(this Color c){
 			ulong i = (ulong) c;
-			Console.WriteLine("{0:X}", i);
+			//Console.WriteLine("{0:X}", i);
 			return new Rgba(
 				(int)(i & 0xFF000000)/0x1000000, 
 				(int)(i & 0x00FF0000)/0x10000,

@@ -40,6 +40,7 @@ namespace TOltjenbruns.MassGame {
 		private Emitter emitter;
 		protected Emitter Emitter {
 			get {return emitter;}
+			set {emitter = value;}
 		}
 		
 		private Element element;
@@ -52,7 +53,7 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		protected bool polarityUpdate = true;
-		public byte Polarity {
+		public virtual byte Polarity {
 			get { return emitter.polarity; }
 			set { 
 				polarityUpdate = true;
@@ -111,11 +112,11 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Original Methods
-		public void attract(Vector3 pos, Emitter e, float netSize, float delta){
+		public void attract(Vector3 pos, Emitter e, float delta){
 			Vector3 diff = pos.LoopDiff(Position + Velocity);
 			float power = e.power * delta;
 			float diffLength = diff.Length();
-			if (diffLength < netSize){
+			if (diffLength < e.field){
 				Vector3 force = Vector3.Zero;
 				if (diffLength > power)
 					force += diff.Multiply(power/(diffLength * diffLength));

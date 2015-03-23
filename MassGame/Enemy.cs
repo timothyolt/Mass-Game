@@ -56,9 +56,9 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		public Enemy(Rgba colorMask) 
-			: base (Player.playerPoly, new Emitter(power, sustain, 1, EmitterType.MAG)){
+			: base (Player.playerPoly, new Emitter(power, sustain, field, 1, EmitterType.MAG)){
 			ColorMask = colorMask;
-			gunEmitter = new Emitter(gunPower, gunSustain, 1, EmitterType.FORCE);
+			gunEmitter = new Emitter(gunPower, gunSustain, gunField, 1, EmitterType.FORCE);
 			Element.LineWidth = 4;
 			health = 20;
 		}
@@ -134,7 +134,7 @@ namespace TOltjenbruns.MassGame {
 		protected virtual void polarize (float delta){
 			foreach (Particle p in Game.Particles){
 				if (p != this && p.EmitterType.Equals(EmitterType.BIT)){
-					p.attract (Position, Emitter, field, delta);
+					p.attract (Position, Emitter, delta);
 					if (p.Polarity != 0 && p.Polarity != Polarity){
 						Vector3 partDiff = Position.LoopDiff(p.Position);
 						if (partDiff.LengthSquared() < 400){

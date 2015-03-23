@@ -35,7 +35,7 @@ namespace TOltjenbruns.MassGame {
 	        while (running) {
 	            SystemEvents.CheckEvents();
 				float delta = s.ElapsedMilliseconds / 1000f;
-				Console.WriteLine("FPS: " + (int)(1/delta));
+				//Console.WriteLine("FPS: " + (int)(1/delta));
 				s.Reset();
 				s.Start();
 	            Update(delta);
@@ -46,11 +46,11 @@ namespace TOltjenbruns.MassGame {
 	
 	    private static bool Init() {
 			//TODO: Test Colors
-			Console.WriteLine(Color.WHITE.ToRgba());
-			Console.WriteLine(Color.RED.ToRgba());
-			Console.WriteLine(Color.GREEN.ToRgba());
-			Console.WriteLine(Color.BLUE.ToRgba());
-			Console.WriteLine(Color.BLACK.ToRgba());
+//			Console.WriteLine(Color.WHITE.ToRgba());
+//			Console.WriteLine(Color.RED.ToRgba());
+//			Console.WriteLine(Color.GREEN.ToRgba());
+//			Console.WriteLine(Color.BLUE.ToRgba());
+//			Console.WriteLine(Color.BLACK.ToRgba());
 			
 			
 	        Game.Graphics = new GraphicsContext();
@@ -64,7 +64,7 @@ namespace TOltjenbruns.MassGame {
 			
 			Game.Player = new Player();
 			Game.Particles.Add(Game.Player);
-			for (int i = 0; i < 200; i++){
+			for (int i = 0; i < 100; i++){
 				Particle particle = new CubeParticle();
 				particle.Position = new Vector3(
 					(float)(Game.Rand.NextDouble() * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH/2, 
