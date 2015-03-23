@@ -76,23 +76,18 @@ namespace TOltjenbruns.MassGame {
         #endregion
 		
 		#region Private Fields
-		private readonly Emitter emitter;
 		private const float power = 1000;
-		private const float sustain = 0.99f;
-		private const float field = 50;
+		private const float sustain = 0.75f;
+		private const float field = 35;
 		
 		private readonly Emitter gunEmitter;
 		private const float gunPower = 1000;
 		private const float gunSustain = 0.75f;
-		private const float gunField = 50;
+		private const float gunField = 35;
 		
-		private Element element;
-		//new player objects should always completely buffer the element on first update
-		//TODO: move update polling to Element
-		private bool updateTransform = true;
-		private bool updateColor = true;
+		private const float sprayCooldownReset = 0.3f;
+		private float sprayCooldown = 0;
 		
-		private HashSet<Particle> particles;
 		#endregion
 		
 		#region Properties
@@ -105,15 +100,6 @@ namespace TOltjenbruns.MassGame {
 //			}
 //		}
 		
-		private double rotation;
-		public double Rotation {
-			get {return rotation;}
-			set {
-				updateTransform = true;
-				rotation = value;
-			}
-		}
-		
 		private float health;
 		public float Health {
 			get {return health;}
@@ -121,30 +107,36 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Constructors
-		public Player (HashSet<Particle> particles)
-			: this (particles, new Rgba(0, 255, 0, 255)){
+		public Player ()
+			: this (new Rgba(0, 255, 0, 255)){
 		}
 		
-		public Player(HashSet<Particle> particles, Rgba colorMask) 
-			:base(playerPoly, new Emitter(power,sustain,2,EmitterType.MAG))
+		public Player(Rgba colorMask) 
+			:base(playerPoly, new Emitter(power, sustain, field, 2, EmitterType.MAG))
 		{
-			this.particles = particles;
 			
 			//element = new Element(playerPoly);
 			Element.LineWidth = 4;
 			Element.ColorMask = colorMask;
 			
-			emitter = new Emitter(power, sustain, 2, EmitterType.MAG);
-			gunEmitter = new Emitter(gunPower, gunSustain, 2, EmitterType.FORCE);
+			gunEmitter = new Emitter(gunPower, gunSustain, gunField, 2, EmitterType.FORCE);
 			
 			health = 20;
 			Position = Vector3.Zero;
-			rotation = 0.0;
 		}
 		#endregion
 		
 		#region Original Methods
-		public void Pupdate (float delta, GamePadData gamePad){
+		public override void update (float delta){
+			GamePadData gamePad = Game.GamePadData;
+			move (delta, gamePad);
+			if (sprayCooldown <= 0) fire (delta, gamePad);
+			else sprayCooldown -= delta;
+			polarize(delta);
+			base.update(delta);
+		}
+		
+		private void move(float delta, GamePadData gamePad){
 			Vector3 velocity = Vector3.Zero;
 			if ((gamePad.Buttons & GamePadButtons.Up) != 0)
 				velocity.Y += 1;
@@ -156,11 +148,12 @@ namespace TOltjenbruns.MassGame {
 				velocity.X -= 1;
 			if (velocity != Vector3.Zero){
 				velocity = velocity.Normalize();
-				velocity = velocity.Multiply(180 * delta);
+				velocity = velocity.Multiply(120 * delta);
 				Position += velocity;
-				//loopScreen();
 			}
-			
+		}
+		
+		private void fire(float delta, GamePadData gamePad){
 			Vector3 aim = Vector3.Zero;
 			if ((gamePad.Buttons & GamePadButtons.Triangle) != 0)
 				aim.Y += 1;
@@ -173,64 +166,47 @@ namespace TOltjenbruns.MassGame {
 			if (aim != Vector3.Zero){
 				aim = aim.Normalize();
 				aim = aim.Multiply(gunPower * delta);
-				foreach (Particle p in particles)
-					// only able to fire the BITs
-					if(p.EmitterType == EmitterType.BIT){
-						//p.attract(Position, gunEmitter, gunField, delta);
-						if ((p.Position - Position).Length() < gunField){
-							p.Polarity = 2;
-							p.applyForce(aim, gunEmitter);
-						}
+				foreach (Particle p in Game.Particles)
+					if(
+						p != this && 
+						p.EmitterType == EmitterType.BIT && 
+						Position.LoopDiff(p.Position).Length() <= gunField
+					){
+						((CubeParticle) p).fireCannon();
+						p.Polarity = Polarity;
+						p.clearForces();
+						p.applyForce(aim, gunEmitter);
 					}
+				sprayCooldown = sprayCooldownReset;
 			}
-			//else
-			//This loop is for attracting particles and taking damage, shouldn't that happen regardless of aim
-			foreach (Particle p in particles){
-				if(p.EmitterType == EmitterType.BIT){
-					// since now attract checks polarity,
-					// shouldn't it run regardles of polarity
-					p.attract (Position, emitter, field, delta);
-					
-					switch(p.Polarity){
-						case 0:
-						case 2:
-							break;
-						default:
-							Vector3 diff = p.Position - Position;
-							if (diff.LengthSquared() < 400){
-								takeDamage (1);
-								p.Polarity = 0;
-							}
-							break;
+		}
+		
+		private void polarize(float delta){
+			foreach (Particle p in Game.Particles){
+				if (p != this && p.EmitterType.Equals(EmitterType.BIT)){
+					p.attract (Position, Emitter, delta);
+					if (p.Polarity != 0 && p.Polarity != Polarity){
+						Vector3 partDiff = Position.LoopDiff(p.Position);
+						if (partDiff.LengthSquared() < 400){
+							takeDamage (1);
+							p.Polarity = 0;
+						}
 					}
 				}
 			}
-			base.update(delta);
 		}
 		
 		public void takeDamage(float damage){
 			
 		}
-		
-		public void render (){
-			Element.draw(Game.Graphics);
-		}
-		
-		public void dispose(){
-			Element.dispose();	
-		}
 		#endregion
 		
 		#region Override Methods
-		public override void update (float delta)
-		{
-			base.update (delta);
-		}
 		public override void transform ()
 		{
 			//TODO: Fix element center
 			Element.Position = Position.Multiply(0.01f).Add(new Vector3(-0.125f, -0.125f, 0));
-			Element.Rotation = rotation;
+			Element.Rotation = Rotation;
 		}
 		public override void color ()
 		{

@@ -39,34 +39,27 @@ namespace TOltjenbruns.MassGame{
 		{
 			//TODO: initialize health
 			Polarity = 3;
-			GunCooldown	= 5;
-			groupEmitter = new Emitter(500,0.4f,0,EmitterType.FORCE);
-			targetEmitter = new Emitter(300,0.4f,0,EmitterType.FORCE);
+//			GunCooldown	= 5;
+//			groupEmitter = new Emitter(500,0.4f,0,EmitterType.FORCE);
+//			targetEmitter = new Emitter(300,0.4f,0,EmitterType.FORCE);
 		}
 		#endregion
 		
 		#region Original Methods
 		public override void preUpdate (float delta)
 		{
-			base.preUpdate (delta);
-			attract(Game.Player.Position,targetEmitter,200,delta);
-			foreach(Particle p in Game.Particles){
-				if(p!=this && p is E_Cannon){
-					attract(p.Position,groupEmitter,100,delta,false);
-				}
-			}
+//			base.preUpdate (delta);
+//			attract(Game.Player.Position,targetEmitter,200,delta);
+//			foreach(Particle p in Game.Particles){
+//				if(p!=this && p is E_Cannon){
+//					attract(p.Position,groupEmitter,100,delta,false);
+//				}
+//			}
 		}
-		public override void Move (float delta)
+		protected override void Move (float delta)
 		{
-			base.Move (delta);
-			if(GunCooldown < 5 && GunCooldown > 4){
-				EmitterSustain = 0.01f;
-				
-			}else{
-				EmitterSustain = 0.99f;
-			}
+			
 		}
-		
 		#endregion
 		
 	}

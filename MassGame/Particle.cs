@@ -27,8 +27,6 @@ namespace TOltjenbruns.MassGame {
 	public abstract class Particle {
 		
 		#region Private Fields
-		private static Vector3 gravity = new Vector3(0, -30, 0);
-		//private static Emitter gEmit = new Emitter(30, 0.5f, 0, null);
 
 		//new particle objects should always completely buffer the element on first update
 		//TODO: move update polling to Element
@@ -42,6 +40,7 @@ namespace TOltjenbruns.MassGame {
 		private Emitter emitter;
 		protected Emitter Emitter {
 			get {return emitter;}
+			set {emitter = value;}
 		}
 		
 		private Element element;
@@ -53,27 +52,14 @@ namespace TOltjenbruns.MassGame {
 			get	{ return emitter.etype; }
 		}
 		
-		public float EmitterSustain{
-			set {emitter.sustain = value;}
-		}
-		
 		protected bool polarityUpdate = true;
-		public byte Polarity {
+		public virtual byte Polarity {
 			get { return emitter.polarity; }
 			set { 
 				polarityUpdate = true;
 				emitter.polarity = value;
 			}
 		}
-		
-//		private float volatilily;
-//		public float Volatility {
-//			get { return volatilily; }
-//			set { 
-//				volatilily = value;
-//				if (
-//			}
-//		}
 		
 		private Rgba colorMask;
 		public Rgba ColorMask {
@@ -126,15 +112,15 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Original Methods
-		public void attract(Vector3 pos, Emitter e, float netSize, float delta){
-			this.attract(pos,e,netSize,delta,(e.polarity == this.emitter.polarity));
+		public void attract(Vector3 pos, Emitter e, float delta){
+			this.attract(pos,e,delta,(e.polarity == this.emitter.polarity));
 		}
 		
-		public void attract(Vector3 pos, Emitter e, float netSize, float delta, bool push){
+		public void attract(Vector3 pos, Emitter e, float delta, bool push){
 			Vector3 diff = pos.LoopDiff(Position + Velocity);
 			float power = e.power * delta;
 			float diffLength = diff.Length();
-			if (diffLength < netSize){
+			if (diffLength < e.field){
 				Vector3 force = Vector3.Zero;
 				if (diffLength > power)
 					force += diff.Multiply(power/(diffLength * diffLength));
@@ -142,7 +128,7 @@ namespace TOltjenbruns.MassGame {
 					force += diff.Multiply(1/power);
 				//if (force.Length() > netSize)
 				//	force = Vector3.Zero;
-				applyForce((push) ? force : -force, e);
+				applyForce(push ? force : -force, e);
 			}
 		}
 //		public void attract(Vector3 pos, float power, float netSize){
@@ -181,6 +167,10 @@ namespace TOltjenbruns.MassGame {
 				forces.Add (e, f);
 		}
 		
+		public void clearForces(){
+			forces.Clear();	
+		}
+		
 		public void render (){
 			element.draw(Game.Graphics);
 		}
@@ -198,7 +188,6 @@ namespace TOltjenbruns.MassGame {
 		public abstract void color();
 		
 		public virtual void update (float delta){
-			
 			//applyForce(gravity.Multiply(delta), gEmit);
 			
 			int fCount = forces.Count;
@@ -216,10 +205,6 @@ namespace TOltjenbruns.MassGame {
 			}
 			velocity += acceleration;
 			acceleration = Velocity.Multiply(-1/2f);
-			if(this.EmitterType == EmitterType.MAG && velocity.LengthSquared() > 16){
-				velocity = velocity.Normalize();
-				velocity *= 4;
-			}
 			Position += velocity;
 			
 			if (position.X < -200) position.X = 200;

@@ -55,7 +55,8 @@
     <Compile Include="Colors.cs" />
     <Compile Include="E_Spray.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="E_Cannon.cs" />
+    <Compile Include="MagParticle.cs" />
     <Compile Include="E_BlackWhole.cs" />
+    <Compile Include="E_Cannon.cs" />
   </ItemGroup>
 </Project>

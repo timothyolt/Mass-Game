@@ -25,6 +25,7 @@ namespace TOltjenbruns.MassGame{
 	public class E_Spray : Enemy
 	{
 		#region Private Fields
+		
 		private Emitter targetEmitter;
 		#endregion
 		
@@ -38,7 +39,9 @@ namespace TOltjenbruns.MassGame{
 		{
 			//TODO: initialize health
 			Polarity = 1;
-			targetEmitter = new Emitter(100,0.7f,2,EmitterType.FORCE);
+			targetEmitter = new Emitter(200,0.7f,200,2,EmitterType.FORCE);
+			
+			//TODO: empty
 		}
 		#endregion
 		
@@ -46,7 +49,7 @@ namespace TOltjenbruns.MassGame{
 		public override void preUpdate (float delta)
 		{
 			base.preUpdate (delta);
-			attract(Game.Player.Position,targetEmitter,200,delta);
+			attract(Game.Player.Position,targetEmitter,delta);
 		}
 		
 		#endregion

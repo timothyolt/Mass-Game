@@ -35,7 +35,7 @@ namespace TOltjenbruns.MassGame {
 	        while (running) {
 	            SystemEvents.CheckEvents();
 				float delta = s.ElapsedMilliseconds / 1000f;
-				Console.WriteLine("FPS: " + (int)(1/delta));
+				//Console.WriteLine("FPS: " + (int)(1/delta));
 				s.Reset();
 				s.Start();
 	            Update(delta);
@@ -46,11 +46,11 @@ namespace TOltjenbruns.MassGame {
 	
 	    private static bool Init() {
 			//TODO: Test Colors
-			Console.WriteLine(Color.WHITE.ToRgba());
-			Console.WriteLine(Color.RED.ToRgba());
-			Console.WriteLine(Color.GREEN.ToRgba());
-			Console.WriteLine(Color.BLUE.ToRgba());
-			Console.WriteLine(Color.BLACK.ToRgba());
+//			Console.WriteLine(Color.WHITE.ToRgba());
+//			Console.WriteLine(Color.RED.ToRgba());
+//			Console.WriteLine(Color.GREEN.ToRgba());
+//			Console.WriteLine(Color.BLUE.ToRgba());
+//			Console.WriteLine(Color.BLACK.ToRgba());
 			
 			
 	        Game.Graphics = new GraphicsContext();
@@ -62,7 +62,7 @@ namespace TOltjenbruns.MassGame {
 	        Game.Shader.SetAttributeBinding(0, "iPosition");
 	        Game.Shader.SetAttributeBinding(1, "iColor");
 			
-			Game.Player = new Player(Game.Particles);
+			Game.Player = new Player();
 			Game.Particles.Add(Game.Player);
 			for (int i = 0; i < 100; i++){
 				Particle particle = new CubeParticle();
@@ -95,7 +95,6 @@ namespace TOltjenbruns.MassGame {
 					Game.Particles.Add(e2);
 					break;
 				}
-				
 			}
 			
 	        return true;
@@ -107,8 +106,8 @@ namespace TOltjenbruns.MassGame {
 	
 	    private static bool Update(float delta) {
 			//TODO: ADD STUFF
-			GamePadData gamePadData = GamePad.GetData(0);
-			Game.Player.Pupdate(delta, gamePadData);
+			Game.GamePadData = GamePad.GetData(0);
+			Game.Player.update(delta);
 			foreach (Particle p in Game.Particles) p.update(delta);
 	        return true;
 	    }

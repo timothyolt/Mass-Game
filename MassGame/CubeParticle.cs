@@ -5,19 +5,34 @@ using Sce.PlayStation.Core;
 namespace TOltjenbruns.MassGame{
 	public class CubeParticle : Particle {
 		#region Private Fields
-		private Emitter cannonEmitter;
 		private const float power = 60;
-		private const float sustain = 0.90f;
+		private const float sustain = 0.75f;
 		private const float field = 5;
+		private Emitter sprayEmitter;
 		
-		private float cooldown = 0;
-		private Player player;
+		private const float cpower = 60;
+		private const float csustain = 0.5f;
+		private const float cfield = 1;
+		private Emitter cannonEmitter;
+		private bool cannonState = false;
+		
+		private const float epower = 250;
+		private const float esustain = 0.8f;
+		private const float efield = 15;
+		private Emitter explodeEmitter;
+		
+		private const float polarityFadeReset = 5;
+		private const float polarityFadeCannon = 4.85f;
+		private float polarityFade = 0;
 		#endregion
 		
 		#region Constructors
+		
 		public CubeParticle ()
-			: base(Player.playerPoly, new Emitter(power, sustain, 0, EmitterType.BIT)) {
-			cannonEmitter = new Emitter(20,0.01f,3,EmitterType.FORCE);
+			: base(Player.playerPoly, new Emitter(power, sustain, field, 0, EmitterType.BIT)) {
+			sprayEmitter = Emitter;
+			cannonEmitter = new Emitter(cpower, csustain, cfield, 0, EmitterType.BIT);
+			explodeEmitter = new Emitter(epower, esustain, efield, 0, EmitterType.BIT);
 			Element.LineWidth = 2;
 			Element.Scale = new Vector3(0.5f, 0.5f, 0.5f);
 			Element.ColorMask = new Rgba(255, 255, 0, 255);
@@ -27,8 +42,12 @@ namespace TOltjenbruns.MassGame{
 		
 		#region Override Methods
 		public override void update (float delta){
-			//TODO: move attract call to player
-			//attract (player.Position, pEmit, pField, delta);
+			fadePolarity(delta);
+			polarize(delta);
+			base.update (delta);
+		}
+		
+		private void fadePolarity(float delta){
 			if (polarityUpdate){
 				polarityUpdate = false;
 				switch (Polarity){
@@ -37,15 +56,20 @@ namespace TOltjenbruns.MassGame{
 					Element.updateColorBuffer();
 					break;
 				default:
-					cooldown = 5;
+					polarityFade = polarityFadeReset;
 					break;
 				}
 			}
-			if (cooldown > 0){
-				int fade = (int)(105f + (cooldown/5.0f) * 150.0f);
+			
+			if (polarityFade > 0){
+				if (cannonState && polarityFade < polarityFadeCannon){
+					Console.WriteLine(Polarity);
+					Emitter = explodeEmitter;
+				}
+				int fade = (int)((polarityFade/5.0f) * 256.0f);
 				switch (Polarity){
 					case 1:
-						Element.ColorMask = new Rgba(255, 255-fade, 0, 255);
+						Element.ColorMask = new Rgba(256, 256-fade, 0, 255);
 						Element.updateColorBuffer();
 						break;
 					case 2:
@@ -53,14 +77,6 @@ namespace TOltjenbruns.MassGame{
 						Element.updateColorBuffer();
 						break;
 					case 3:
-						if(cooldown < 1){
-							foreach (Particle p in Game.Particles) {
-								if(p.EmitterType == EmitterType.BIT &&
-							   	   p!=this){
-									attract(p.Position,cannonEmitter,3,delta);
-								}
-							}
-						}
 						Element.ColorMask = new Rgba(255, 255-fade, fade, 255);
 						Element.updateColorBuffer();
 						break;
@@ -69,27 +85,40 @@ namespace TOltjenbruns.MassGame{
 						Element.updateColorBuffer();
 						break;
 				}
-				cooldown -= delta;
-				if (cooldown <= 0){
-					cooldown = 0;
+				polarityFade -= delta;
+				if (polarityFade <= 0){	
+					Emitter = sprayEmitter;
+					polarityFade = 0;
 					Polarity = 0;
 					Element.ColorMask = new Rgba(255, 255, 0, 255);
 					Element.updateColorBuffer();
 				}
 			}
+		}
+		
+		private void polarize(float delta){
 			foreach (Particle p in Game.Particles)
-				if (p is CubeParticle) {
-					if (p != this){
-						//if(cooldown > 4 && cooldown < 5 && Polarity == 3){
-							p.attract (Position,cannonEmitter,3,delta);
-						//}else
-							//p.attract (Position, Emitter, field, delta);
-					}
-				}
-				
-			//TODO: Fix element center
-			//Rotation = Math.Atan2(velocity.Y, velocity.X);
-			base.update (delta);
+//<<<<<<< HEAD
+//				if (p is CubeParticle) {
+//					if (p != this){
+//						//if(cooldown > 4 && cooldown < 5 && Polarity == 3){
+//							p.attract (Position,cannonEmitter,3,delta);
+//						//}else
+//							//p.attract (Position, Emitter, field, delta);
+//					}
+//				}
+//				
+//			//TODO: Fix element center
+//			//Rotation = Math.Atan2(velocity.Y, velocity.X);
+//			base.update (delta);
+//=======
+				if (p != this && p.Polarity == Polarity && (!p.EmitterType.Equals(EmitterType.MAG)))
+					p.attract (Position, Emitter, delta);
+		}
+		
+		public void fireCannon(){
+			cannonState = true;
+			Emitter = cannonEmitter;
 		}
 		
 		public override void transform (){

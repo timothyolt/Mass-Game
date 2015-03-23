@@ -13,16 +13,18 @@ namespace TOltjenbruns.MassGame {
 		
 		public readonly uint id;
 		public readonly float power;
-		public float sustain;
+		public readonly float sustain;
+		public readonly float field;
 		public byte polarity;
 		public readonly EmitterType etype;
 		
-		public Emitter(float power, float sustain, byte polarity, EmitterType ptype){
+		public Emitter(float power, float sustain, float field, byte polarity, EmitterType ptype){
 			id = nextId;
 			nextId++;
 			
 			this.power = power;
 			this.sustain = sustain;
+			this.field = field;
 			this.polarity = polarity;
 			this.etype = ptype;
 		}
