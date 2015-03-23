@@ -37,7 +37,7 @@ namespace TOltjenbruns.MassGame{
 			: base (colorMask)
 		{
 			//TODO: initialize health
-			
+			Polarity = 1;
 			targetEmitter = new Emitter(300,0.7f,2,EmitterType.FORCE);
 		}
 		#endregion
@@ -46,8 +46,7 @@ namespace TOltjenbruns.MassGame{
 		public override void preUpdate (float delta)
 		{
 			base.preUpdate (delta);
-			//Vector3 diff = Game.Player.Position.LoopDiff(Position);
-			attract(Game.Player.Position,targetEmitter,300,delta);
+			attract(Game.Player.Position,targetEmitter,200,delta);
 		}
 		
 		#endregion

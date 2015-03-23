@@ -123,6 +123,10 @@ namespace TOltjenbruns.MassGame {
 		
 		#region Original Methods
 		public void attract(Vector3 pos, Emitter e, float netSize, float delta){
+			this.attract(pos,e,netSize,delta,(e.polarity == this.emitter.polarity));
+		}
+		
+		public void attract(Vector3 pos, Emitter e, float netSize, float delta, bool push){
 			Vector3 diff = pos.LoopDiff(Position + Velocity);
 			float power = e.power * delta;
 			float diffLength = diff.Length();
@@ -134,7 +138,7 @@ namespace TOltjenbruns.MassGame {
 					force += diff.Multiply(1/power);
 				//if (force.Length() > netSize)
 				//	force = Vector3.Zero;
-				applyForce((e.polarity == this.emitter.polarity) ? force : -force, e);
+				applyForce((push) ? force : -force, e);
 			}
 		}
 //		public void attract(Vector3 pos, float power, float netSize){
@@ -208,6 +212,10 @@ namespace TOltjenbruns.MassGame {
 			}
 			velocity += acceleration;
 			acceleration = Velocity.Multiply(-1/2f);
+			if(this.EmitterType == EmitterType.MAG && velocity.LengthSquared() > 16){
+				velocity = velocity.Normalize();
+				velocity *= 4;
+			}
 			Position += velocity;
 			
 			if (position.X < -200) position.X = 200;

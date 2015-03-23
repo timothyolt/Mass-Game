@@ -71,7 +71,7 @@ namespace TOltjenbruns.MassGame {
 					(float)(Game.Rand.NextDouble() * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT/2, 0f);
 				Game.Particles.Add (particle);
 			}
-			for (int i = 0; i < 30; i++){
+			for (int i = 0; i < 10; i++){
 				switch(Game.Rand.Next(3)){
 				case 0:
 					E_Cannon e = new E_Cannon();

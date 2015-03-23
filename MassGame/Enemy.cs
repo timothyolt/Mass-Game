@@ -43,7 +43,6 @@ namespace TOltjenbruns.MassGame {
 		private bool updateTransform = true;
 		private bool updateColor = true;
 		
-		private float gunCooldown = (float)(3+(rand.NextDouble()*4));
 		private Vector3 target;
 		#endregion
 		
@@ -52,7 +51,11 @@ namespace TOltjenbruns.MassGame {
 		
 		//target property
 		
-		//
+		private float gunCooldown = (float)(3+(rand.NextDouble()*4));
+		public float GunCooldown{
+			get {return gunCooldown;}
+			protected set {gunCooldown = value;}
+		}
 		
 		private float health;
 		public float Health {
@@ -100,7 +103,8 @@ namespace TOltjenbruns.MassGame {
 		public virtual void Move (float delta){
 			foreach (Particle p in Game.Particles){
 				if (p.EmitterType == EmitterType.MAG) {
-					attract(p.Position, boidEmitter, field, delta);
+					//boid menuver
+					attract(p.Position, boidEmitter, field, delta, true);
 				}
 			}
 		}
@@ -108,7 +112,11 @@ namespace TOltjenbruns.MassGame {
 		public virtual void Fire (float delta){
 			target = Position.LoopDiff(Game.Player.Position);
 			if (gunCooldown <= 0){
-				gunCooldown	= (float)(3+(rand.NextDouble()*4));
+				if(Polarity!=3){
+					gunCooldown	= (float)(3+(rand.NextDouble()*4));
+				}else{
+					gunCooldown	= 5;
+				}
 				Vector3 aim = target.Normalize();
 				aim = aim.Multiply(gunPower * delta);
 				float gunFieldSq = gunField*gunField;
@@ -120,7 +128,7 @@ namespace TOltjenbruns.MassGame {
 				foreach (Particle p in Game.Particles)
 					if (
 				    	(!p.EmitterType.Equals(EmitterType.MAG)) && 
-						(p.Position - Position).LengthSquared() < gunFieldSq
+						(p.Position.LoopDiff(Position)).LengthSquared() < gunFieldSq
 					){
 						p.Polarity = Polarity;
 						p.applyForce(aim, gunEmitter);

@@ -156,7 +156,7 @@ namespace TOltjenbruns.MassGame {
 				velocity.X -= 1;
 			if (velocity != Vector3.Zero){
 				velocity = velocity.Normalize();
-				velocity = velocity.Multiply(120 * delta);
+				velocity = velocity.Multiply(180 * delta);
 				Position += velocity;
 				//loopScreen();
 			}

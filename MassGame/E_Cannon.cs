@@ -38,9 +38,10 @@ namespace TOltjenbruns.MassGame{
 			: base (colorMask)
 		{
 			//TODO: initialize health
-			
+			Polarity = 3;
+			GunCooldown	= 5;
 			groupEmitter = new Emitter(500,0.4f,0,EmitterType.FORCE);
-			targetEmitter = new Emitter(500,0.4f,0,EmitterType.FORCE);
+			targetEmitter = new Emitter(300,0.4f,0,EmitterType.FORCE);
 		}
 		#endregion
 		
@@ -48,11 +49,11 @@ namespace TOltjenbruns.MassGame{
 		public override void preUpdate (float delta)
 		{
 			base.preUpdate (delta);
-			//Vector3 diff = Game.Player.Position.LoopDiff(Position);
-			attract(Game.Player.Position,targetEmitter,300,delta);
+			attract(Game.Player.Position,targetEmitter,200,delta);
 			foreach(Particle p in Game.Particles){
-				if(p!=this && p is E_Cannon)
-					attract(p.Position,groupEmitter,100,delta);
+				if(p!=this && p is E_Cannon){
+					attract(p.Position,groupEmitter,100,delta,false);
+				}
 			}
 		}
 		

@@ -37,8 +37,8 @@ namespace TOltjenbruns.MassGame{
 			: base (colorMask)
 		{
 			//TODO: initialize health
-			
-			avoidEmitter = new Emitter(100,0.3f,0,EmitterType.FORCE);
+			Polarity = 4;
+			avoidEmitter = new Emitter(20,0.01f,0,EmitterType.FORCE);
 		}
 		#endregion
 		
@@ -46,14 +46,9 @@ namespace TOltjenbruns.MassGame{
 		public override void preUpdate (float delta)
 		{
 			base.preUpdate (delta);
-			//Vector3 diff = Game.Player.Position.LoopDiff(Position);
-			//attract(Game.Player.Position,targetEmitter,300,delta);
 			foreach(Particle p in Game.Particles){
-				if(!(p is E_BlackWhole)){
-					attract(p.Position,avoidEmitter,300,delta);
-				}
-				else if(p!=this){
-					attract(p.Position,avoidEmitter,300,delta);
+			if(p is CubeParticle){//Quick and dirty way to avoid all particles (brownian motion)
+					attract(p.Position,avoidEmitter,10,delta,true);
 				}
 			}
 		}
