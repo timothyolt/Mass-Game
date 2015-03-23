@@ -22,9 +22,19 @@ namespace TOltjenbruns.MassGame{
 		private Emitter explodeEmitter;
 		
 		private const float polarityFadeReset = 5;
-		private const float polarityFadeCannon = 4.85f;
+		private const float polarityFadeCannon = 4.8f;
 		private float polarityFade = 0;
 		#endregion
+		
+		public override byte Polarity{
+			get {return base.Polarity;}
+			set {
+				sprayEmitter.polarity = value;
+				cannonEmitter.polarity = value;
+				explodeEmitter.polarity = value;
+				base.Polarity = value;
+			}
+		}
 		
 		#region Constructors
 		
@@ -63,7 +73,7 @@ namespace TOltjenbruns.MassGame{
 			
 			if (polarityFade > 0){
 				if (cannonState && polarityFade < polarityFadeCannon){
-					Console.WriteLine(Polarity);
+					//Console.WriteLine(Polarity);
 					Emitter = explodeEmitter;
 				}
 				int fade = (int)((polarityFade/5.0f) * 256.0f);

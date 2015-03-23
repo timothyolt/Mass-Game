@@ -25,7 +25,6 @@ namespace TOltjenbruns.MassGame{
 	public class E_BlackWhole : Enemy
 	{
 		#region Private Fields
-		private Emitter avoidEmitter;
 		#endregion
 		
 		#region Constructor

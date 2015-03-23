@@ -36,9 +36,6 @@ namespace TOltjenbruns.MassGame {
 		private const float gunSustain = 0.75f;
 		private const float gunField = 50;
 		
-		//new player objects should always completely buffer the element on first update
-		//TODO: move update polling to Element
-		
 		private float gunCooldown = (float)(3 + (Game.Rand.NextDouble() * 4));
 		private Vector3 target;
 		#endregion
