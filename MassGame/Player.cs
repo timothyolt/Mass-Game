@@ -77,7 +77,7 @@ namespace TOltjenbruns.MassGame {
 		
 		#region Private Fields
 		private const float power = 1000;
-		private const float sustain = 0.75f;
+		private const float sustain = 0.95f;
 		private const float field = 35;
 		
 		private readonly Emitter gunEmitter;

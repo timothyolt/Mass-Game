@@ -40,7 +40,6 @@ namespace TOltjenbruns.MassGame{
 			: base (colorMask)
 		{
 			//TODO: initialize health
-			Polarity = 1;
 			targetEmitter = new Emitter(targetPower,targetSustain,targetField,2,EmitterType.FORCE);
 			
 			//TODO: empty

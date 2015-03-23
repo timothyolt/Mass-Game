@@ -18,7 +18,7 @@ namespace TOltjenbruns.MassGame{
 		
 		private const float epower = 250;
 		private const float esustain = 0.8f;
-		private const float efield = 15;
+		private const float efield = 20;
 		private Emitter explodeEmitter;
 		
 		private const float polarityFadeReset = 5;
