@@ -2,13 +2,15 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="MassGame\E_BlackWhole.cs">
     <Files>
-      <File FileName="MassGame\E_Cannon.cs" Line="50" Column="19" />
-      <File FileName="MassGame\E_Spray.cs" Line="58" Column="1" />
-      <File FileName="MassGame\Enemy.cs" Line="80" Column="25" />
-      <File FileName="MassGame\Particle.cs" Line="131" Column="28" />
-      <File FileName="MassGame\AppMain.cs" Line="74" Column="25" />
-      <File FileName="MassGame\E_BlackWhole.cs" Line="52" Column="87" />
+      <File FileName="MassGame\E_BlackWhole.cs" Line="40" Column="17" />
+      <File FileName="MassGame\E_Cannon.cs" Line="51" Column="27" />
+      <File FileName="MassGame\E_Spray.cs" Line="47" Column="4" />
+      <File FileName="MassGame\Enemy.cs" Line="148" Column="8" />
+      <File FileName="MassGame\Particle.cs" Line="204" Column="26" />
+      <File FileName="MassGame\AppMain.cs" Line="67" Column="25" />
       <File FileName="MassGame\Game.cs" Line="1" Column="1" />
+      <File FileName="MassGame\CubeParticle.cs" Line="58" Column="64" />
+      <File FileName="MassGame\Player.cs" Line="155" Column="53" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

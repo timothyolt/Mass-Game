@@ -140,18 +140,12 @@ namespace TOltjenbruns.MassGame {
 				//to limit the force effects only to BIT types
 				if(p.EmitterType == EmitterType.BIT){
 					p.attract (Position, Emitter, field, delta);
-					
-					switch(p.Polarity){
-						case 0:
-						case 1:
-							break;
-						default:
-							Vector3 partDiff = Position.LoopDiff(p.Position);
-							if (partDiff.LengthSquared() < 400){
-								takeDamage (1);
-								p.Polarity = 0;
-							}
-							break;
+					if(p.Polarity != 0 && Polarity != p.Polarity){
+						Vector3 partDiff = Position.LoopDiff(p.Position);
+						if (partDiff.LengthSquared() < 400){
+							takeDamage (1);
+							p.Polarity = 0;
+						}
 					}
 				}
 			}
