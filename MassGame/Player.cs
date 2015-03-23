@@ -76,9 +76,8 @@ namespace TOltjenbruns.MassGame {
         #endregion
 		
 		#region Private Fields
-		private readonly Emitter emitter;
 		private const float power = 1000;
-		private const float sustain = 0.99f;
+		private const float sustain = 0.5f;
 		private const float field = 35;
 		
 		private readonly Emitter gunEmitter;
@@ -120,7 +119,6 @@ namespace TOltjenbruns.MassGame {
 			Element.LineWidth = 4;
 			Element.ColorMask = colorMask;
 			
-			emitter = new Emitter(power, sustain, 2, EmitterType.MAG);
 			gunEmitter = new Emitter(gunPower, gunSustain, 2, EmitterType.FORCE);
 			
 			health = 20;

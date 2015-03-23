@@ -6,8 +6,14 @@ namespace TOltjenbruns.MassGame{
 	public class CubeParticle : Particle {
 		#region Private Fields
 		private const float power = 60;
-		private const float sustain = 0.75f;
-	private const float field = 1;
+		private const float sustain = 0.5f;
+		private const float field = 3;
+		private Emitter sprayEmitter;
+		
+		private const float cpower = 60;
+		private const float csustain = 0.75f;
+		private const float cfield = 8;
+		private Emitter cannonEmitter;
 		
 		private const float polarityFadeReset = 5;
 		private float polarityFade = 0;
@@ -15,7 +21,7 @@ namespace TOltjenbruns.MassGame{
 		
 		#region Constructors
 		public CubeParticle ()
-			: base(Player.playerPoly, new Emitter(power, sustain, 0, EmitterType.BIT)) {
+			: base(Player.playerPoly, sprayEmitter) {
 			Element.LineWidth = 2;
 			Element.Scale = new Vector3(0.5f, 0.5f, 0.5f);
 			Element.ColorMask = new Rgba(255, 255, 0, 255);
