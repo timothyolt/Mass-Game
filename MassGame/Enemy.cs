@@ -86,8 +86,9 @@ namespace TOltjenbruns.MassGame {
 		public override void update (float delta){
 			preUpdate(delta);
 			Move(delta);
-			Fire(delta);
-			
+			if(gunCooldown <= 0){
+				Fire(delta);
+			}
 			base.update(delta);
 		}
 		
@@ -107,35 +108,7 @@ namespace TOltjenbruns.MassGame {
 					attract(p.Position, boidEmitter, field, delta, true);
 				}
 			}
-		}
-		
-		public virtual void Fire (float delta){
 			target = Position.LoopDiff(Game.Player.Position);
-			if (gunCooldown <= 0){
-				if(Polarity!=3){
-					gunCooldown	= (float)(3+(rand.NextDouble()*4));
-				}else{
-					gunCooldown	= 5;
-				}
-				Vector3 aim = target.Normalize();
-				aim = aim.Multiply(gunPower * delta);
-				float gunFieldSq = gunField*gunField;
-				//TODO: we are doing a lot of duplicate distance tests, lets make a HashSet<Particle,DistDiffPair>
-				//and a private subclass DistDiffPair which holds a public vector3 (the diff) and a public float (distance)
-				//Putting this in particle and making a method to populate the set each tick would be a good idea
-				//Dont worry about clearing it, there can only be one data stored under a key (a particle in this case)
-				//Last update's distances will be overriten when the HashSet is repopulated
-				foreach (Particle p in Game.Particles)
-					if (
-				    	(!p.EmitterType.Equals(EmitterType.MAG)) && 
-						(p.Position.LoopDiff(Position)).LengthSquared() < gunFieldSq
-					){
-						p.Polarity = Polarity;
-						p.applyForce(aim, gunEmitter);
-					}
-			}
-			//else
-			//This loop is for attracting particles and taking damage, shouldn't that happen regardless of firing
 			foreach (Particle p in Game.Particles){
 				//to limit the force effects only to BIT types
 				if(p.EmitterType == EmitterType.BIT){
@@ -147,6 +120,31 @@ namespace TOltjenbruns.MassGame {
 							p.Polarity = 0;
 						}
 					}
+				}
+			}
+		}
+		
+		public virtual void Fire (float delta){
+			if(Polarity!=3){
+				gunCooldown	= (float)(3+(rand.NextDouble()*4));
+			}else{
+				gunCooldown	= 5;
+			}
+			Vector3 aim = target.Normalize();
+			aim = aim.Multiply(gunPower * delta);
+			float gunFieldSq = gunField*gunField;
+			//TODO: we are doing a lot of duplicate distance tests, lets make a HashSet<Particle,DistDiffPair>
+			//and a private subclass DistDiffPair which holds a public vector3 (the diff) and a public float (distance)
+			//Putting this in particle and making a method to populate the set each tick would be a good idea
+			//Dont worry about clearing it, there can only be one data stored under a key (a particle in this case)
+			//Last update's distances will be overriten when the HashSet is repopulated
+			foreach (Particle p in Game.Particles){
+				if (
+			    	(!p.EmitterType.Equals(EmitterType.MAG)) && 
+					(p.Position.LoopDiff(Position)).LengthSquared() < gunFieldSq
+				){
+					p.Polarity = Polarity;
+					p.applyForce(aim, gunEmitter);
 				}
 			}
 		}

@@ -72,7 +72,7 @@ namespace TOltjenbruns.MassGame {
 				Game.Particles.Add (particle);
 			}
 			for (int i = 0; i < 10; i++){
-				switch(Game.Rand.Next(3)){
+				switch(/*Game.Rand.Next(3)*/0){
 				case 0:
 					E_Cannon e = new E_Cannon();
 					e.Position = new Vector3(

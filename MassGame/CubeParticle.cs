@@ -5,6 +5,7 @@ using Sce.PlayStation.Core;
 namespace TOltjenbruns.MassGame{
 	public class CubeParticle : Particle {
 		#region Private Fields
+		private Emitter cannonEmitter;
 		private const float power = 60;
 		private const float sustain = 0.90f;
 		private const float field = 5;
@@ -16,6 +17,7 @@ namespace TOltjenbruns.MassGame{
 		#region Constructors
 		public CubeParticle ()
 			: base(Player.playerPoly, new Emitter(power, sustain, 0, EmitterType.BIT)) {
+			cannonEmitter = new Emitter(600,0.5f,3,EmitterType.FORCE);
 			Element.LineWidth = 2;
 			Element.Scale = new Vector3(0.5f, 0.5f, 0.5f);
 			Element.ColorMask = new Rgba(255, 255, 0, 255);
@@ -51,6 +53,14 @@ namespace TOltjenbruns.MassGame{
 						Element.updateColorBuffer();
 						break;
 					case 3:
+						if(cooldown < 1){
+							foreach (Particle p in Game.Particles) {
+								if(p.EmitterType == EmitterType.BIT &&
+							   	   p!=this){
+									attract(p.Position,cannonEmitter,3,delta);
+								}
+							}
+						}
 						Element.ColorMask = new Rgba(255, 255-fade, fade, 255);
 						Element.updateColorBuffer();
 						break;
@@ -69,7 +79,12 @@ namespace TOltjenbruns.MassGame{
 			}
 			foreach (Particle p in Game.Particles)
 				if (p is CubeParticle) {
-					if (p != this) p.attract (Position, Emitter, field, delta);
+					if (p != this){
+//						if(cooldown > 0 && cooldown < 1 && Polarity == 3){
+							p.attract (Position,cannonEmitter,3,delta);
+//						}else
+//							p.attract (Position, Emitter, field, delta);
+					}
 				}
 				
 			//TODO: Fix element center

@@ -13,7 +13,7 @@ namespace TOltjenbruns.MassGame {
 		
 		public readonly uint id;
 		public readonly float power;
-		public readonly float sustain;
+		public float sustain;
 		public byte polarity;
 		public readonly EmitterType etype;
 		

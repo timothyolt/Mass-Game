@@ -38,7 +38,7 @@ namespace TOltjenbruns.MassGame{
 		{
 			//TODO: initialize health
 			Polarity = 4;
-			avoidEmitter = new Emitter(20,0.01f,0,EmitterType.FORCE);
+			avoidEmitter = new Emitter(20,0.1f,0,EmitterType.FORCE);
 		}
 		#endregion
 		
@@ -48,7 +48,7 @@ namespace TOltjenbruns.MassGame{
 			base.preUpdate (delta);
 			foreach(Particle p in Game.Particles){
 			if(p is CubeParticle){//Quick and dirty way to avoid all particles (brownian motion)
-					attract(p.Position,avoidEmitter,10,delta,true);
+					attract(p.Position,avoidEmitter,50,delta,true);
 				}
 			}
 		}

@@ -53,6 +53,10 @@ namespace TOltjenbruns.MassGame {
 			get	{ return emitter.etype; }
 		}
 		
+		public float EmitterSustain{
+			set {emitter.sustain = value;}
+		}
+		
 		protected bool polarityUpdate = true;
 		public byte Polarity {
 			get { return emitter.polarity; }

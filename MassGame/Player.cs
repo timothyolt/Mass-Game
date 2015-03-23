@@ -176,18 +176,10 @@ namespace TOltjenbruns.MassGame {
 				foreach (Particle p in particles)
 					// only able to fire the BITs
 					if(p.EmitterType == EmitterType.BIT){
-						switch(p.Polarity){
-							case 0:
-							case 2:
-								// fires only the yellow and green bits
-								//p.attract(Position, gunEmitter, gunField, delta);
-								if ((p.Position - Position).Length() < gunField){
-									p.Polarity = 2;
-									p.applyForce(aim, gunEmitter);
-								}
-								break;
-							default:
-								break;
+						//p.attract(Position, gunEmitter, gunField, delta);
+						if ((p.Position - Position).Length() < gunField){
+							p.Polarity = 2;
+							p.applyForce(aim, gunEmitter);
 						}
 					}
 			}
