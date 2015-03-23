@@ -17,7 +17,7 @@ namespace TOltjenbruns.MassGame{
 		#region Constructors
 		public CubeParticle ()
 			: base(Player.playerPoly, new Emitter(power, sustain, 0, EmitterType.BIT)) {
-			cannonEmitter = new Emitter(600,0.5f,3,EmitterType.FORCE);
+			cannonEmitter = new Emitter(20,0.01f,3,EmitterType.FORCE);
 			Element.LineWidth = 2;
 			Element.Scale = new Vector3(0.5f, 0.5f, 0.5f);
 			Element.ColorMask = new Rgba(255, 255, 0, 255);
@@ -80,10 +80,10 @@ namespace TOltjenbruns.MassGame{
 			foreach (Particle p in Game.Particles)
 				if (p is CubeParticle) {
 					if (p != this){
-//						if(cooldown > 0 && cooldown < 1 && Polarity == 3){
+						//if(cooldown > 4 && cooldown < 5 && Polarity == 3){
 							p.attract (Position,cannonEmitter,3,delta);
-//						}else
-//							p.attract (Position, Emitter, field, delta);
+						//}else
+							//p.attract (Position, Emitter, field, delta);
 					}
 				}
 				

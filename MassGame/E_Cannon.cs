@@ -59,8 +59,9 @@ namespace TOltjenbruns.MassGame{
 		public override void Move (float delta)
 		{
 			base.Move (delta);
-			if(GunCooldown < 1){
+			if(GunCooldown < 5 && GunCooldown > 4){
 				EmitterSustain = 0.01f;
+				
 			}else{
 				EmitterSustain = 0.99f;
 			}

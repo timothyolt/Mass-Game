@@ -38,7 +38,7 @@ namespace TOltjenbruns.MassGame{
 		{
 			//TODO: initialize health
 			Polarity = 1;
-			targetEmitter = new Emitter(300,0.7f,2,EmitterType.FORCE);
+			targetEmitter = new Emitter(100,0.7f,2,EmitterType.FORCE);
 		}
 		#endregion
 		
