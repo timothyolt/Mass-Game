@@ -22,28 +22,35 @@ using Sce.PlayStation.Core.Graphics;
 using Sce.PlayStation.Core.Input;
 
 namespace TOltjenbruns.MassGame{
-	public class E_Spray : Enemy
+	public class E_BlackWhole : Enemy
 	{
 		#region Private Fields
-		
+		private Emitter avoidEmitter;
 		#endregion
 		
 		#region Constructor
-		public E_Spray ()
-			: this (new Rgba(255, 0, 0, 255)){
+		public E_BlackWhole ()
+			: this (new Rgba(0, 0, 0, 255)){
 		}
 		
-		public E_Spray (Rgba colorMask)
+		public E_BlackWhole (Rgba colorMask)
 			: base (colorMask)
 		{
 			//TODO: initialize health
-			
-			//TODO: 
+			Polarity = 4;
 		}
 		#endregion
 		
 		#region Original Methods
-		
+		public override void preUpdate (float delta)
+		{
+			base.preUpdate (delta);
+			foreach(Particle p in Game.Particles){
+			if(p is CubeParticle){//Quick and dirty way to avoid all particles (brownian motion)
+					attract(p.Position,Emitter,delta,true);
+				}
+			}
+		}
 		
 		#endregion
 		

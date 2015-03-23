@@ -72,7 +72,9 @@ namespace TOltjenbruns.MassGame {
 		public override void update (float delta){
 			preUpdate(delta);
 			Move(delta);
-			Fire(delta);
+			if(gunCooldown <= 0){
+				Fire(delta);
+			}
 			polarize(delta);
 			base.update(delta);
 		}
@@ -99,6 +101,11 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		protected virtual void Fire (float delta){
+			if(Polarity!=3){
+				gunCooldown	= (float)(3+(Game.Rand.NextDouble()*4));
+			}else{
+				gunCooldown	= 5;
+			}
 			target = Position.LoopDiff(Game.Player.Position);
 			gunCooldown -= delta;
 			if (gunCooldown <= 0){
@@ -132,6 +139,7 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		protected virtual void polarize (float delta){
+			target = Position.LoopDiff(Game.Player.Position);
 			foreach (Particle p in Game.Particles){
 				if (p != this && p.EmitterType.Equals(EmitterType.BIT)){
 					p.attract (Position, Emitter, delta);
@@ -151,75 +159,6 @@ namespace TOltjenbruns.MassGame {
 			//TODO: Change Color
 			//TODO: Check if dead
 		}
-		#endregion
-		
-		#region AI Methods
-		/*
-		public void AvoidPlusTarget (Vector3 pos, Player player, HashSet<Enemy> enemies,
-		                             ref Vector3 target, ref Vector3 avoidVector, ref float targetDist){
-			//not sure if we want to avoid the oppposite polar particles as well
-			Vector3 _avoidVector = Vector3.Zero;
-			Vector3 playerOffsetPos = Offset(player.Position,pos);
-			float closest = playerOffsetPos.LengthSquared();
-			Vector3 _target = playerOffsetPos;
-			int neighborCount = 0;
-			int threshold = 10000;// 100 pixels squared
-			//closest is the distance to player here \/
-			if (closest < threshold) {
-				neighborCount++;
-				Vector3 norm = playerOffsetPos.Normalize();
-				_avoidVector -= norm.Multiply(FMath.Sqrt(threshold-closest));
-			}
-			foreach(Enemy e in enemies){
-				if (this != e) {
-					Vector3 offset = Offset(e.position,pos);
-					float dist = offset.LengthSquared();
-					if (dist < closest) {
-						closest = dist;
-						_target = offset;
-					}
-					if (dist < threshold ) {
-						neighborCount++;
-						Vector3 norm_ = offset.Normalize();
-						_avoidVector -= norm_.Multiply(FMath.Sqrt(threshold-dist));
-					}
-				}
-			}
-			target = _target;
-			avoidVector = _avoidVector;
-			targetDist = FMath.Sqrt(closest);
-		}
-		
-		/// <summary>
-		/// Returns the Vector3 offsetPoint relative to perspectivePoint.
-		/// </summary>
-		/// <param name='offsetPoint'>
-		/// Offset point, the target.
-		/// </param>
-		/// <param name='perspectivePoint'>
-		/// Perspective point, the center of the parspective.
-		/// </param>
-		
-		public void loopScreen ()
-		{
-			if (position.X > 200) {
-				position.X -= 400;
-				updateTransform = true;
-			}
-			if (position.X <= -200) {
-				position.X += 400;
-				updateTransform = true;
-			}
-			if (position.Y > 200) {
-				position.Y -= 400;
-				updateTransform = true;
-			}
-			if (position.Y <= -200) {
-				position.Y += 400;
-				updateTransform = true;
-			}
-		}
-		*/
 		#endregion
 	}
 }

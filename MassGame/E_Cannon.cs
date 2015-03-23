@@ -22,28 +22,49 @@ using Sce.PlayStation.Core.Graphics;
 using Sce.PlayStation.Core.Input;
 
 namespace TOltjenbruns.MassGame{
-	public class E_Spray : Enemy
+	public class E_Cannon : Enemy
 	{
 		#region Private Fields
-		
+		private Emitter groupEmitter;
+		private Emitter targetEmitter;
 		#endregion
 		
 		#region Constructor
-		public E_Spray ()
-			: this (new Rgba(255, 0, 0, 255)){
+		public E_Cannon ()
+			: this (new Rgba(255, 0, 255, 255)){
 		}
 		
-		public E_Spray (Rgba colorMask)
+		public E_Cannon (Rgba colorMask)
 			: base (colorMask)
 		{
 			//TODO: initialize health
-			
-			//TODO: 
+			Polarity = 3;
+//			GunCooldown	= 5;
+//			groupEmitter = new Emitter(500,0.4f,0,EmitterType.FORCE);
+//			targetEmitter = new Emitter(300,0.4f,0,EmitterType.FORCE);
 		}
 		#endregion
 		
 		#region Original Methods
-		
+		public override void preUpdate (float delta)
+		{
+//			base.preUpdate (delta);
+//			attract(Game.Player.Position,targetEmitter,200,delta);
+//			foreach(Particle p in Game.Particles){
+//				if(p!=this && p is E_Cannon){
+//					attract(p.Position,groupEmitter,100,delta,false);
+//				}
+//			}
+		}
+		protected override void Move (float delta)
+		{
+//			base.Move (delta);
+//			if(GunCooldown < 1){
+//				EmitterSustain = 0.01f;
+//			}else{
+//				EmitterSustain = 0.99f;
+//			}
+		}
 		
 		#endregion
 		

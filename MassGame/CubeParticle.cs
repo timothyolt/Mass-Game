@@ -73,7 +73,15 @@ namespace TOltjenbruns.MassGame{
 						Element.updateColorBuffer();
 						break;
 					case 2:
-						Element.ColorMask = new Rgba(256-fade, 255, 0, 255);
+						Element.ColorMask = new Rgba(255-fade, 255, 0, 255);
+						Element.updateColorBuffer();
+						break;
+					case 3:
+						Element.ColorMask = new Rgba(255, 255-fade, fade, 255);
+						Element.updateColorBuffer();
+						break;
+					case 4:
+						Element.ColorMask = new Rgba(255-fade, 255-fade, 0, 255);
 						Element.updateColorBuffer();
 						break;
 				}
