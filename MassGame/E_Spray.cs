@@ -26,6 +26,7 @@ namespace TOltjenbruns.MassGame{
 	{
 		#region Private Fields
 		
+		private Emitter targetEmitter;
 		#endregion
 		
 		#region Constructor
@@ -37,13 +38,19 @@ namespace TOltjenbruns.MassGame{
 			: base (colorMask)
 		{
 			//TODO: initialize health
+			Polarity = 1;
+			targetEmitter = new Emitter(200,0.7f,200,2,EmitterType.FORCE);
 			
-			//TODO: 
+			//TODO: empty
 		}
 		#endregion
 		
 		#region Original Methods
-		
+		public override void preUpdate (float delta)
+		{
+			base.preUpdate (delta);
+			attract(Game.Player.Position,targetEmitter,delta);
+		}
 		
 		#endregion
 		

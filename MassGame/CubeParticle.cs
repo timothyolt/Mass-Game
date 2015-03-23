@@ -108,6 +108,20 @@ namespace TOltjenbruns.MassGame{
 		
 		private void polarize(float delta){
 			foreach (Particle p in Game.Particles)
+//<<<<<<< HEAD
+//				if (p is CubeParticle) {
+//					if (p != this){
+//						//if(cooldown > 4 && cooldown < 5 && Polarity == 3){
+//							p.attract (Position,cannonEmitter,3,delta);
+//						//}else
+//							//p.attract (Position, Emitter, field, delta);
+//					}
+//				}
+//				
+//			//TODO: Fix element center
+//			//Rotation = Math.Atan2(velocity.Y, velocity.X);
+//			base.update (delta);
+//=======
 				if (p != this && p.Polarity == Polarity && (!p.EmitterType.Equals(EmitterType.MAG)))
 					p.attract (Position, Emitter, delta);
 		}
