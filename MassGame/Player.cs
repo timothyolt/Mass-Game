@@ -123,6 +123,7 @@ namespace TOltjenbruns.MassGame {
 			if (sprayCooldown <= 0) fire (delta, gamePad);
 			else sprayCooldown -= delta;
 			polarize(delta);
+			pickUpPower();
 			base.update(delta);
 		}
 		
@@ -182,6 +183,16 @@ namespace TOltjenbruns.MassGame {
 							p.Polarity = 0;
 						}
 					}
+				}
+			}
+		}
+		
+		public void pickUpPower ()
+		{
+			for (int i = 0; i < Game.groundPowerUps.Count; i++) {
+				if(Game.groundPowerUps[i].Position.LoopDiff(Position).LengthSquared() < field*field){
+					Game.obtainedPowerUps.Add(Game.groundPowerUps[i]);
+					Game.groundPowerUps.RemoveAt(i);
 				}
 			}
 		}

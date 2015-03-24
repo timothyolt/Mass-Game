@@ -97,6 +97,8 @@ namespace TOltjenbruns.MassGame {
 				}
 			}
 			
+			Game.groundPowerUps.Add(new PickCannon());
+			
 	        return true;
 	    }
 
