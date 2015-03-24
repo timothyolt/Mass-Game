@@ -80,13 +80,21 @@ namespace TOltjenbruns.MassGame {
 		private const float sustain = 0.95f;
 		private const float field = 35;
 		
-		private readonly Emitter gunEmitter;
-		private const float gunPower = 1000;
-		private const float gunSustain = 0.75f;
+		private const float gunPower = 2000;
+		private const float gunSustain = 0.65f;
 		private const float gunField = 35;
+		private readonly Emitter gunEmitter;
+		
+		private const float compactPower = 2000;
+		private const float compactSustain = 0.65f;
+		private const float compactField = 35;
+		private readonly Emitter compactEmitter;
 		
 		private const float sprayCooldownReset = 0.3f;
 		private float sprayCooldown = 0;
+		
+		private const float chargeTimeReset = 0.25f;
+		private float chargeTime = 0;
 		
 		#endregion
 		
@@ -162,7 +170,8 @@ namespace TOltjenbruns.MassGame {
 						p.EmitterType == EmitterType.BIT && 
 						Position.LoopDiff(p.Position).Length() <= gunField
 					){
-						((CubeParticle) p).fireCannon();
+						//((CubeParticle) p).fireCannon();
+						((CubeParticle) p).fireBlackHole();
 						p.Polarity = Polarity;
 						p.clearForces();
 						p.applyForce(aim, gunEmitter);

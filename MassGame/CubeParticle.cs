@@ -16,13 +16,20 @@ namespace TOltjenbruns.MassGame{
 		private Emitter cannonEmitter;
 		private bool cannonState = false;
 		
-		private const float epower = 250;
+		private const float bpower = 250;
+		private const float bsustain = 0.8f;
+		private const float bfield = 100;
+		private Emitter blackEmitter;
+		private bool blackHoleState = false;
+		
+		private const float epower = 500;
 		private const float esustain = 0.8f;
 		private const float efield = 20;
 		private Emitter explodeEmitter;
 		
 		private const float polarityFadeReset = 5;
 		private const float polarityFadeCannon = 4.8f;
+		private const float polarityFadeBlack = 2f;
 		private float polarityFade = 0;
 		#endregion
 		
@@ -32,6 +39,7 @@ namespace TOltjenbruns.MassGame{
 				sprayEmitter.polarity = value;
 				cannonEmitter.polarity = value;
 				explodeEmitter.polarity = value;
+				blackEmitter.polarity = value;
 				base.Polarity = value;
 			}
 		}
@@ -43,6 +51,7 @@ namespace TOltjenbruns.MassGame{
 			sprayEmitter = Emitter;
 			cannonEmitter = new Emitter(cpower, csustain, cfield, 0, EmitterType.BIT);
 			explodeEmitter = new Emitter(epower, esustain, efield, 0, EmitterType.BIT);
+			blackEmitter = new Emitter(bpower, bsustain, bfield, 0, EmitterType.BIT);
 			Element.LineWidth = 2;
 			Element.Scale = new Vector3(0.5f, 0.5f, 0.5f);
 			Element.ColorMask = new Rgba(255, 255, 0, 255);
@@ -60,20 +69,19 @@ namespace TOltjenbruns.MassGame{
 		private void fadePolarity(float delta){
 			if (polarityUpdate){
 				polarityUpdate = false;
-				switch (Polarity){
-				case 0:
+				if (Polarity == 0){
 					Element.ColorMask = new Rgba(255, 255, 0, 255);
 					Element.updateColorBuffer();
-					break;
-				default:
-					polarityFade = polarityFadeReset;
-					break;
 				}
 			}
 			
 			if (polarityFade > 0){
-				if (cannonState && polarityFade < polarityFadeCannon){
-					//Console.WriteLine(Polarity);
+				if (
+					(cannonState && polarityFade < polarityFadeCannon)||
+					(blackHoleState && polarityFade < polarityFadeBlack)
+				){
+					cannonState = false;
+					blackHoleState = false;
 					Emitter = explodeEmitter;
 				}
 				int fade = (int)((polarityFade/5.0f) * 256.0f);
@@ -107,28 +115,35 @@ namespace TOltjenbruns.MassGame{
 		}
 		
 		private void polarize(float delta){
-			foreach (Particle p in Game.Particles)
-//<<<<<<< HEAD
-//				if (p is CubeParticle) {
-//					if (p != this){
-//						//if(cooldown > 4 && cooldown < 5 && Polarity == 3){
-//							p.attract (Position,cannonEmitter,3,delta);
-//						//}else
-//							//p.attract (Position, Emitter, field, delta);
-//					}
-//				}
-//				
-//			//TODO: Fix element center
-//			//Rotation = Math.Atan2(velocity.Y, velocity.X);
-//			base.update (delta);
-//=======
-				if (p != this && p.Polarity == Polarity && (!p.EmitterType.Equals(EmitterType.MAG)))
-					p.attract (Position, Emitter, delta);
+			foreach (Particle p in Game.Particles){
+				if (p != this && (!p.EmitterType.Equals(EmitterType.MAG))){
+					if (blackHoleState) {
+						p.attract (Position, Emitter, delta, false);
+						if (Position.LoopDiff(p.Position).Length() < Emitter.field){
+							p.Polarity = Polarity;
+						}
+					}
+					else if (p.Polarity == Polarity){
+						p.attract (Position, Emitter, delta);
+					}
+				}
+			}
 		}
 		
 		public void fireCannon(){
 			cannonState = true;
 			Emitter = cannonEmitter;
+			polarityFade = polarityFadeReset;
+		}
+		
+		public void fireSpray(){
+			polarityFade = polarityFadeReset;
+		}
+		
+		public void fireBlackHole(){
+			blackHoleState = true;
+			Emitter = blackEmitter;
+			polarityFade = polarityFadeReset;
 		}
 		
 		public override void transform (){

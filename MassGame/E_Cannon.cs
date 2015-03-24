@@ -26,14 +26,14 @@ namespace TOltjenbruns.MassGame{
 	{
 		#region Private Fields
 		
-		private const float targetPower = 4f;
-		private const float targetSustain = 0f;
+		private const float targetPower = 16f;
+		private const float targetSustain = 0.5f;
 		private const float targetField = 200;
 		private Emitter targetEmitter;
 		
-		private const float seekPower = 1000f;
+		private const float seekPower = 500f;
 		private const float seekSustain = 0.2f;
-		private const float seekField = 35;
+		private const float seekField = 10;
 		private Emitter seekEmitter;
 		
 		private E_Cannon neighbor = null;
@@ -53,7 +53,6 @@ namespace TOltjenbruns.MassGame{
 				//Lazy code, last one in array is the neighbor
 				if (p is E_Cannon)
 					neighbor = (E_Cannon) p;
-//			groupEmitter = new Emitter(500,0.4f,0,EmitterType.FORCE);
 		}
 		#endregion
 		
@@ -70,16 +69,23 @@ namespace TOltjenbruns.MassGame{
 				foreach(Particle p in Game.Particles)
 					if(p is CubeParticle)
 						attract(p.Position,seekEmitter,delta,true);
-//			attract(Game.Player.Position,targetEmitter,200,delta);
-//			foreach(Particle p in Game.Particles){
-//				if(p!=this && p is E_Cannon){
-//					attract(p.Position,groupEmitter,100,delta,false);
-//				}
-//			}
 		}
 		protected override void Move (float delta)
 		{
 			base.Move(delta);
+		}
+		
+		public override void applyVelocity (float delta)
+		{
+			if (neighbor == null){
+				if (Velocity.LengthSquared() > 64)
+					Velocity = Velocity.Normalize().Multiply(8);
+			}
+			else {
+				if (Velocity.LengthSquared() > 16)
+					Velocity = Velocity.Normalize().Multiply(2);
+			}
+			base.applyVelocity (delta);
 		}
 		#endregion
 		

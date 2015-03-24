@@ -64,7 +64,7 @@ namespace TOltjenbruns.MassGame {
 			
 			Game.Player = new Player();
 			Game.Particles.Add(Game.Player);
-			for (int i = 0; i < 200; i++){
+			for (int i = 0; i < 100; i++){
 				Particle particle = new CubeParticle();
 				particle.Position = new Vector3(
 					(float)(Game.Rand.NextDouble() * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH/2, 

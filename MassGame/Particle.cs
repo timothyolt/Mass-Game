@@ -82,6 +82,7 @@ namespace TOltjenbruns.MassGame {
 		private Vector3 velocity;
 		public Vector3 Velocity {
 			get {return velocity;}	
+			set {velocity = value;}
 		}
 		
 		private Vector3 acceleration;
@@ -188,7 +189,6 @@ namespace TOltjenbruns.MassGame {
 		public abstract void color();
 		
 		public virtual void update (float delta){
-			//applyForce(gravity.Multiply(delta), gEmit);
 			
 			int fCount = forces.Count;
 			HashSet<Emitter> removeQueue = new HashSet<Emitter>();
@@ -205,7 +205,7 @@ namespace TOltjenbruns.MassGame {
 			}
 			velocity += acceleration;
 			acceleration = Velocity.Multiply(-1/2f);
-			Position += velocity;
+			applyVelocity(delta);
 			
 			if (position.X < -200) position.X = 200;
 			if (position.X > 200) position.X = -200;
@@ -224,6 +224,10 @@ namespace TOltjenbruns.MassGame {
 				element.updateColorBuffer();
 			}
 			
+		}
+		
+		public virtual void applyVelocity(float delta){
+			Position += velocity;
 		}
 		#endregion
 	}
