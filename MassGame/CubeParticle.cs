@@ -24,7 +24,7 @@ namespace TOltjenbruns.MassGame{
 		
 		private const float epower = 500;
 		private const float esustain = 0.8f;
-		private const float efield = 20;
+		private const float efield = 15;
 		private Emitter explodeEmitter;
 		
 		private const float polarityFadeReset = 5;
@@ -43,7 +43,6 @@ namespace TOltjenbruns.MassGame{
 				base.Polarity = value;
 			}
 		}
-		
 		#region Constructors
 		
 		public CubeParticle ()

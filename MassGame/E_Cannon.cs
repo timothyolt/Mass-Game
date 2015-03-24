@@ -1,4 +1,4 @@
- /*Copyright (C) 2015 Timothy A. Oltjenbruns and Steffen Lim
+ /*Copyright (C) 2015 Timothy A. Oltjenbruns
   *
   *	This program is free software; you can redistribute it and/or modify
   *	it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ namespace TOltjenbruns.MassGame{
 		}
 		protected override void Move (float delta)
 		{
-			base.Move(delta);
+			
 		}
 		
 		public override void applyVelocity (float delta)
