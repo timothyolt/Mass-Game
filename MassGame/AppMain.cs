@@ -64,15 +64,15 @@ namespace TOltjenbruns.MassGame {
 			
 			Game.Player = new Player();
 			Game.Particles.Add(Game.Player);
-			for (int i = 0; i < 200; i++){
+			for (int i = 0; i < 100; i++){
 				Particle particle = new CubeParticle();
 				particle.Position = new Vector3(
 					(float)(Game.Rand.NextDouble() * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH/2, 
 					(float)(Game.Rand.NextDouble() * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT/2, 0f);
 				Game.Particles.Add (particle);
 			}
-			for (int i = 0; i < 5; i++){
-				switch(0){/*/Game.Rand.Next(3)){*/
+			for (int i = 0; i < 10; i++){
+				switch(Game.Rand.Next(3)){
 				case 0:
 					E_Cannon e = new E_Cannon();
 					e.Position = new Vector3(
@@ -96,6 +96,10 @@ namespace TOltjenbruns.MassGame {
 					break;
 				}
 			}
+			Game.CannonPick = new PickCannon(new Vector3(Game.Rand.Next(-200,200),Game.Rand.Next(-200,200),0));
+			Game.BWholePick = new PickBwhole(new Vector3(Game.Rand.Next(-200,200),Game.Rand.Next(-200,200),0));
+			Game.groundPowerUps.Add(Game.CannonPick);
+			Game.groundPowerUps.Add(Game.BWholePick);
 			
 	        return true;
 	    }
@@ -109,6 +113,7 @@ namespace TOltjenbruns.MassGame {
 			Game.GamePadData = GamePad.GetData(0);
 			Game.Player.update(delta);
 			foreach (Particle p in Game.Particles) p.update(delta);
+			foreach (Particle p in Game.groundPowerUps) p.update(delta);
 	        return true;
 	    }
 	
@@ -133,6 +138,7 @@ namespace TOltjenbruns.MassGame {
 	
 	        Game.Graphics.SetShaderProgram(Game.Shader);
 			foreach (Particle p in Game.Particles) p.render();
+			foreach (Particle p in Game.groundPowerUps) p.render();
 			Game.Player.render();
 	
 	        Game.Graphics.SwapBuffers();

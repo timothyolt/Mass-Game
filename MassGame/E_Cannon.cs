@@ -1,4 +1,4 @@
- /*Copyright (C) 2015 Timothy A. Oltjenbruns and Steffen Lim
+ /*Copyright (C) 2015 Timothy A. Oltjenbruns
   *
   *	This program is free software; you can redistribute it and/or modify
   *	it under the terms of the GNU General Public License as published by
@@ -25,18 +25,8 @@ namespace TOltjenbruns.MassGame{
 	public class E_Cannon : Enemy
 	{
 		#region Private Fields
-		
-		private const float targetPower = 4f;
-		private const float targetSustain = 0f;
-		private const float targetField = 200;
+		private Emitter groupEmitter;
 		private Emitter targetEmitter;
-		
-		private const float seekPower = 1000f;
-		private const float seekSustain = 0.2f;
-		private const float seekField = 35;
-		private Emitter seekEmitter;
-		
-		private E_Cannon neighbor = null;
 		#endregion
 		
 		#region Constructor
@@ -47,29 +37,18 @@ namespace TOltjenbruns.MassGame{
 		public E_Cannon (Rgba colorMask)
 			: base (colorMask)
 		{
-			targetEmitter = new Emitter(targetPower,targetSustain,targetField,Polarity,EmitterType.FORCE);
-			seekEmitter = new Emitter(seekPower,seekSustain,seekField,Polarity,EmitterType.FORCE);
-			foreach(Particle p in Game.Particles)
-				//Lazy code, last one in array is the neighbor
-				if (p is E_Cannon)
-					neighbor = (E_Cannon) p;
+			//TODO: initialize health
+			Polarity = 3;
+//			GunCooldown	= 5;
 //			groupEmitter = new Emitter(500,0.4f,0,EmitterType.FORCE);
+//			targetEmitter = new Emitter(300,0.4f,0,EmitterType.FORCE);
 		}
 		#endregion
 		
 		#region Original Methods
 		public override void preUpdate (float delta)
 		{
-			base.preUpdate (delta);
-			if (neighbor != null){
-				Vector3 aim = Position.LoopDiff(neighbor.Position);
-				aim = aim.Normalize().Multiply(targetEmitter.power);
-				applyForce(aim, targetEmitter);
-			}
-			else 
-				foreach(Particle p in Game.Particles)
-					if(p is CubeParticle)
-						attract(p.Position,seekEmitter,delta,true);
+//			base.preUpdate (delta);
 //			attract(Game.Player.Position,targetEmitter,200,delta);
 //			foreach(Particle p in Game.Particles){
 //				if(p!=this && p is E_Cannon){
@@ -79,7 +58,7 @@ namespace TOltjenbruns.MassGame{
 		}
 		protected override void Move (float delta)
 		{
-			base.Move(delta);
+			
 		}
 		#endregion
 		

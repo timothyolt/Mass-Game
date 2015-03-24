@@ -25,10 +25,7 @@ namespace TOltjenbruns.MassGame{
 	public class E_BlackWhole : Enemy
 	{
 		#region Private Fields
-		private const float avoidPower = 1000;
-		private const float avoidSustain = 0.2f;
-		private const float avoidField = 35;
-		private readonly Emitter avoidEmitter;
+		private Emitter avoidEmitter;
 		#endregion
 		
 		#region Constructor
@@ -40,7 +37,7 @@ namespace TOltjenbruns.MassGame{
 			: base (colorMask)
 		{
 			//TODO: initialize health
-			avoidEmitter = new Emitter(avoidPower, avoidSustain, avoidField, Polarity, EmitterType.MAG);
+			Polarity = 4;
 		}
 		#endregion
 		
@@ -50,7 +47,7 @@ namespace TOltjenbruns.MassGame{
 			base.preUpdate (delta);
 			foreach(Particle p in Game.Particles){
 			if(p is CubeParticle){//Quick and dirty way to avoid all particles (brownian motion)
-					attract(p.Position,avoidEmitter,delta,true);
+					attract(p.Position,Emitter,delta,true);
 				}
 			}
 		}

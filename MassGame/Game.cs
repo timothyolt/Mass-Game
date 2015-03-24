@@ -25,6 +25,18 @@ namespace TOltjenbruns.MassGame {
 	public static class Game {
 		//TODO: add dictionary keyed by string (polarity name) with a simple struct holding a color and byte
 		
+		private static PickCannon cannonPick = null;
+		public static PickCannon CannonPick{
+			get {return cannonPick;}
+			set {cannonPick = value;}
+		}
+		
+		private static PickBwhole bWholePick = null;
+		public static PickBwhole BWholePick{
+			get {return bWholePick;}
+			set {bWholePick = value;}
+		}
+		
 		private static Player player = null;
 		public static Player Player {
 			get {return player;}
@@ -92,7 +104,10 @@ namespace TOltjenbruns.MassGame {
 				diff.Y += SCREEN_HEIGHT;
 			return diff;
 		}
-
+		
+		public static List<Particle> obtainedPowerUps = new List<Particle>();
+		public static List<Particle> groundPowerUps = new List<Particle>();
+		
 	    public static void Dispose() {
 	        shader.Dispose();
 	        graphics.Dispose();

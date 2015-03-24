@@ -77,7 +77,7 @@ namespace TOltjenbruns.MassGame {
 		
 		#region Private Fields
 		private const float power = 1000;
-		private const float sustain = 0.95f;
+		private const float sustain = 0.75f;
 		private const float field = 35;
 		
 		private readonly Emitter gunEmitter;
@@ -88,9 +88,18 @@ namespace TOltjenbruns.MassGame {
 		private const float sprayCooldownReset = 0.3f;
 		private float sprayCooldown = 0;
 		
+		private int fireType = 0;
 		#endregion
 		
 		#region Properties
+//		private Vector3 Position;
+//		public Vector3 Position {
+//			get {return Position;}
+//			set {
+//				updateTransform = true;
+//				Position = value;
+//			}
+//		}
 		
 		private float health;
 		public float Health {
@@ -106,6 +115,8 @@ namespace TOltjenbruns.MassGame {
 		public Player(Rgba colorMask) 
 			:base(playerPoly, new Emitter(power, sustain, field, 2, EmitterType.MAG))
 		{
+			
+			//element = new Element(playerPoly);
 			Element.LineWidth = 4;
 			Element.ColorMask = colorMask;
 			
@@ -123,6 +134,7 @@ namespace TOltjenbruns.MassGame {
 			if (sprayCooldown <= 0) fire (delta, gamePad);
 			else sprayCooldown -= delta;
 			polarize(delta);
+			pickUpPower();
 			base.update(delta);
 		}
 		
@@ -145,6 +157,15 @@ namespace TOltjenbruns.MassGame {
 		
 		private void fire(float delta, GamePadData gamePad){
 			Vector3 aim = Vector3.Zero;
+			
+			if ((gamePad.Buttons & GamePadButtons.L) != 0)
+				if(Game.obtainedPowerUps.Contains(Game.CannonPick)){
+					fireType = 1;
+				}
+			if ((gamePad.Buttons & GamePadButtons.R) != 0)
+				if(Game.obtainedPowerUps.Contains(Game.CannonPick)){
+					fireType = 2;
+				}
 			if ((gamePad.Buttons & GamePadButtons.Triangle) != 0)
 				aim.Y += 1;
 			if ((gamePad.Buttons & GamePadButtons.Cross) != 0)
@@ -162,12 +183,17 @@ namespace TOltjenbruns.MassGame {
 						p.EmitterType == EmitterType.BIT && 
 						Position.LoopDiff(p.Position).Length() <= gunField
 					){
-						((CubeParticle) p).fireCannon();
+						if(fireType == 1){
+							((CubeParticle) p).fireCannon();
+						}else if(fireType == 2){
+							((CubeParticle) p).fireCannon();//change to black hole
+						}
 						p.Polarity = Polarity;
 						p.clearForces();
 						p.applyForce(aim, gunEmitter);
 					}
 				sprayCooldown = sprayCooldownReset;
+				fireType = 0;
 			}
 		}
 		
@@ -182,6 +208,16 @@ namespace TOltjenbruns.MassGame {
 							p.Polarity = 0;
 						}
 					}
+				}
+			}
+		}
+		
+		public void pickUpPower ()
+		{
+			for (int i = 0; i < Game.groundPowerUps.Count; i++) {
+				if(Game.groundPowerUps[i].Position.LoopDiff(Position).LengthSquared() < field*field){
+					Game.obtainedPowerUps.Add(Game.groundPowerUps[i]);
+					Game.groundPowerUps.RemoveAt(i);
 				}
 			}
 		}
@@ -202,6 +238,24 @@ namespace TOltjenbruns.MassGame {
 		{
 			
 		}
+		#endregion
+		
+		#region additional meathods
+//		public void loopScreen ()
+//		{
+//			if (Position.X > 200) {
+//				Position.X -= 400;
+//			}
+//			if (Position.X <= -200) {
+//				Position.X += 400;
+//			}
+//			if (Position.Y > 200) {
+//				Position.Y -= 400;
+//			}
+//			if (Position.Y <= -200) {
+//				Position.Y += 400;
+//			}
+//		}
 		#endregion
 	}
 }
