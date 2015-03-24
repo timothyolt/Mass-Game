@@ -145,6 +145,7 @@ namespace TOltjenbruns.MassGame {
 			polarize(delta);
 			pickUpPower();
 			base.update(delta);
+			Console.WriteLine(health);
 		}
 		
 		private void move(float delta, GamePadData gamePad){

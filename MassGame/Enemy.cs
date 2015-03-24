@@ -69,7 +69,6 @@ namespace TOltjenbruns.MassGame {
 		#region Original Methods
 		public virtual void preUpdate (float delta){
 			gunCooldown -= delta;
-			Console.WriteLine(gunCooldown);
 		}
 		
 		public override void update (float delta){
@@ -127,14 +126,12 @@ namespace TOltjenbruns.MassGame {
 //						p.applyForce(aim, gunEmitter);
 //					}'
 			foreach (Particle p in Game.Particles){
-				//Console.WriteLine("PRE fire");
 				if(
 					p != this && 
 					p.EmitterType == EmitterType.BIT && 
 					Position.LoopDiff(p.Position).Length() <= gunField
 				){
 					if(this is E_Cannon){
-						//Console.WriteLine("fire");
 						((CubeParticle) p).fireCannon();
 					}
 					else if(this is E_BlackWhole){
