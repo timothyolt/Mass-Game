@@ -25,9 +25,7 @@ namespace TOltjenbruns.MassGame{
 	public class E_Spray : Enemy
 	{
 		#region Private Fields
-		private const float targetPower = 0.1f;
-		private const float targetSustain = 0.7f;
-		private const float targetField = 200;
+		
 		private Emitter targetEmitter;
 		#endregion
 		
@@ -40,7 +38,8 @@ namespace TOltjenbruns.MassGame{
 			: base (colorMask)
 		{
 			//TODO: initialize health
-			targetEmitter = new Emitter(targetPower,targetSustain,targetField,2,EmitterType.FORCE);
+			Polarity = 1;
+			targetEmitter = new Emitter(200,0.7f,200,2,EmitterType.FORCE);
 			
 			//TODO: empty
 		}
@@ -50,9 +49,7 @@ namespace TOltjenbruns.MassGame{
 		public override void preUpdate (float delta)
 		{
 			base.preUpdate (delta);
-			Vector3 aim = Position.LoopDiff(Game.Player.Position);
-			aim = aim.Normalize().Multiply(targetEmitter.power);
-			applyForce(aim, targetEmitter);
+			attract(Game.Player.Position,targetEmitter,delta);
 		}
 		
 		#endregion

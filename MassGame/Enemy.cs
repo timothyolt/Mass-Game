@@ -28,18 +28,16 @@ namespace TOltjenbruns.MassGame {
 		
 		#region Private Fields
 		private const float power = 1000;
-		private const float sustain = 0.95f;
+		private const float sustain = 0.5f;
 		private const float field = 35;
-		
-		private const float magPower = 1000;
-		private const float magSustain = 0.3f;
-		private const float magField = 35;
-		private readonly Emitter magEmitter;
 		
 		private readonly Emitter gunEmitter;
 		private const float gunPower = 1000;
 		private const float gunSustain = 0.75f;
 		private const float gunField = 50;
+		
+		//new player objects should always completely buffer the element on first update
+		//TODO: move update polling to Element
 		
 		private float gunCooldown = (float)(3 + (Game.Rand.NextDouble() * 4));
 		private Vector3 target;
@@ -60,9 +58,7 @@ namespace TOltjenbruns.MassGame {
 		public Enemy(Rgba colorMask) 
 			: base (Player.playerPoly, new Emitter(power, sustain, field, 1, EmitterType.MAG)){
 			ColorMask = colorMask;
-			Polarity = 1;
-			gunEmitter = new Emitter(gunPower, gunSustain, gunField, Polarity, EmitterType.FORCE);
-			magEmitter = new Emitter(magPower, magSustain, magField, Polarity, EmitterType.MAG);
+			gunEmitter = new Emitter(gunPower, gunSustain, gunField, 1, EmitterType.FORCE);
 			Element.LineWidth = 4;
 			health = 20;
 		}
@@ -95,7 +91,11 @@ namespace TOltjenbruns.MassGame {
 		protected virtual void Move (float delta){
 			foreach (Particle p in Game.Particles){
 				if (p.EmitterType == EmitterType.MAG) {
-					attract(p.Position, magEmitter, delta, true);
+					//Vector3 diff = Position.LoopDiff(p.Position);
+					//diff = diff.Normalize();
+					//diff /= diff.LengthSquared();
+					//diff *= delta;
+					//p.attract(Position, Emitter, field, delta);
 				}
 			}
 		}
