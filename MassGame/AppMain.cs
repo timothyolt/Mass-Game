@@ -64,14 +64,14 @@ namespace TOltjenbruns.MassGame {
 			
 			Game.Player = new Player();
 			Game.Particles.Add(Game.Player);
-			for (int i = 0; i < 100; i++){
+			for (int i = 0; i < 200; i++){
 				Particle particle = new CubeParticle();
 				particle.Position = new Vector3(
 					(float)(Game.Rand.NextDouble() * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH/2, 
 					(float)(Game.Rand.NextDouble() * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT/2, 0f);
 				Game.Particles.Add (particle);
 			}
-			for (int i = 0; i < 10; i++){
+			for (int i = 0; i < 30; i++){
 				switch(Game.Rand.Next(3)){
 				case 0:
 					E_Cannon e = new E_Cannon();

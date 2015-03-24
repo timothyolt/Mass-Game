@@ -170,7 +170,7 @@ namespace TOltjenbruns.MassGame {
 					fireType = 1;
 				}
 			if ((gamePad.Buttons & GamePadButtons.R) != 0)
-				if(Game.obtainedPowerUps.Contains(Game.CannonPick)){
+				if(Game.obtainedPowerUps.Contains(Game.BWholePick)){
 					fireType = 2;
 				}
 			if ((gamePad.Buttons & GamePadButtons.Triangle) != 0)

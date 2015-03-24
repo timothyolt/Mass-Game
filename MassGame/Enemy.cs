@@ -67,6 +67,7 @@ namespace TOltjenbruns.MassGame {
 		#region Original Methods
 		public virtual void preUpdate (float delta){
 			gunCooldown -= delta;
+			Console.WriteLine(gunCooldown);
 		}
 		
 		public override void update (float delta){
@@ -107,16 +108,14 @@ namespace TOltjenbruns.MassGame {
 				gunCooldown	= 5;
 			}
 			target = Position.LoopDiff(Game.Player.Position);
-			gunCooldown -= delta;
-			if (gunCooldown <= 0){
-				gunCooldown	= (float)(3 + (Game.Rand.NextDouble() * 4));
-				Vector3 aim = target.Normalize();
-				aim = aim.Multiply(gunPower * delta);
-				//TODO: we are doing a lot of duplicate distance tests, lets make a HashSet<Particle,DistDiffPair>
-				//and a private subclass DistDiffPair which holds a public vector3 (the diff) and a public float (distance)
-				//Putting this in particle and making a method to populate the set each tick would be a good idea
-				//Dont worry about clearing it, there can only be one data stored under a key (a particle in this case)
-				//Last update's distances will be overriten when the HashSet is repopulated
+			gunCooldown	= (float)(3 + (Game.Rand.NextDouble() * 4));
+			Vector3 aim = target.Normalize();
+			aim = aim.Multiply(gunPower * delta);
+			//TODO: we are doing a lot of duplicate distance tests, lets make a HashSet<Particle,DistDiffPair>
+			//and a private subclass DistDiffPair which holds a public vector3 (the diff) and a public float (distance)
+			//Putting this in particle and making a method to populate the set each tick would be a good idea
+			//Dont worry about clearing it, there can only be one data stored under a key (a particle in this case)
+			//Last update's distances will be overriten when the HashSet is repopulated
 //				foreach (Particle p in Game.Particles)
 //					if (
 //				    	(p.EmitterType.Equals(EmitterType.MAG)) && 
@@ -125,16 +124,27 @@ namespace TOltjenbruns.MassGame {
 //						p.Polarity = Polarity;
 //						p.applyForce(aim, gunEmitter);
 //					}'
-				foreach (Particle p in Game.Particles)
-					if(
-						p != this && 
-						p.EmitterType == EmitterType.BIT && 
-						Position.LoopDiff(p.Position).Length() <= gunField
-					){
-						p.Polarity = Polarity;
-						p.clearForces();
-						p.applyForce(aim, gunEmitter);
+			foreach (Particle p in Game.Particles){
+				//Console.WriteLine("PRE fire");
+				if(
+					p != this && 
+					p.EmitterType == EmitterType.BIT && 
+					Position.LoopDiff(p.Position).Length() <= gunField
+				){
+					if(this is E_Cannon){
+						//Console.WriteLine("fire");
+						((CubeParticle) p).fireCannon();
 					}
+					else if(this is E_BlackWhole){
+						((CubeParticle) p).fireBlackHole();
+					}
+					else
+						((CubeParticle) p).fireSpray();
+					p.Polarity = Polarity;
+					p.clearForces();
+					p.applyForce(aim, gunEmitter);
+				}
+			
 			}
 		}
 		

@@ -47,6 +47,7 @@ namespace TOltjenbruns.MassGame{
 		public E_Cannon (Rgba colorMask)
 			: base (colorMask)
 		{
+			Polarity = 3;
 			targetEmitter = new Emitter(targetPower,targetSustain,targetField,Polarity,EmitterType.FORCE);
 			seekEmitter = new Emitter(seekPower,seekSustain,seekField,Polarity,EmitterType.FORCE);
 			foreach(Particle p in Game.Particles)
