@@ -68,6 +68,7 @@ namespace TOltjenbruns.MassGame {
 			
 			Game.Player = new Player();
 			Game.Particles.Add(Game.Player);
+			bool blackHolePlaced = false;
 			for (int i = 0; i < 200; i++){
 				Particle particle = new CubeParticle();
 				particle.Position = new Vector3(
@@ -75,7 +76,7 @@ namespace TOltjenbruns.MassGame {
 					(float)(Game.Rand.NextDouble() * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT/2, 0f);
 				Game.Particles.Add (particle);
 			}
-			for (int i = 0; i < 30; i++){
+			for (int i = 0; i < 10; i++){
 				switch(Game.Rand.Next(3)){
 				case 0:
 					E_Cannon e = new E_Cannon();
@@ -85,12 +86,16 @@ namespace TOltjenbruns.MassGame {
 					Game.Particles.Add(e);
 					break;
 				case 1:
-					E_BlackWhole e3 = new E_BlackWhole();
-					e3.Position = new Vector3(
-						(float)(Game.Rand.NextDouble() * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH/2, 
-						(float)(Game.Rand.NextDouble() * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT/2, 0f);
-					Game.Particles.Add(e3);
-					break;
+					if (!blackHolePlaced){
+						blackHolePlaced = true;
+						E_BlackWhole e3 = new E_BlackWhole();
+						e3.Position = new Vector3(
+							(float)(Game.Rand.NextDouble() * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH/2, 
+							(float)(Game.Rand.NextDouble() * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT/2, 0f);
+						Game.Particles.Add(e3);
+						break;
+					}
+					goto default;
 				default:
 					E_Spray e2 = new E_Spray();
 					e2.Position = new Vector3(
