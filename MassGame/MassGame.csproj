@@ -58,7 +58,5 @@
     <Compile Include="MagParticle.cs" />
     <Compile Include="E_BlackWhole.cs" />
     <Compile Include="E_Cannon.cs" />
-    <Compile Include="PickCannon.cs" />
-    <Compile Include="PickBwhole.cs" />
   </ItemGroup>
 </Project>
