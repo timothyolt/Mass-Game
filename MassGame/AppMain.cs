@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2015 Timothy A. Oltjenbruns
+ *	Copyright (C) 2015 Timothy A. Oltjenbruns and Steffen Lim
  *
  *	This program is free software; you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
@@ -39,6 +39,9 @@ namespace TOltjenbruns.MassGame {
 				s.Reset();
 				s.Start();
 	            Update(delta);
+				foreach (Particle p in Game.RemoveParticles)
+					Game.Particles.Remove(p);
+				Game.RemoveParticles.Clear();
 	            Render();
 	        }
 	        Dispose();
@@ -57,6 +60,7 @@ namespace TOltjenbruns.MassGame {
 	        Game.Shader = new ShaderProgram("/Application/shaders/Primitive.cgx");
 			Game.Rand = new Random();
 			Game.Particles = new HashSet<Particle>();
+			Game.RemoveParticles = new HashSet<Particle>();
 				
 	        Game.Shader.SetUniformBinding(0, "WorldViewProj");
 	        Game.Shader.SetAttributeBinding(0, "iPosition");
@@ -64,14 +68,14 @@ namespace TOltjenbruns.MassGame {
 			
 			Game.Player = new Player();
 			Game.Particles.Add(Game.Player);
-			for (int i = 0; i < 100; i++){
+			for (int i = 0; i < 200; i++){
 				Particle particle = new CubeParticle();
 				particle.Position = new Vector3(
 					(float)(Game.Rand.NextDouble() * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH/2, 
 					(float)(Game.Rand.NextDouble() * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT/2, 0f);
 				Game.Particles.Add (particle);
 			}
-			for (int i = 0; i < 10; i++){
+			for (int i = 0; i < 30; i++){
 				switch(Game.Rand.Next(3)){
 				case 0:
 					E_Cannon e = new E_Cannon();

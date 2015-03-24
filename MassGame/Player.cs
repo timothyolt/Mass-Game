@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2015 Timothy A. Oltjenbruns
+ *	Copyright (C) 2015 Timothy A. Oltjenbruns and Steffen Lim
  *
  *	This program is free software; you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
@@ -108,6 +108,7 @@ namespace TOltjenbruns.MassGame {
 //			}
 //		}
 		
+		private float healthMax;
 		private float health;
 		public float Health {
 			get {return health;}
@@ -129,7 +130,8 @@ namespace TOltjenbruns.MassGame {
 			
 			gunEmitter = new Emitter(gunPower, gunSustain, gunField, 2, EmitterType.FORCE);
 			
-			health = 20;
+			health = 300;
+			healthMax = 300;
 			Position = Vector3.Zero;
 		}
 		#endregion
@@ -232,8 +234,18 @@ namespace TOltjenbruns.MassGame {
 			}
 		}
 		
-		public void takeDamage(float damage){
-			
+		public virtual void takeDamage(float damage){
+			health -= damage;
+			bool r = ColorMask.R > 0;
+			bool g = ColorMask.G > 0;
+			bool b = ColorMask.B > 0;
+			int fade = (int)(256 * (health/healthMax));
+			ColorMask = new Rgba(
+				r ? fade : 0, 
+				g ? fade : 0, 
+				b ? fade : 0, 255);
+			if (health <= 0)
+				Game.RemoveParticles.Add(this);
 		}
 		#endregion
 		
@@ -248,24 +260,6 @@ namespace TOltjenbruns.MassGame {
 		{
 			
 		}
-		#endregion
-		
-		#region additional meathods
-//		public void loopScreen ()
-//		{
-//			if (Position.X > 200) {
-//				Position.X -= 400;
-//			}
-//			if (Position.X <= -200) {
-//				Position.X += 400;
-//			}
-//			if (Position.Y > 200) {
-//				Position.Y -= 400;
-//			}
-//			if (Position.Y <= -200) {
-//				Position.Y += 400;
-//			}
-//		}
 		#endregion
 	}
 }
