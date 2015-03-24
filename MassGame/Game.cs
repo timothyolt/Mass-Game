@@ -92,10 +92,7 @@ namespace TOltjenbruns.MassGame {
 				diff.Y += SCREEN_HEIGHT;
 			return diff;
 		}
-		
-		public static List<Particle> obtainedPowerUps = new List<Particle>();
-		public static List<Particle> groundPowerUps = new List<Particle>();
-		
+
 	    public static void Dispose() {
 	        shader.Dispose();
 	        graphics.Dispose();
