@@ -77,7 +77,7 @@ namespace TOltjenbruns.MassGame {
 		
 		#region Private Fields
 		private const float power = 1000;
-		private const float sustain = 0.75f;
+		private const float sustain = 0.95f;
 		private const float field = 35;
 		
 		private readonly Emitter gunEmitter;
@@ -91,14 +91,6 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Properties
-//		private Vector3 Position;
-//		public Vector3 Position {
-//			get {return Position;}
-//			set {
-//				updateTransform = true;
-//				Position = value;
-//			}
-//		}
 		
 		private float health;
 		public float Health {
@@ -114,8 +106,6 @@ namespace TOltjenbruns.MassGame {
 		public Player(Rgba colorMask) 
 			:base(playerPoly, new Emitter(power, sustain, field, 2, EmitterType.MAG))
 		{
-			
-			//element = new Element(playerPoly);
 			Element.LineWidth = 4;
 			Element.ColorMask = colorMask;
 			
@@ -223,24 +213,6 @@ namespace TOltjenbruns.MassGame {
 		{
 			
 		}
-		#endregion
-		
-		#region additional meathods
-//		public void loopScreen ()
-//		{
-//			if (Position.X > 200) {
-//				Position.X -= 400;
-//			}
-//			if (Position.X <= -200) {
-//				Position.X += 400;
-//			}
-//			if (Position.Y > 200) {
-//				Position.Y -= 400;
-//			}
-//			if (Position.Y <= -200) {
-//				Position.Y += 400;
-//			}
-//		}
 		#endregion
 	}
 }
