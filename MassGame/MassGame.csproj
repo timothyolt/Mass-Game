@@ -54,5 +54,11 @@
     <Compile Include="Player.cs" />
     <Compile Include="Polygon.cs" />
     <Compile Include="Colors.cs" />
+    <Compile Include="E_Spray.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="E_BlackWhole.cs" />
+    <Compile Include="E_Cannon.cs" />
+    <Compile Include="PickCannon.cs" />
+    <Compile Include="PickBwhole.cs" />
   </ItemGroup>
 </Project>

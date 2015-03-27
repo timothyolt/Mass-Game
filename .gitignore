@@ -47,5 +47,17 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+<<<<<<< HEAD
 *.pidb
 *.userprefs
+=======
+
+
+*.pidb
+MassGame/MassGame.pidb
+Mass-Game.userprefs
+MassGame/MassGame.pidb
+*.pidb
+*.userprefs
+MassGame/MassGame.pidb
+>>>>>>> origin/testing

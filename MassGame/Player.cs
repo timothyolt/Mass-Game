@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2015 Timothy A. Oltjenbruns
+ *	Copyright (C) 2015 Timothy A. Oltjenbruns and Steffen Lim
  *
  *	This program is free software; you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ using Sce.PlayStation.Core.Graphics;
 using Sce.PlayStation.Core.Input;
 
 namespace TOltjenbruns.MassGame {
-	public class Player {
+	public class Player : Particle {
         #region PlayerPolygon
         private static readonly float[] verticies = {
         0.333f, 0.000f, 0f, //Vericies
@@ -76,44 +76,39 @@ namespace TOltjenbruns.MassGame {
         #endregion
 		
 		#region Private Fields
-		private readonly Emitter emitter;
 		private const float power = 1000;
-		private const float sustain = 0.99f;
-		private const float field = 50;
+		private const float sustain = 0.75f;
+		private const float field = 35;
 		
+		private const float gunPower = 2000;
+		private const float gunSustain = 0.65f;
+		private const float gunField = 35;
 		private readonly Emitter gunEmitter;
-		private const float gunPower = 1000;
-		private const float gunSustain = 0.75f;
-		private const float gunField = 50;
 		
-		private Element element;
-		//new player objects should always completely buffer the element on first update
-		//TODO: move update polling to Element
-		private bool updateTransform = true;
-		private bool updateColor = true;
+		private const float compactPower = 2000;
+		private const float compactSustain = 0.65f;
+		private const float compactField = 35;
+		private readonly Emitter compactEmitter;
 		
-		private HashSet<Particle> particles;
+		private const float sprayCooldownReset = 0.3f;
+		private float sprayCooldown = 0;
+		
+		private const float chargeTimeReset = 0.25f;
+		private float chargeTime = 0;
+		private int fireType = 0;
 		#endregion
 		
 		#region Properties
-		private Vector3 position;
-		public Vector3 Position {
-			get {return position;}
-			set {
-				updateTransform = true;
-				position = value;
-			}
-		}
+//		private Vector3 Position;
+//		public Vector3 Position {
+//			get {return Position;}
+//			set {
+//				updateTransform = true;
+//				Position = value;
+//			}
+//		}
 		
-		private double rotation;
-		public double Rotation {
-			get {return rotation;}
-			set {
-				updateTransform = true;
-				rotation = value;
-			}
-		}
-		
+		private float healthMax;
 		private float health;
 		public float Health {
 			get {return health;}
@@ -121,28 +116,39 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Constructors
-		public Player (HashSet<Particle> particles)
-			: this (particles, new Rgba(0, 255, 0, 255)){
+		public Player ()
+			: this (new Rgba(0, 255, 0, 255)){
 		}
 		
-		public Player(HashSet<Particle> particles, Rgba colorMask){
-			this.particles = particles;
+		public Player(Rgba colorMask) 
+			:base(playerPoly, new Emitter(power, sustain, field, 2, EmitterType.MAG))
+		{
 			
-			element = new Element(playerPoly);
-			element.LineWidth = 4;
-			element.ColorMask = colorMask;
+			//element = new Element(playerPoly);
+			Element.LineWidth = 4;
+			Element.ColorMask = colorMask;
 			
-			emitter = new Emitter(power, sustain);
-			gunEmitter = new Emitter(gunPower, gunSustain);
+			gunEmitter = new Emitter(gunPower, gunSustain, gunField, 2, EmitterType.FORCE);
 			
-			health = 20;
-			position = Vector3.Zero;
-			rotation = 0.0;
+			health = 300;
+			healthMax = 300;
+			Position = Vector3.Zero;
 		}
 		#endregion
 		
 		#region Original Methods
-		public void update (float delta, GamePadData gamePad){
+		public override void update (float delta){
+			GamePadData gamePad = Game.GamePadData;
+			move (delta, gamePad);
+			if (sprayCooldown <= 0) fire (delta, gamePad);
+			else sprayCooldown -= delta;
+			polarize(delta);
+			pickUpPower();
+			base.update(delta);
+			Console.WriteLine(health);
+		}
+		
+		private void move(float delta, GamePadData gamePad){
 			Vector3 velocity = Vector3.Zero;
 			if ((gamePad.Buttons & GamePadButtons.Up) != 0)
 				velocity.Y += 1;
@@ -157,8 +163,19 @@ namespace TOltjenbruns.MassGame {
 				velocity = velocity.Multiply(120 * delta);
 				Position += velocity;
 			}
-			
+		}
+		
+		private void fire(float delta, GamePadData gamePad){
 			Vector3 aim = Vector3.Zero;
+			
+			if ((gamePad.Buttons & GamePadButtons.L) != 0)
+				if(Game.obtainedPowerUps.Contains(Game.CannonPick)){
+					fireType = 1;
+				}
+			if ((gamePad.Buttons & GamePadButtons.R) != 0)
+				if(Game.obtainedPowerUps.Contains(Game.BWholePick)){
+					fireType = 2;
+				}
 			if ((gamePad.Buttons & GamePadButtons.Triangle) != 0)
 				aim.Y += 1;
 			if ((gamePad.Buttons & GamePadButtons.Cross) != 0)
@@ -170,53 +187,79 @@ namespace TOltjenbruns.MassGame {
 			if (aim != Vector3.Zero){
 				aim = aim.Normalize();
 				aim = aim.Multiply(gunPower * delta);
-				foreach (Particle p in particles)
-					if ((p.Position - position).Length() < gunField){
-						p.Polarity = 2;
+				foreach (Particle p in Game.Particles)
+					if(
+						p != this && 
+						p.EmitterType == EmitterType.BIT && 
+						Position.LoopDiff(p.Position).Length() <= gunField
+					){
+						if(fireType == 1){
+							((CubeParticle) p).fireCannon();
+						}
+						else if(fireType == 2){
+							((CubeParticle) p).fireBlackHole();//change to black hole
+						}
+						else
+							((CubeParticle) p).fireSpray();
+						p.Polarity = Polarity;
+						p.clearForces();
 						p.applyForce(aim, gunEmitter);
 					}
+				sprayCooldown = sprayCooldownReset;
+				fireType = 0;
 			}
-			else 
-				foreach (Particle p in particles)
-					switch(p.Polarity){
-						case 0:
-							p.attract (position, emitter, field, delta);
-							break;
-						case 2:
-							p.repel (position, emitter, field, delta);
-							break;
-						default:
-							Vector3 diff = p.Position - position;
-							if (diff.Length() > 20){
-								takeDamage (1);
-								p.Polarity = 0;
-							}
-							break;
+		}
+		
+		private void polarize(float delta){
+			foreach (Particle p in Game.Particles){
+				if (p != this && p.EmitterType.Equals(EmitterType.BIT)){
+					p.attract (Position, Emitter, delta);
+					if (p.Polarity != 0 && p.Polarity != Polarity){
+						Vector3 partDiff = Position.LoopDiff(p.Position);
+						if (partDiff.LengthSquared() < 400){
+							takeDamage (1);
+							p.Polarity = 0;
+						}
 					}
-			
-			if (updateTransform) {
-				updateTransform = false;
-				//TODO: Fix element center
-				element.Position = position.Multiply(0.01f).Add(new Vector3(-0.125f, -0.125f, 0));
-				element.Rotation = rotation;
-				element.updateTransBuffer();
-			}
-			if (updateColor) {
-				updateColor = false;
-				element.updateColorBuffer();
+				}
 			}
 		}
 		
-		public void takeDamage(float damage){
+		public void pickUpPower ()
+		{
+			for (int i = 0; i < Game.groundPowerUps.Count; i++) {
+				if(Game.groundPowerUps[i].Position.LoopDiff(Position).LengthSquared() < field*field){
+					Game.obtainedPowerUps.Add(Game.groundPowerUps[i]);
+					Game.groundPowerUps.RemoveAt(i);
+				}
+			}
+		}
+		
+		public virtual void takeDamage(float damage){
+			health -= damage;
+			bool r = ColorMask.R > 0;
+			bool g = ColorMask.G > 0;
+			bool b = ColorMask.B > 0;
+			int fade = (int)(256 * (health/healthMax));
+			ColorMask = new Rgba(
+				r ? fade : 0, 
+				g ? fade : 0, 
+				b ? fade : 0, 255);
+			if (health <= 0)
+				Game.RemoveParticles.Add(this);
+		}
+		#endregion
+		
+		#region Override Methods
+		public override void transform ()
+		{
+			//TODO: Fix element center
+			Element.Position = Position.Multiply(0.01f).Add(new Vector3(-0.125f, -0.125f, 0));
+			Element.Rotation = Rotation;
+		}
+		public override void color ()
+		{
 			
-		}
-		
-		public void render (GraphicsContext graphics){
-			element.draw(graphics);
-		}
-		
-		public void dispose(){
-			element.dispose();	
 		}
 		#endregion
 	}

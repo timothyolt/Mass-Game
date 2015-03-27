@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2015 Timothy A. Oltjenbruns
+ *	Copyright (C) 2015 Timothy A. Oltjenbruns and Steffen Lim
  *
  *	This program is free software; you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
@@ -24,50 +24,27 @@ using Sce.PlayStation.Core.Graphics;
 using Sce.PlayStation.Core.Input;
 
 namespace TOltjenbruns.MassGame {
-	public class Enemy {
+	public class Enemy : Particle{
 		
 		#region Private Fields
-		private readonly Emitter emitter;
 		private const float power = 1000;
-		private const float sustain = 0.99f;
-		private const float field = 50;
+		private const float sustain = 0.5f;
+		private const float field = 35;
 		
 		private readonly Emitter gunEmitter;
 		private const float gunPower = 1000;
 		private const float gunSustain = 0.75f;
 		private const float gunField = 50;
 		
-		private Element element;
 		//new player objects should always completely buffer the element on first update
 		//TODO: move update polling to Element
-		private bool updateTransform = true;
-		private bool updateColor = true;
 		
-		private float gunCooldown = 5;
-		
-		private Player player;
-		private HashSet<Particle> particles;
+		private float gunCooldown = (float)(3 + (Game.Rand.NextDouble() * 4));
+		private Vector3 target;
 		#endregion
 		
 		#region Properties
-		private Vector3 position;
-		public Vector3 Position {
-			get {return position;}
-			set {
-				updateTransform = true;
-				position = value;
-			}
-		}
-		
-		private double rotation;
-		public double Rotation {
-			get {return rotation;}
-			set {
-				updateTransform = true;
-				rotation = value;
-			}
-		}
-		
+		private float healthMax;
 		private float health;
 		public float Health {
 			get {return health;}
@@ -75,94 +52,132 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Constructors
-		public Enemy (Player player, HashSet<Particle> particles)
-			: this (player, particles, new Rgba(255, 0, 0, 255)){
+		public Enemy ()
+			: this (new Rgba(255, 0, 0, 255)){
 		}
 		
-		public Enemy(Player player, HashSet<Particle> particles, Rgba colorMask){
-			this.particles = particles;
-			this.player = player;
-			
-			element = new Element(Player.playerPoly);
-			element.LineWidth = 4;
-			element.ColorMask = colorMask;
-			
-			emitter = new Emitter(power, sustain);
-			gunEmitter = new Emitter(gunPower, gunSustain);
-			
-			health = 20;
-			position = Vector3.Zero;
-			rotation = 0.0;
+		public Enemy(Rgba colorMask) 
+			: base (Player.playerPoly, new Emitter(power, sustain, field, 1, EmitterType.MAG)){
+			ColorMask = colorMask;
+			gunEmitter = new Emitter(gunPower, gunSustain, gunField, 1, EmitterType.FORCE);
+			Element.LineWidth = 4;
+			health = 50;
+			healthMax = 50;
 		}
 		#endregion
 		
 		#region Original Methods
-		public void update (float delta){
-			Vector3 diff = player.Position - position;
-			float distance = diff.Length();
-			if (distance > 150){
-				Vector3 velocity = diff.Normalize();
-				velocity = velocity.Multiply(120 * delta);
-				Position += velocity;
-			}
-			else if (distance < 50){
-				Vector3 velocity = diff.Normalize();
-				velocity = velocity.Multiply(-120 * delta);
-				Position += velocity;
-			}
-			
+		public virtual void preUpdate (float delta){
 			gunCooldown -= delta;
-			if (gunCooldown <= 0){
+		}
+		
+		public override void update (float delta){
+			preUpdate(delta);
+			Move(delta);
+			if(gunCooldown <= 0){
+				Fire(delta);
+			}
+			polarize(delta);
+			base.update(delta);
+		}
+		
+		public override void transform (){
+			Element.Position = Position.Multiply(0.01f).Add(new Vector3(-0.0625f,-0.0625f,0));
+			Element.Rotation = Rotation;
+		}
+		
+		public override void color () {
+			Element.ColorMask = ColorMask;
+		}
+		
+		protected virtual void Move (float delta){
+			foreach (Particle p in Game.Particles){
+				if (p.EmitterType == EmitterType.MAG) {
+					//Vector3 diff = Position.LoopDiff(p.Position);
+					//diff = diff.Normalize();
+					//diff /= diff.LengthSquared();
+					//diff *= delta;
+					//p.attract(Position, Emitter, field, delta);
+				}
+			}
+		}
+		
+		protected virtual void Fire (float delta){
+			if(Polarity!=3){
+				gunCooldown	= (float)(3+(Game.Rand.NextDouble()*4));
+			}else{
 				gunCooldown	= 5;
-				Vector3 aim = diff.Normalize();
-				aim = aim.Multiply(gunPower * delta);
-				foreach (Particle p in particles)
-					if ((p.Position - position).Length() < gunField){
-						p.Polarity = 1;
-						p.applyForce(aim, gunEmitter);
+			}
+			target = Position.LoopDiff(Game.Player.Position);
+			gunCooldown	= (float)(3 + (Game.Rand.NextDouble() * 4));
+			Vector3 aim = target.Normalize();
+			aim = aim.Multiply(gunPower * delta);
+			//TODO: we are doing a lot of duplicate distance tests, lets make a HashSet<Particle,DistDiffPair>
+			//and a private subclass DistDiffPair which holds a public vector3 (the diff) and a public float (distance)
+			//Putting this in particle and making a method to populate the set each tick would be a good idea
+			//Dont worry about clearing it, there can only be one data stored under a key (a particle in this case)
+			//Last update's distances will be overriten when the HashSet is repopulated
+//				foreach (Particle p in Game.Particles)
+//					if (
+//				    	(p.EmitterType.Equals(EmitterType.MAG)) && 
+//						(p.Position - Position).LengthSquared() < gunFieldSq
+//					){
+//						p.Polarity = Polarity;
+//						p.applyForce(aim, gunEmitter);
+//					}'
+			foreach (Particle p in Game.Particles){
+				if(
+					p != this && 
+					p.EmitterType == EmitterType.BIT && 
+					Position.LoopDiff(p.Position).Length() <= gunField
+				){
+					if(this is E_Cannon){
+						((CubeParticle) p).fireCannon();
 					}
-			}
-			else 
-				foreach (Particle p in particles)
-					switch(p.Polarity){
-						case 0:
-							p.attract (position, emitter, field, delta);
-							break;
-						case 1:
-							p.repel (position, emitter, field, delta);
-							break;
-						default:
-							Vector3 partDiff = p.Position - position;
-							if (partDiff.Length() > 20){
-								takeDamage (1);
-								p.Polarity = 0;
-							}
-							break;
+					else if(this is E_BlackWhole){
+						((CubeParticle) p).fireBlackHole();
 					}
+					else
+						((CubeParticle) p).fireSpray();
+					p.Polarity = Polarity;
+					p.clearForces();
+					p.applyForce(aim, gunEmitter);
+				}
 			
-			if (updateTransform) {
-				updateTransform = false;
-				//TODO: Fix element center
-				element.Position = position.Multiply(0.01f).Add(new Vector3(-0.125f, -0.125f, 0));
-				element.Rotation = rotation;
-				element.updateTransBuffer();
-			}
-			if (updateColor) {
-				updateColor = false;
-				element.updateColorBuffer();
 			}
 		}
 		
-		public void takeDamage(float damage){
-			
+		protected virtual void polarize (float delta){
+			target = Position.LoopDiff(Game.Player.Position);
+			foreach (Particle p in Game.Particles){
+				if (p != this && p.EmitterType.Equals(EmitterType.BIT)){
+					p.attract (Position, Emitter, delta);
+					if (p.Polarity != 0 && p.Polarity != Polarity){
+						Vector3 partDiff = Position.LoopDiff(p.Position);
+						if (partDiff.LengthSquared() < 400){
+							takeDamage (1);
+							p.Polarity = 0;
+						}
+					}
+				}
+			}
 		}
 		
-		public void render (GraphicsContext graphics){
-			element.draw(graphics);
-		}
-		
-		public void dispose(){
-			element.dispose();	
+		public virtual void takeDamage(float damage){
+			health -= damage;
+			bool r = ColorMask.R > 0;
+			bool g = ColorMask.G > 0;
+			bool b = ColorMask.B > 0;
+			int fade = (int)(256 * (health/healthMax));
+			ColorMask = new Rgba(
+				r ? fade : 0, 
+				g ? fade : 0, 
+				b ? fade : 0, 255);
+			if (health <= 0)
+				Game.RemoveParticles.Add(this);
+			//TODO: Subtract HP
+			//TODO: Change Color
+			//TODO: Check if dead
 		}
 		#endregion
 	}

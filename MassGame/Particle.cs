@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2015 Timothy A. Oltjenbruns
+ *	Copyright (C) 2015 Timothy A. Oltjenbruns and Steffen Lim
  *
  *	This program is free software; you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
@@ -25,9 +25,8 @@ using Sce.PlayStation.Core.Input;
 
 namespace TOltjenbruns.MassGame {
 	public abstract class Particle {
+		
 		#region Private Fields
-		private static Vector3 gravity = new Vector3(0, -30, 0);
-		private static Emitter gEmit = new Emitter(30, 0.5f);
 
 		//new particle objects should always completely buffer the element on first update
 		//TODO: move update polling to Element
@@ -41,6 +40,7 @@ namespace TOltjenbruns.MassGame {
 		private Emitter emitter;
 		protected Emitter Emitter {
 			get {return emitter;}
+			set {emitter = value;}
 		}
 		
 		private Element element;
@@ -48,29 +48,18 @@ namespace TOltjenbruns.MassGame {
 			get {return element;}
 		}
 		
-		private byte polarity;
+		public EmitterType EmitterType {
+			get	{ return emitter.etype; }
+		}
+		
 		protected bool polarityUpdate = true;
-		public byte Polarity {
-			get { return polarity; }
+		public virtual byte Polarity {
+			get { return emitter.polarity; }
 			set { 
 				polarityUpdate = true;
-				polarity = value;
+				emitter.polarity = value;
 			}
 		}
-		
-		private HashSet<Particle> particles;
-		protected HashSet<Particle> Particles{
-			get { return particles; }
-		}
-		
-//		private float volatilily;
-//		public float Volatility {
-//			get { return volatilily; }
-//			set { 
-//				volatilily = value;
-//				if (
-//			}
-//		}
 		
 		private Rgba colorMask;
 		public Rgba ColorMask {
@@ -93,6 +82,7 @@ namespace TOltjenbruns.MassGame {
 		private Vector3 velocity;
 		public Vector3 Velocity {
 			get {return velocity;}	
+			set {velocity = value;}
 		}
 		
 		private Vector3 acceleration;
@@ -111,10 +101,9 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Constructors
-		public Particle(Polygon poly, Emitter emitter, HashSet<Particle> particles){
+		public Particle(Polygon poly, Emitter emitter){
 			element = new Element(poly);
 			this.emitter = emitter;
-			this.particles = particles;
 			
 			forces = new SortedList<Emitter, Vector3>();
 			
@@ -124,38 +113,25 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Original Methods
-		public void attract(Vector3 pos, Emitter e, float netSize, float delta){
-			Vector3 diff = Position + Velocity - pos;
+		public void attract(Vector3 pos, Emitter e, float delta){
+			this.attract(pos,e,delta,(e.polarity == this.emitter.polarity));
+		}
+		
+		public void attract(Vector3 pos, Emitter e, float delta, bool push){
+			Vector3 diff = pos.LoopDiff(Position + Velocity);
 			float power = e.power * delta;
 			float diffLength = diff.Length();
-			if (diffLength < netSize){
+			if (diffLength < e.field){
 				Vector3 force = Vector3.Zero;
 				if (diffLength > power)
-					force += diff.Multiply(power/(diffLength*diffLength));
+					force += diff.Multiply(power/(diffLength * diffLength));
 				else 
 					force += diff.Multiply(1/power);
 				//if (force.Length() > netSize)
 				//	force = Vector3.Zero;
-				applyForce(-force, e);
+				applyForce(push ? force : -force, e);
 			}
 		}
-		
-		public void repel(Vector3 pos, Emitter e, float netSize, float delta){
-			Vector3 diff = Position + Velocity - pos;
-			float power = e.power * delta;
-			float diffLength = diff.Length();
-			if (diffLength < netSize){
-				Vector3 force = Vector3.Zero;
-				if (diffLength > power)
-					force += diff.Multiply(power/(diffLength*diffLength));
-				else 
-					force += diff.Multiply(1/power);
-				//if (force.Length() > netSize)
-				//	force = Vector3.Zero;
-				applyForce(force, e);
-			}
-		}
-		
 //		public void attract(Vector3 pos, float power, float netSize){
 //			Vector3 diff = pos - Position;
 //			Vector3 force = Vector3.Zero;
@@ -192,8 +168,12 @@ namespace TOltjenbruns.MassGame {
 				forces.Add (e, f);
 		}
 		
-		public void render (GraphicsContext graphics){
-			element.draw(graphics);
+		public void clearForces(){
+			forces.Clear();	
+		}
+		
+		public void render (){
+			element.draw(Game.Graphics);
 		}
 		
 		public void dispose(){
@@ -209,7 +189,6 @@ namespace TOltjenbruns.MassGame {
 		public abstract void color();
 		
 		public virtual void update (float delta){
-			//applyForce(gravity.Multiply(delta), gEmit);
 			
 			int fCount = forces.Count;
 			HashSet<Emitter> removeQueue = new HashSet<Emitter>();
@@ -226,7 +205,7 @@ namespace TOltjenbruns.MassGame {
 			}
 			velocity += acceleration;
 			acceleration = Velocity.Multiply(-1/2f);
-			Position += velocity;
+			applyVelocity(delta);
 			
 			if (position.X < -200) position.X = 200;
 			if (position.X > 200) position.X = -200;
@@ -245,6 +224,10 @@ namespace TOltjenbruns.MassGame {
 				element.updateColorBuffer();
 			}
 			
+		}
+		
+		public virtual void applyVelocity(float delta){
+			Position += velocity;
 		}
 		#endregion
 	}

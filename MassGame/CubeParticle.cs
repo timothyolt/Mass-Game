@@ -1,3 +1,20 @@
+/*
+ *	Copyright (C) 2015 Timothy A. Oltjenbruns and Steffen Lim
+ *
+ *	This program is free software; you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation; either version 2 of the License, or
+ *	(at your option) any later version.
+ *	
+ *	This program is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *	
+ *	You should have received a copy of the GNU General Public License along
+ *	with this program; if not, write to the Free Software Foundation, Inc.,
+ *	51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 using System;
 using System.Collections.Generic;
 using Sce.PlayStation.Core;
@@ -6,69 +23,143 @@ namespace TOltjenbruns.MassGame{
 	public class CubeParticle : Particle {
 		#region Private Fields
 		private const float power = 60;
-		private const float sustain = 0.90f;
+		private const float sustain = 0.75f;
 		private const float field = 5;
+		private Emitter sprayEmitter;
 		
-		private float cooldown = 0;
-		private Player player;
+		private const float cpower = 60;
+		private const float csustain = 0.5f;
+		private const float cfield = 1;
+		private Emitter cannonEmitter;
+		private bool cannonState = false;
+		
+		private const float bpower = 250;
+		private const float bsustain = 0.8f;
+		private const float bfield = 100;
+		private Emitter blackEmitter;
+		private bool blackHoleState = false;
+		
+		private const float epower = 500;
+		private const float esustain = 0.8f;
+		private const float efield = 15;
+		private Emitter explodeEmitter;
+		
+		private const float polarityFadeReset = 5;
+		private const float polarityFadeCannon = 4.8f;
+		private const float polarityFadeBlack = 2f;
+		private float polarityFade = 0;
 		#endregion
 		
+		public override byte Polarity{
+			get {return base.Polarity;}
+			set {
+				sprayEmitter.polarity = value;
+				cannonEmitter.polarity = value;
+				explodeEmitter.polarity = value;
+				blackEmitter.polarity = value;
+				base.Polarity = value;
+			}
+		}
 		#region Constructors
-		public CubeParticle (Polygon poly, Player player, HashSet<Particle> particles)
-			: base(poly, new Emitter(power, sustain), particles) {
-			this.player = player;
-			Polarity = 0;
+		
+		public CubeParticle ()
+			: base(Player.playerPoly, new Emitter(power, sustain, field, 0, EmitterType.BIT)) {
+			sprayEmitter = Emitter;
+			cannonEmitter = new Emitter(cpower, csustain, cfield, 0, EmitterType.BIT);
+			explodeEmitter = new Emitter(epower, esustain, efield, 0, EmitterType.BIT);
+			blackEmitter = new Emitter(bpower, bsustain, bfield, 0, EmitterType.BIT);
 			Element.LineWidth = 2;
 			Element.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+			Element.ColorMask = new Rgba(255, 255, 0, 255);
+			Element.updateColorBuffer();
 		}
 		#endregion
 		
 		#region Override Methods
 		public override void update (float delta){
-			//TODO: move attract call to player
-			//attract (player.Position, pEmit, pField, delta);
+			fadePolarity(delta);
+			polarize(delta);
+			base.update (delta);
+		}
+		
+		private void fadePolarity(float delta){
 			if (polarityUpdate){
 				polarityUpdate = false;
-				switch (Polarity){
-				case 0:
+				if (Polarity == 0){
 					Element.ColorMask = new Rgba(255, 255, 0, 255);
 					Element.updateColorBuffer();
-					break;
-				case 1:
-					cooldown = 5;
-					Element.ColorMask = new Rgba(255, 0, 0, 255);
-					Element.updateColorBuffer();
-					break;
-				case 2:
-					cooldown = 5;
-					Element.ColorMask = new Rgba(0, 255, 0, 255);
-					Element.updateColorBuffer();
-					break;
 				}
 			}
-			if (cooldown > 0){
-				byte fade = (byte)(106 + (cooldown * 30));
+			
+			if (polarityFade > 0){
+				if (
+					(cannonState && polarityFade < polarityFadeCannon)||
+					(blackHoleState && polarityFade < polarityFadeBlack)
+				){
+					cannonState = false;
+					blackHoleState = false;
+					Emitter = explodeEmitter;
+				}
+				int fade = (int)((polarityFade/5.0f) * 256.0f);
 				switch (Polarity){
 					case 1:
 						Element.ColorMask = new Rgba(256, 256-fade, 0, 255);
 						Element.updateColorBuffer();
 						break;
 					case 2:
-						Element.ColorMask = new Rgba(256-fade, 255, 0, 255);
+						Element.ColorMask = new Rgba(255-fade, 255, 0, 255);
+						Element.updateColorBuffer();
+						break;
+					case 3:
+						Element.ColorMask = new Rgba(255, 255-fade, fade, 255);
+						Element.updateColorBuffer();
+						break;
+					case 4:
+						Element.ColorMask = new Rgba(255-fade, 255-fade, 0, 255);
 						Element.updateColorBuffer();
 						break;
 				}
-				cooldown -= delta;
-				if (cooldown <= 0){
-					cooldown = 0;
+				polarityFade -= delta;
+				if (polarityFade <= 0){	
+					Emitter = sprayEmitter;
+					polarityFade = 0;
 					Polarity = 0;
+					Element.ColorMask = new Rgba(255, 255, 0, 255);
+					Element.updateColorBuffer();
 				}
 			}
-			foreach (Particle p in Particles)
-				if (p != this) p.repel (Position, Emitter, field, delta);
-			//TODO: Fix element center
-			//Rotation = Math.Atan2(velocity.Y, velocity.X);
-			base.update (delta);
+		}
+		
+		private void polarize(float delta){
+			foreach (Particle p in Game.Particles){
+				if (p != this && (!p.EmitterType.Equals(EmitterType.MAG))){
+					if (blackHoleState) {
+						p.attract (Position, Emitter, delta, false);
+						if (Position.LoopDiff(p.Position).Length() < Emitter.field){
+							p.Polarity = Polarity;
+						}
+					}
+					else if (p.Polarity == Polarity){
+						p.attract (Position, Emitter, delta);
+					}
+				}
+			}
+		}
+		
+		public void fireCannon(){
+			cannonState = true;
+			Emitter = cannonEmitter;
+			polarityFade = polarityFadeReset;
+		}
+		
+		public void fireSpray(){
+			polarityFade = polarityFadeReset;
+		}
+		
+		public void fireBlackHole(){
+			blackHoleState = true;
+			Emitter = blackEmitter;
+			polarityFade = polarityFadeReset;
 		}
 		
 		public override void transform (){
