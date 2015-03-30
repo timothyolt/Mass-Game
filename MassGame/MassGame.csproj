@@ -8,7 +8,7 @@
     <ProjectGuid>{F51FE676-F629-4FFE-96E2-D582AAB60A0A}</ProjectGuid>
     <ProjectTypeGuids>{69878862-DA7D-4DC6-B0A1-50D8FAB4242F};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
-    <RootNamespace>MassGame</RootNamespace>
+    <RootNamespace>TOltjenrbruns.MassGame</RootNamespace>
     <AssemblyName>MassGame</AssemblyName>
     <ReleaseVersion>0.2</ReleaseVersion>
   </PropertyGroup>
@@ -37,8 +37,8 @@
     <Reference Include="Sce.PlayStation.Core" />
   </ItemGroup>
   <ItemGroup>
-    <ShaderProgram Include="shaders\Primitive.fcg" />
-    <ShaderProgram Include="shaders\Primitive.vcg" />
+    <ShaderProgram Include="Shaders\Primitive.fcg" />
+    <ShaderProgram Include="Shaders\Primitive.vcg" />
   </ItemGroup>
   <ItemGroup>
     <PsmMetadata Include="app.xml" />
@@ -46,19 +46,25 @@
   <Import Project="$(MSBuildExtensionsPath)\Sce\Sce.Psm.CSharp.targets" />
   <ItemGroup>
     <Compile Include="AppMain.cs" />
-    <Compile Include="CubeParticle.cs" />
-    <Compile Include="Element.cs" />
-    <Compile Include="Emitter.cs" />
-    <Compile Include="Enemy.cs" />
-    <Compile Include="Particle.cs" />
-    <Compile Include="Player.cs" />
-    <Compile Include="Polygon.cs" />
-    <Compile Include="Colors.cs" />
-    <Compile Include="E_Spray.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="E_BlackWhole.cs" />
-    <Compile Include="E_Cannon.cs" />
-    <Compile Include="PickCannon.cs" />
-    <Compile Include="PickBwhole.cs" />
+    <Compile Include="Graphics\Colors.cs" />
+    <Compile Include="Graphics\Element.cs" />
+    <Compile Include="Particle\Mag\Player.cs" />
+    <Compile Include="Graphics\Polygon.cs" />
+    <Compile Include="Particle\Emitter.cs" />
+    <Compile Include="Particle\Bit\ParticleBit.cs" />
+    <Compile Include="Particle\Bit\PickupCannon.cs" />
+    <Compile Include="Particle\Bit\PickupBlackHole.cs" />
+    <Compile Include="Particle\Mag\EnemyBlackHole.cs" />
+    <Compile Include="Particle\Mag\EnemyCannon.cs" />
+    <Compile Include="Particle\Mag\EnemySpray.cs" />
+    <Compile Include="Particle\BaseParticle.cs" />
+    <Compile Include="Particle\Mag\BaseEnemy.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Graphics\" />
+    <Folder Include="Particle\" />
+    <Folder Include="Particle\Mag\" />
+    <Folder Include="Particle\Bit\" />
   </ItemGroup>
 </Project>
