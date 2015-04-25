@@ -16,27 +16,37 @@
 using Sce.PlayStation.Core;
 
 namespace TOltjenbruns.MassGame {
-	public enum Color : ulong {
-		TRANS = 0x00000000,
-		BLACK = 0x000000FF,
-		WHITE = 0xFFFFFFFF,
-		RED = 0xFF0000FF,
-		GREEN = 0x00FF00FF,
-		BLUE = 0x0000FFFF
-	}
-	
-	//TODO: fix red channel not working
-	public static class ColorRgba {
-		public static Rgba ToRgba (this Color c) {
-			ulong i = (ulong)c;
-			//Console.WriteLine("{0:X}", i);
-			return new Rgba (
-				(int)(i & 0xFF000000) / 0x1000000, 
-				(int)(i & 0x00FF0000) / 0x10000,
-				(int)(i & 0x0000FF00) / 0x100,
-				(int)(i & 0x000000FF)
-			);
+	public class CannonPickup : BaseParticle {
+		#region Private Fields
+		private const float power = 1000;
+		private const float sustain = 0.5f;
+		private const float field = 15;
+		#endregion
+		
+		#region Constructor
+		public CannonPickup (Vector3 pos) 
+			:base(PlayerMag.playerPoly,new Emitter(power,sustain,field,0,EmitterType.FORCE)) {
+			ColorMask = new Rgba (0, 0, 255, 255);
+			Position = pos;
+			Element.LineWidth = 1;
+			Element.Scale = new Vector3 (0.5f, 0.5f, 1);
 		}
+		#endregion
+		
+		#region override
+		public override void update (float delta) {
+			base.update (delta);
+		}
+		
+		public override void transform () {
+			Element.Position = Position.Multiply (0.01f).Add (new Vector3 (-0.0625f, -0.0625f, 0));
+			Element.Rotation = Rotation;
+		}
+
+		public override void color () {
+			Element.ColorMask = ColorMask;
+		}
+		#endregion
 	}
 }
 

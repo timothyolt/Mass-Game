@@ -1,30 +1,23 @@
-/*
- *	Copyright (C) 2015 Timothy A. Oltjenbruns and Steffen Lim
- *
- *	This program is free software; you can redistribute it and/or modify
- *	it under the terms of the GNU General Public License as published by
- *	the Free Software Foundation; either version 2 of the License, or
- *	(at your option) any later version.
- *	
- *	This program is distributed in the hope that it will be useful,
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *	GNU General Public License for more details.
- *	
- *	You should have received a copy of the GNU General Public License along
- *	with this program; if not, write to the Free Software Foundation, Inc.,
- *	51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
-using System;
+// Copyright (C) 2015 Timothy A. Oltjenbruns
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//  
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, write to the Free Software Foundation, Inc.,
+// 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 using System.Collections.Generic;
-
 using Sce.PlayStation.Core;
-using Sce.PlayStation.Core.Graphics;
-using Sce.PlayStation.Core.Input;
 
 namespace TOltjenbruns.MassGame {
-	public abstract class Particle {
+	public abstract class BaseParticle {
 		
 		#region Private Fields
 
@@ -32,20 +25,21 @@ namespace TOltjenbruns.MassGame {
 		//TODO: move update polling to Element
 		private bool updateTransform = true;
 		private bool updateColor = true;
-		
 		private SortedList<Emitter, Vector3> forces;
 		#endregion
 		
 		#region Properties
 		private Emitter emitter;
+
 		protected Emitter Emitter {
-			get {return emitter;}
-			set {emitter = value;}
+			get { return emitter;}
+			set { emitter = value;}
 		}
 		
 		private Element element;
+
 		protected Element Element {
-			get {return element;}
+			get { return element;}
 		}
 		
 		public EmitterType EmitterType {
@@ -53,6 +47,7 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		protected bool polarityUpdate = true;
+
 		public virtual byte Polarity {
 			get { return emitter.polarity; }
 			set { 
@@ -62,6 +57,7 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		private Rgba colorMask;
+
 		public Rgba ColorMask {
 			get { return colorMask; }
 			set {
@@ -71,8 +67,9 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		private Vector3 position;
+
 		public Vector3 Position {
-			get {return position;}
+			get { return position;}
 			set {
 				updateTransform = true;
 				position = value;
@@ -80,19 +77,22 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		private Vector3 velocity;
+
 		public Vector3 Velocity {
-			get {return velocity;}	
-			set {velocity = value;}
+			get { return velocity;}	
+			set { velocity = value;}
 		}
 		
 		private Vector3 acceleration;
+
 		public Vector3 Acceleration {
-			get {return acceleration;}	
+			get { return acceleration;}	
 		}
 		
 		private double rotation;
+
 		public double Rotation {
-			get {return rotation;}
+			get { return rotation;}
 			set {
 				updateTransform = true;
 				rotation = value;
@@ -101,11 +101,11 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Constructors
-		public Particle(Polygon poly, Emitter emitter){
-			element = new Element(poly);
+		public BaseParticle (Polygon poly, Emitter emitter) {
+			element = new Element (poly);
 			this.emitter = emitter;
 			
-			forces = new SortedList<Emitter, Vector3>();
+			forces = new SortedList<Emitter, Vector3> ();
 			
 			position = Vector3.Zero;
 			rotation = 0.0;
@@ -113,23 +113,23 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Original Methods
-		public void attract(Vector3 pos, Emitter e, float delta){
-			this.attract(pos,e,delta,(e.polarity == this.emitter.polarity));
+		public void attract (Vector3 pos, Emitter e, float delta) {
+			this.attract (pos, e, delta, (e.polarity == this.emitter.polarity));
 		}
 		
-		public void attract(Vector3 pos, Emitter e, float delta, bool push){
-			Vector3 diff = pos.LoopDiff(Position + Velocity);
+		public void attract (Vector3 pos, Emitter e, float delta, bool push) {
+			Vector3 diff = pos.LoopDiff (Position + Velocity);
 			float power = e.power * delta;
-			float diffLength = diff.Length();
-			if (diffLength < e.field){
+			float diffLength = diff.Length ();
+			if (diffLength < e.field) {
 				Vector3 force = Vector3.Zero;
 				if (diffLength > power)
-					force += diff.Multiply(power/(diffLength * diffLength));
+					force += diff.Multiply (power / (diffLength * diffLength));
 				else 
-					force += diff.Multiply(1/power);
+					force += diff.Multiply (1 / power);
 				//if (force.Length() > netSize)
 				//	force = Vector3.Zero;
-				applyForce(push ? force : -force, e);
+				applyForce (push ? force : -force, e);
 			}
 		}
 //		public void attract(Vector3 pos, float power, float netSize){
@@ -160,73 +160,77 @@ namespace TOltjenbruns.MassGame {
 //			acceleration -= force;
 //		}
 		
-		public void applyForce(Vector3 f, Emitter e){
+		public void applyForce (Vector3 f, Emitter e) {
 			Vector3 existingForce = Vector3.Zero;
-			if (forces.ContainsKey(e))
+			if (forces.ContainsKey (e))
 				forces [e] += f;
 			else 
 				forces.Add (e, f);
 		}
 		
-		public void clearForces(){
-			forces.Clear();	
+		public void clearForces () {
+			forces.Clear ();	
 		}
 		
-		public void render (){
-			element.draw(Game.Graphics);
+		public void render () {
+			element.draw (Game.Graphics);
 		}
 		
-		public void dispose(){
-			element.dispose();	
+		public void dispose () {
+			element.dispose ();	
 		}
 		#endregion
 		
 		#region Abstract Methods
 		//TODO: move update flagging to element
-		public abstract void transform();
+		public abstract void transform ();
 		
 		//TODO: move update flagging to element
-		public abstract void color();
+		public abstract void color ();
 		
-		public virtual void update (float delta){
+		public virtual void update (float delta) {
 			
 			int fCount = forces.Count;
-			HashSet<Emitter> removeQueue = new HashSet<Emitter>();
-			foreach (var pair in forces){
+			HashSet<Emitter> removeQueue = new HashSet<Emitter> ();
+			foreach (var pair in forces) {
 				Vector3 force = pair.Value;
 				Emitter e = pair.Key;
-				if (force.LengthSquared() < 0.01)
+				if (force.LengthSquared () < 0.01)
 					removeQueue.Add (pair.Key);
 				acceleration += force;
-				forces[pair.Key] = force.Multiply(e.sustain);
+				forces [pair.Key] = force.Multiply (e.sustain);
 			}
-			foreach (Emitter e in removeQueue){
+			foreach (Emitter e in removeQueue) {
 				forces.Remove (e);
 			}
 			velocity += acceleration;
-			acceleration = Velocity.Multiply(-1/2f);
-			applyVelocity(delta);
+			acceleration = Velocity.Multiply (-1 / 2f);
+			applyVelocity (delta);
 			
-			if (position.X < -200) position.X = 200;
-			if (position.X > 200) position.X = -200;
-			if (position.Y < -200) position.Y = 200;
-			if (position.Y > 200) position.Y = -200;
+			if (position.X < -200)
+				position.X = 200;
+			if (position.X > 200)
+				position.X = -200;
+			if (position.Y < -200)
+				position.Y = 200;
+			if (position.Y > 200)
+				position.Y = -200;
 			
 			if (updateTransform) {
 				updateTransform = false;
 				transform ();
-				element.updateTransBuffer();
+				element.updateTransBuffer ();
 			}
 			
 			if (updateColor) {
 				updateColor = false;
 				color ();
-				element.updateColorBuffer();
+				element.updateColorBuffer ();
 			}
 			
 		}
 		
-		public virtual void applyVelocity(float delta){
+		public virtual void applyVelocity (float delta) {
 			Position += velocity;
 		}
 		#endregion

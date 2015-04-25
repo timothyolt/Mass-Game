@@ -16,27 +16,32 @@
 using Sce.PlayStation.Core;
 
 namespace TOltjenbruns.MassGame {
-	public enum Color : ulong {
-		TRANS = 0x00000000,
-		BLACK = 0x000000FF,
-		WHITE = 0xFFFFFFFF,
-		RED = 0xFF0000FF,
-		GREEN = 0x00FF00FF,
-		BLUE = 0x0000FFFF
-	}
-	
-	//TODO: fix red channel not working
-	public static class ColorRgba {
-		public static Rgba ToRgba (this Color c) {
-			ulong i = (ulong)c;
-			//Console.WriteLine("{0:X}", i);
-			return new Rgba (
-				(int)(i & 0xFF000000) / 0x1000000, 
-				(int)(i & 0x00FF0000) / 0x10000,
-				(int)(i & 0x0000FF00) / 0x100,
-				(int)(i & 0x000000FF)
-			);
+	public class BlackHoleMag : BaseMag {
+		#region Private Fields
+		private Emitter avoidEmitter;
+		#endregion
+		
+		#region Constructor
+		public BlackHoleMag ()
+			: this (new Rgba(0, 0, 0, 255)) {
 		}
+		
+		public BlackHoleMag (Rgba colorMask)
+			: base (colorMask) {
+		}
+		#endregion
+		
+		#region Original Methods
+		public override void preUpdate (float delta) {
+			base.preUpdate (delta);
+			foreach (BaseParticle p in Game.Particles) {
+				if (p is BitParticle)//Quick and dirty way to avoid all particles (brownian motion)
+					attract (p.Position, Emitter, delta, true);
+			}
+		}
+		
+		#endregion
+		
 	}
 }
 

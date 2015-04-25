@@ -29,8 +29,29 @@ Global
 		$1.DirectoryNamespaceAssociation = None
 		$1.ResourceNamePolicy = FileFormatDefault
 		$0.StandardHeader = $2
-		$2.Text = @/*\n *\tCopyright (C) 2015 Timothy A. Oltjenbruns\n *\n *\tThis program is free software; you can redistribute it and/or modify\n *\tit under the terms of the GNU General Public License as published by\n *\tthe Free Software Foundation; either version 2 of the License, or\n *\t(at your option) any later version.\n *\t\n *\tThis program is distributed in the hope that it will be useful,\n *\tbut WITHOUT ANY WARRANTY; without even the implied warranty of\n *\tMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n *\tGNU General Public License for more details.\n *\t\n *\tYou should have received a copy of the GNU General Public License along\n *\twith this program; if not, write to the Free Software Foundation, Inc.,\n *\t51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.\n */
+		$2.Text = @Copyright (C) 2015 Timothy A. Oltjenbruns\n\nThis program is free software; you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation; either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n \nYou should have received a copy of the GNU General Public License along\nwith this program; if not, write to the Free Software Foundation, Inc.,\n51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 		$2.IncludeInNewFiles = True
+		$0.TextStylePolicy = $3
+		$3.inheritsSet = null
+		$3.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $4
+		$4.NamespaceBraceStyle = EndOfLine
+		$4.ClassBraceStyle = EndOfLine
+		$4.InterfaceBraceStyle = EndOfLine
+		$4.StructBraceStyle = EndOfLine
+		$4.EnumBraceStyle = EndOfLine
+		$4.MethodBraceStyle = EndOfLine
+		$4.ConstructorBraceStyle = EndOfLine
+		$4.DestructorBraceStyle = EndOfLine
+		$4.IfElseBraceForcement = RemoveBraces
+		$4.ForBraceForcement = RemoveBraces
+		$4.WhileBraceForcement = RemoveBraces
+		$4.UsingBraceForcement = RemoveBraces
+		$4.FixedBraceForcement = RemoveBraces
+		$4.PlaceElseOnNewLine = True
+		$4.inheritsSet = Mono
+		$4.inheritsScope = text/x-csharp
+		$4.scope = text/x-csharp
 		description = Proof of Concept
 	EndGlobalSection
 EndGlobal
