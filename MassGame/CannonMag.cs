@@ -19,13 +19,13 @@ namespace TOltjenbruns.MassGame {
 	public class CannonMag : BaseMag {
 		#region Private Fields
 		
-		private const float targetPower = 8;
-		private const float targetSustain = 0.5f;
+		private const float targetPower = 250f;
+		private const float targetSustain = 0.01f;
 		private const float targetField = 200;
 		private Emitter targetEmitter;
-		private const float seekPower = 500f;
-		private const float seekSustain = 0.2f;
-		private const float seekField = 10;
+		private const float seekPower = 700f;
+		private const float seekSustain = 0.8f;
+		private const float seekField = 40;
 		private Emitter seekEmitter;
 		private CannonMag neighbor = null;
 		#endregion
@@ -40,23 +40,16 @@ namespace TOltjenbruns.MassGame {
 			Polarity = 3;
 			targetEmitter = new Emitter (targetPower, targetSustain, targetField, EmitterType.FORCE);
 			seekEmitter = new Emitter (seekPower, seekSustain, seekField, EmitterType.FORCE);
-			foreach (BaseParticle p in Game.Particles)
-				//Lazy code, last one in array is the neighbor
-				if (p is CannonMag)
-					neighbor = (CannonMag)p;
 		}
 		#endregion
 		
 		#region Original Methods
 		public override void preUpdate (float delta) {
 			base.preUpdate (delta);
-			if (neighbor != null) {
-				Vector3 aim = Position.LoopDiff (neighbor.Position);
-				aim = aim.Normalize ().Multiply (targetEmitter.power);
-				applyForce (aim, targetEmitter);
-			}
-			else 
-				foreach (BaseParticle p in Game.Particles)
+			foreach (BaseParticle p in Game.Particles)
+				if ((p.Polarity != (byte)Game.PolarityState.NEUTRAL) || p is BitParticle)
+					attract (p.Position, targetEmitter, delta, false);
+				else 
 					attract (p.Position, seekEmitter, delta, true);
 		}
 
