@@ -22,12 +22,12 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Constructor
-		public BlackHoleMag ()
-			: this (new Rgba(0, 0, 0, 255)) {
+		public BlackHoleMag (byte polarity)
+			: this (polarity, new Rgba(0, 0, 0, 255)) {
 		}
 		
-		public BlackHoleMag (Rgba colorMask)
-			: base (colorMask) {
+		public BlackHoleMag (byte polarity, Rgba colorMask)
+			: base (polarity, colorMask) {
 		}
 		#endregion
 		

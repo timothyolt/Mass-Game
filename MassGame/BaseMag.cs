@@ -45,14 +45,14 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Constructors
-		public BaseMag ()
-			: this (new Rgba(255, 0, 0, 255)) {
+		public BaseMag (byte polarity)
+			: this (polarity, new Rgba(255, 0, 0, 255)) {
 		}
 		
-		public BaseMag (Rgba colorMask) 
-			: base (PlayerMag.playerPoly, new Emitter(power, sustain, field, 1, EmitterType.MAG)) {
+		public BaseMag (byte polarity, Rgba colorMask) 
+			: base (PlayerMag.playerPoly, polarity, new Emitter(power, sustain, field, EmitterType.MAG)) {
 			ColorMask = colorMask;
-			gunEmitter = new Emitter (gunPower, gunSustain, gunField, 1, EmitterType.FORCE);
+			gunEmitter = new Emitter (gunPower, gunSustain, gunField, EmitterType.FORCE);
 			Element.LineWidth = 4;
 			health = 50;
 			healthMax = 50;
@@ -122,9 +122,9 @@ namespace TOltjenbruns.MassGame {
 					p.EmitterType == EmitterType.BIT && 
 					Position.LoopDiff (p.Position).Length () <= gunField
 				) {
-					if (this is CannonEnemy)
+					if (this is CannonMag)
 						((BitParticle)p).fireCannon ();
-					else if (this is BlackHoleEnemy)
+					else if (this is BlackHoleMag)
 						((BitParticle)p).fireBlackHole ();
 					else
 						((BitParticle)p).fireSpray ();
@@ -140,7 +140,7 @@ namespace TOltjenbruns.MassGame {
 			target = Position.LoopDiff (Game.Player.Position);
 			foreach (BaseParticle p in Game.Particles) {
 				if (p != this && p.EmitterType.Equals (EmitterType.BIT)) {
-					p.attract (Position, Emitter, delta);
+					p.attract (Position, Emitter, Polarity, delta);
 					if (p.Polarity != 0 && p.Polarity != Polarity) {
 						Vector3 partDiff = Position.LoopDiff (p.Position);
 						if (partDiff.LengthSquared () < 400) {

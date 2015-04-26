@@ -46,13 +46,13 @@ namespace TOltjenbruns.MassGame {
 			get	{ return emitter.etype; }
 		}
 		
-		protected bool polarityUpdate = true;
+		private byte polarity;
 
 		public virtual byte Polarity {
-			get { return emitter.polarity; }
+			get { return polarity; }
 			set { 
-				polarityUpdate = true;
-				emitter.polarity = value;
+				updatePolarity (polarity);
+				polarity = value;
 			}
 		}
 		
@@ -101,8 +101,9 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Constructors
-		public BaseParticle (Polygon poly, Emitter emitter) {
+		public BaseParticle (Polygon poly, byte polarity, Emitter emitter) {
 			element = new Element (poly);
+			this.polarity = polarity;
 			this.emitter = emitter;
 			
 			forces = new SortedList<Emitter, Vector3> ();
@@ -113,8 +114,8 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Original Methods
-		public void attract (Vector3 pos, Emitter e, float delta) {
-			this.attract (pos, e, delta, (e.polarity == this.emitter.polarity));
+		public void attract (Vector3 pos, Emitter e, byte polarity, float delta) {
+			this.attract (pos, e, delta, (polarity == this.polarity));
 		}
 		
 		public void attract (Vector3 pos, Emitter e, float delta, bool push) {
@@ -132,33 +133,6 @@ namespace TOltjenbruns.MassGame {
 				applyForce (push ? force : -force, e);
 			}
 		}
-//		public void attract(Vector3 pos, float power, float netSize){
-//			Vector3 diff = pos - Position;
-//			Vector3 force = Vector3.Zero;
-//			if (diff.LengthSquared() < netSize){
-//				if (diff.Length() > power)
-//					force += diff.Multiply(power/diff.LengthSquared());
-//				else 
-//					force += diff.Divide(power);
-//				if (force.LengthSquared() > netSize)
-//					force = Vector3.Zero;
-//			}
-//			acceleration += force;
-//		}
-//		
-//		public void repel(Vector3 pos, float power, float netSize){
-//			Vector3 diff = pos - Position;
-//			Vector3 force = Vector3.Zero;
-//			if (diff.LengthSquared() < netSize){
-//				if (diff.Length() > power)
-//					force += diff.Multiply(power/diff.LengthSquared());
-//				else 
-//					force += diff.Multiply(power);
-//				if (force.LengthSquared() > netSize)
-//					force = Vector3.Zero;
-//			}
-//			acceleration -= force;
-//		}
 		
 		public void applyForce (Vector3 f, Emitter e) {
 			Vector3 existingForce = Vector3.Zero;
@@ -187,6 +161,10 @@ namespace TOltjenbruns.MassGame {
 		
 		//TODO: move update flagging to element
 		public abstract void color ();
+		
+		protected virtual void updatePolarity (byte polarity) {
+			//Empty virtual
+		}
 		
 		public virtual void update (float delta) {
 			

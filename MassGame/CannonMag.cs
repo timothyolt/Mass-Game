@@ -19,7 +19,7 @@ namespace TOltjenbruns.MassGame {
 	public class CannonMag : BaseMag {
 		#region Private Fields
 		
-		private const float targetPower = 16f;
+		private const float targetPower = 8;
 		private const float targetSustain = 0.5f;
 		private const float targetField = 200;
 		private Emitter targetEmitter;
@@ -31,15 +31,15 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Constructor
-		public CannonMag ()
-			: this (new Rgba(255, 0, 255, 255)) {
+		public CannonMag (byte polarity)
+			: this (polarity, new Rgba(255, 0, 255, 255)) {
 		}
 		
-		public CannonMag (Rgba colorMask)
-			: base (colorMask) {
+		public CannonMag (byte polarity, Rgba colorMask)
+			: base (polarity, colorMask) {
 			Polarity = 3;
-			targetEmitter = new Emitter (targetPower, targetSustain, targetField, Polarity, EmitterType.FORCE);
-			seekEmitter = new Emitter (seekPower, seekSustain, seekField, Polarity, EmitterType.FORCE);
+			targetEmitter = new Emitter (targetPower, targetSustain, targetField, EmitterType.FORCE);
+			seekEmitter = new Emitter (seekPower, seekSustain, seekField, EmitterType.FORCE);
 			foreach (BaseParticle p in Game.Particles)
 				//Lazy code, last one in array is the neighbor
 				if (p is CannonMag)
@@ -57,8 +57,7 @@ namespace TOltjenbruns.MassGame {
 			}
 			else 
 				foreach (BaseParticle p in Game.Particles)
-					if (p is BitParticle)
-						attract (p.Position, seekEmitter, delta, true);
+					attract (p.Position, seekEmitter, delta, true);
 		}
 
 		protected override void Move (float delta) {

@@ -26,15 +26,15 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Constructor
-		public SprayEnemy ()
-			: this (new Rgba(255, 0, 0, 255)) {
+		public SprayEnemy (byte polarity)
+			: this (polarity, new Rgba(255, 0, 0, 255)) {
 		}
 		
-		public SprayEnemy (Rgba colorMask)
-			: base (colorMask) {
+		public SprayEnemy (byte polarity, Rgba colorMask)
+			: base (polarity, colorMask) {
 			//TODO: initialize health
 			Polarity = 1;
-			targetEmitter = new Emitter (targetPower, targetSustain, targetField, 2, EmitterType.FORCE);
+			targetEmitter = new Emitter (targetPower, targetSustain, targetField, EmitterType.FORCE);
 			
 			//TODO: empty
 		}

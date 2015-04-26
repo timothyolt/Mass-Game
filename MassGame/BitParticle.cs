@@ -42,24 +42,14 @@ namespace TOltjenbruns.MassGame {
 		private float polarityFade = 0;
 		#endregion
 		
-		public override byte Polarity {
-			get { return base.Polarity;}
-			set {
-				sprayEmitter.polarity = value;
-				cannonEmitter.polarity = value;
-				explodeEmitter.polarity = value;
-				blackEmitter.polarity = value;
-				base.Polarity = value;
-			}
-		}
 		#region Constructors
 		
-		public BitParticle ()
-			: base(PlayerMag.playerPoly, new Emitter(power, sustain, field, 0, EmitterType.BIT)) {
+		public BitParticle (byte polarity)
+			: base(PlayerMag.playerPoly, polarity, new Emitter(power, sustain, field, EmitterType.BIT)) {
 			sprayEmitter = Emitter;
-			cannonEmitter = new Emitter (cpower, csustain, cfield, 0, EmitterType.BIT);
-			explodeEmitter = new Emitter (epower, esustain, efield, 0, EmitterType.BIT);
-			blackEmitter = new Emitter (bpower, bsustain, bfield, 0, EmitterType.BIT);
+			cannonEmitter = new Emitter (cpower, csustain, cfield, EmitterType.BIT);
+			explodeEmitter = new Emitter (epower, esustain, efield, EmitterType.BIT);
+			blackEmitter = new Emitter (bpower, bsustain, bfield, EmitterType.BIT);
 			Element.LineWidth = 2;
 			Element.Scale = new Vector3 (0.5f, 0.5f, 0.5f);
 			Element.ColorMask = new Rgba (255, 255, 0, 255);
@@ -67,35 +57,22 @@ namespace TOltjenbruns.MassGame {
 		}
 		#endregion
 		
-		#region Override Methods
-		public override void update (float delta) {
-			fadePolarity (delta);
-			polarize (delta);
-			base.update (delta);
-		}
-		
+		#region Original Methods
 		private void fadePolarity (float delta) {
-			if (polarityUpdate) {
-				polarityUpdate = false;
-				if (Polarity == 0) {
-					Element.ColorMask = new Rgba (255, 255, 0, 255);
-					Element.updateColorBuffer ();
-				}
-			}
-			
-			if (polarityFade > 0) {
-				if (
+			if (
 					(cannonState && polarityFade < polarityFadeCannon) ||
 					(blackHoleState && polarityFade < polarityFadeBlack)
 				) {
-					cannonState = false;
-					blackHoleState = false;
-					Emitter = explodeEmitter;
-				}
+				cannonState = false;
+				blackHoleState = false;
+				Emitter = explodeEmitter;
+			}
+			if (polarityFade > 0) {
 				int fade = (int)((polarityFade / 5.0f) * 256.0f);
+				polarityFade -= delta;
 				switch (Polarity) {
 				case 1:
-					Element.ColorMask = new Rgba (256, 256 - fade, 0, 255);
+					Element.ColorMask = new Rgba (25, 25 - fade, 0, 255);
 					Element.updateColorBuffer ();
 					break;
 				case 2:
@@ -111,8 +88,7 @@ namespace TOltjenbruns.MassGame {
 					Element.updateColorBuffer ();
 					break;
 				}
-				polarityFade -= delta;
-				if (polarityFade <= 0) {	
+				if (polarityFade <= 0) {
 					Emitter = sprayEmitter;
 					polarityFade = 0;
 					Polarity = 0;
@@ -127,17 +103,19 @@ namespace TOltjenbruns.MassGame {
 				if (p != this && (!p.EmitterType.Equals (EmitterType.MAG)))
 				if (blackHoleState) {
 					p.attract (Position, Emitter, delta, false);
-					if (Position.LoopDiff (p.Position).Length () < Emitter.field)
+					if ((Position.LoopDiff (p.Position).Length () < Emitter.field / 2))// && (p.Polarity != Polarity))
 						p.Polarity = Polarity;
 				}
 				else if (p.Polarity == Polarity)
-					p.attract (Position, Emitter, delta);
+					p.attract (Position, Emitter, Polarity, delta);
 			}
 		}
 		
 		public void fireCannon () {
 			cannonState = true;
 			Emitter = cannonEmitter;
+			Element.ColorMask = new Rgba (255, 0, 255, 255);
+			Element.updateColorBuffer ();
 			polarityFade = polarityFadeReset;
 		}
 		
@@ -148,7 +126,40 @@ namespace TOltjenbruns.MassGame {
 		public void fireBlackHole () {
 			blackHoleState = true;
 			Emitter = blackEmitter;
+			Element.ColorMask = new Rgba (0, 0, 0, 255);
+			Element.updateColorBuffer ();
 			polarityFade = polarityFadeReset;
+		}
+		#endregion
+		
+		#region Override Methods
+		public override void update (float delta) {
+			fadePolarity (delta);
+			polarize (delta);
+			base.update (delta);
+		}
+		
+		protected override void updatePolarity (byte polarity) {
+			switch (polarity) {
+			case 0:
+				Element.ColorMask = new Rgba (255, 255, 0, 255);
+				Element.updateColorBuffer ();
+				break;
+			case 1:
+				if ((!cannonState) && (!blackHoleState)) {
+					Element.ColorMask = new Rgba (255, 0, 0, 255);
+					Element.updateColorBuffer ();
+					if (polarityFade == 0)
+						polarityFade = polarityFadeReset;
+				}
+				break;
+			case 2:
+				Element.ColorMask = new Rgba (0, 255, 0, 255);
+				Element.updateColorBuffer ();
+				if (polarityFade == 0)
+					polarityFade = polarityFadeReset;
+				break;
+			}
 		}
 		
 		public override void transform () {

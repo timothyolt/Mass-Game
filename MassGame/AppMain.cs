@@ -14,19 +14,33 @@
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.  
 
-//TODO: fix polarity
 //TODO: fix enemy inheritance
+//TODO: fix snake enemy
 //TODO: weapon cycle visibiliy
 //TODO: game states:
+//		intro
 //		instruction
 //		high score
-//		
+//		game
+//		high score set
+//TODO: sound effects and background sound
+//TODO: fire upon release for easier aiming (and visual feedback)
 //TODO: enemy spawning
 //TODO: particle inventory (might cause less derpy physics)
 //		still render them, but physics only interacts with the holder until thrown
+//TODO: external mesh files
 //TODO: options
 //		control style
 //		difficulty
+//TODO: clean up and comment
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using Sce.PlayStation.Core;
+using Sce.PlayStation.Core.Environment;
+using Sce.PlayStation.Core.Graphics;
+using Sce.PlayStation.Core.Input;
+
 namespace TOltjenbruns.MassGame {
 	class AppMain {
 		private static bool running = true;
@@ -69,20 +83,20 @@ namespace TOltjenbruns.MassGame {
 			Game.Shader.SetAttributeBinding (0, "iPosition");
 			Game.Shader.SetAttributeBinding (1, "iColor");
 			
-			Game.Player = new PlayerMag ();
+			Game.Player = new PlayerMag ((byte)Game.PolarityState.PLAYER);
 			Game.Particles.Add (Game.Player);
 			bool blackHolePlaced = false;
 			for (int i = 0; i < 200; i++) {
-				BaseParticle particle = new BitParticle ();
+				BaseParticle particle = new BitParticle ((byte)Game.PolarityState.NEUTRAL);
 				particle.Position = new Vector3 (
 					(float)(Game.Rand.NextDouble () * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH / 2, 
 					(float)(Game.Rand.NextDouble () * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT / 2, 0f);
 				Game.Particles.Add (particle);
 			}
-			for (int i = 0; i < 10; i++)
-				switch (Game.Rand.Next (3)) {
+			for (int i = 0; i < 2; i++)
+				switch (0) {//Game.Rand.Next (3)) {
 				case 0:
-					CannonMag e = new CannonMag ();
+					CannonMag e = new CannonMag ((byte)Game.PolarityState.ENEMY);
 					e.Position = new Vector3 (
 						(float)(Game.Rand.NextDouble () * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH / 2, 
 						(float)(Game.Rand.NextDouble () * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT / 2, 0f);
@@ -91,7 +105,7 @@ namespace TOltjenbruns.MassGame {
 				case 1:
 					if (!blackHolePlaced) {
 						blackHolePlaced = true;
-						BlackHoleMag e3 = new BlackHoleMag ();
+						BlackHoleMag e3 = new BlackHoleMag ((byte)Game.PolarityState.ENEMY);
 						e3.Position = new Vector3 (
 							(float)(Game.Rand.NextDouble () * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH / 2, 
 							(float)(Game.Rand.NextDouble () * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT / 2, 0f);
@@ -100,17 +114,17 @@ namespace TOltjenbruns.MassGame {
 					}
 					goto default;
 				default:
-					SprayEnemy e2 = new SprayEnemy ();
+					SprayEnemy e2 = new SprayEnemy (1);
 					e2.Position = new Vector3 (
 						(float)(Game.Rand.NextDouble () * Game.SCREEN_WIDTH) - Game.SCREEN_WIDTH / 2, 
 						(float)(Game.Rand.NextDouble () * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT / 2, 0f);
 					Game.Particles.Add (e2);
 					break;
 				}
-			Game.CannonPick = new CannonPickup (new Vector3 (Game.Rand.Next (-200, 200), Game.Rand.Next (-200, 200), 0));
-			Game.BWholePick = new BlackHolePickup (new Vector3 (Game.Rand.Next (-200, 200), Game.Rand.Next (-200, 200), 0));
-			Game.groundPowerUps.Add (Game.CannonPick);
-			Game.groundPowerUps.Add (Game.BWholePick);
+			Game.CannonPickup = new CannonPickup ((byte)Game.PolarityState.NEUTRAL, new Vector3 (Game.Rand.Next (-200, 200), Game.Rand.Next (-200, 200), 0));
+			Game.BlackHolePickup = new BlackHolePickup ((byte)Game.PolarityState.NEUTRAL, new Vector3 (Game.Rand.Next (-200, 200), Game.Rand.Next (-200, 200), 0));
+			Game.pickups.Add (Game.CannonPickup);
+			Game.pickups.Add (Game.BlackHolePickup);
 			
 			return true;
 		}
@@ -125,7 +139,7 @@ namespace TOltjenbruns.MassGame {
 			Game.Player.update (delta);
 			foreach (BaseParticle p in Game.Particles)
 				p.update (delta);
-			foreach (BaseParticle p in Game.groundPowerUps)
+			foreach (BaseParticle p in Game.pickups)
 				p.update (delta);
 			return true;
 		}
@@ -152,7 +166,7 @@ namespace TOltjenbruns.MassGame {
 			Game.Graphics.SetShaderProgram (Game.Shader);
 			foreach (BaseParticle p in Game.Particles)
 				p.render ();
-			foreach (BaseParticle p in Game.groundPowerUps)
+			foreach (BaseParticle p in Game.pickups)
 				p.render ();
 			Game.Player.render ();
 	

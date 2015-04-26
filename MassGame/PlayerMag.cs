@@ -107,18 +107,18 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Constructors
-		public PlayerMag ()
-			: this (new Rgba(0, 255, 0, 255)) {
+		public PlayerMag (byte polarity)
+			: this (polarity, new Rgba(0, 255, 0, 255)) {
 		}
 		
-		public PlayerMag (Rgba colorMask) 
-			:base(playerPoly, new Emitter(power, sustain, field, 2, EmitterType.MAG)) {
+		public PlayerMag (byte polarity, Rgba colorMask) 
+			: base (playerPoly, polarity, new Emitter(power, sustain, field, EmitterType.MAG)) {
 			
 			//element = new Element(playerPoly);
 			Element.LineWidth = 4;
 			Element.ColorMask = colorMask;
 			
-			gunEmitter = new Emitter (gunPower, gunSustain, gunField, 2, EmitterType.FORCE);
+			gunEmitter = new Emitter (gunPower, gunSustain, gunField, EmitterType.FORCE);
 			
 			health = 300;
 			healthMax = 300;
@@ -161,10 +161,10 @@ namespace TOltjenbruns.MassGame {
 			Vector3 aim = Vector3.Zero;
 			
 			if ((gamePad.Buttons & GamePadButtons.L) != 0)
-			if (Game.obtainedPowerUps.Contains (Game.CannonPick))
+			if (Game.obtainedPowerUps.Contains (Game.CannonPickup))
 				fireType = 1;
 			if ((gamePad.Buttons & GamePadButtons.R) != 0)
-			if (Game.obtainedPowerUps.Contains (Game.BWholePick))
+			if (Game.obtainedPowerUps.Contains (Game.BlackHolePickup))
 				fireType = 2;
 			if ((gamePad.Buttons & GamePadButtons.Triangle) != 0)
 				aim.Y += 1;
@@ -178,17 +178,20 @@ namespace TOltjenbruns.MassGame {
 				aim = aim.Normalize ();
 				aim = aim.Multiply (gunPower * delta);
 				foreach (BaseParticle p in Game.Particles)
-					if (
-						p != this && 
+					if (p != this && 
 						p.EmitterType == EmitterType.BIT && 
-						Position.LoopDiff (p.Position).Length () <= gunField
-					) {
-						if (fireType == 1)
+						Position.LoopDiff (p.Position).Length () <= gunField) {
+						switch (fireType) {
+						case 1:
 							((BitParticle)p).fireCannon ();
-						else if (fireType == 2)
-							((BitParticle)p).fireBlackHole ();//change to black hole
-						else
+							break;
+						case 2:	
+							((BitParticle)p).fireBlackHole ();
+							break;
+						default:
 							((BitParticle)p).fireSpray ();
+							break;
+						}
 						p.Polarity = Polarity;
 						p.clearForces ();
 						p.applyForce (aim, gunEmitter);
@@ -201,7 +204,7 @@ namespace TOltjenbruns.MassGame {
 		private void polarize (float delta) {
 			foreach (BaseParticle p in Game.Particles) {
 				if (p != this && p.EmitterType.Equals (EmitterType.BIT)) {
-					p.attract (Position, Emitter, delta);
+					p.attract (Position, Emitter, Polarity, delta);
 					if (p.Polarity != 0 && p.Polarity != Polarity) {
 						Vector3 partDiff = Position.LoopDiff (p.Position);
 						if (partDiff.LengthSquared () < 400) {
@@ -214,10 +217,10 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		public void pickUpPower () {
-			for (int i = 0; i < Game.groundPowerUps.Count; i++)
-				if (Game.groundPowerUps [i].Position.LoopDiff (Position).LengthSquared () < field * field) {
-					Game.obtainedPowerUps.Add (Game.groundPowerUps [i]);
-					Game.groundPowerUps.RemoveAt (i);
+			for (int i = 0; i < Game.pickups.Count; i++)
+				if (Game.pickups [i].Position.LoopDiff (Position).LengthSquared () < field * field) {
+					Game.obtainedPowerUps.Add (Game.pickups [i]);
+					Game.pickups.RemoveAt (i);
 				}
 		}
 		
