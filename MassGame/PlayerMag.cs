@@ -36,7 +36,6 @@ namespace TOltjenbruns.MassGame {
         0.666f, 0.577f, 0f,
         0.500f, 0.289f, 0f,
         };
-		
 		private static readonly float[] colors = {
 
         180 / 256f, 180 / 256f, 180 / 256f, 1.0f,
@@ -160,16 +159,6 @@ namespace TOltjenbruns.MassGame {
 			}
 		}
 		
-		private void resetElement(Polygon poly){
-			Rgba colorMask = Element.ColorMask;
-			float lineWidth = Element.LineWidth;
-			Element = new Element (poly);
-			Element.LineWidth = lineWidth;
-			Element.ColorMask = colorMask;
-			Element.updateColorBuffer ();
-			Element.updateTransBuffer ();
-		}
-		
 		private void fire (float delta, GamePadData gamePad) {
 			Vector3 aim = Vector3.Zero;
 			
@@ -177,10 +166,8 @@ namespace TOltjenbruns.MassGame {
 			if (Game.obtainedPowerUps.Contains (Game.CannonPickup))
 				fireType = 1;
 			if ((gamePad.Buttons & GamePadButtons.R) != 0)
-			if (Game.obtainedPowerUps.Contains (Game.BlackHolePickup)) {
+			if (Game.obtainedPowerUps.Contains (Game.BlackHolePickup))
 				fireType = 2;
-				resetElement(BlackHoleMag.blackHolePoly);
-			}
 			if ((gamePad.Buttons & GamePadButtons.Triangle) != 0)
 				aim.Y += 1;
 			if ((gamePad.Buttons & GamePadButtons.Cross) != 0)
@@ -202,7 +189,6 @@ namespace TOltjenbruns.MassGame {
 							break;
 						case 2:	
 							((BitParticle)p).fireBlackHole ();
-							resetElement (playerPoly);
 							break;
 						default:
 							((BitParticle)p).fireSpray ();

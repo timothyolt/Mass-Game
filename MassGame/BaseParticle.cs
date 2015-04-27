@@ -40,7 +40,6 @@ namespace TOltjenbruns.MassGame {
 
 		protected Element Element {
 			get { return element;}
-			set { element = value;}
 		}
 		
 		public EmitterType EmitterType {
