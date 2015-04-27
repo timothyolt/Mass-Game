@@ -17,9 +17,6 @@ using Sce.PlayStation.Core;
 
 namespace TOltjenbruns.MassGame {
 	public class BlackHoleMag : BaseMag {
-		#region Private Fields
-		private Emitter avoidEmitter;
-		#endregion
 		
 		#region Constructor
 		public BlackHoleMag (byte polarity)

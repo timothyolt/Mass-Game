@@ -144,6 +144,7 @@ namespace TOltjenbruns.MassGame {
 			case 0:
 				Element.ColorMask = new Rgba (255, 255, 0, 255);
 				Element.updateColorBuffer ();
+				polarityFade = 0;
 				break;
 			case 1:
 				if ((!cannonState) && (!blackHoleState)) {

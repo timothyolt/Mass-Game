@@ -15,7 +15,6 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.  
 
 //TODO: fix enemy inheritance
-//TODO: fix snake enemy
 //TODO: weapon cycle visibiliy
 //TODO: game states:
 //		intro
@@ -24,8 +23,8 @@
 //		game
 //		high score set
 //TODO: sound effects and background sound
-//TODO: fire upon release for easier aiming (and visual feedback)
 //TODO: enemy spawning
+//TODO: fire upon release for easier aiming (and visual feedback)
 //TODO: particle inventory (might cause less derpy physics)
 //		still render them, but physics only interacts with the holder until thrown
 //TODO: external mesh files

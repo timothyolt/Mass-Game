@@ -51,7 +51,7 @@ namespace TOltjenbruns.MassGame {
 		public virtual byte Polarity {
 			get { return polarity; }
 			set { 
-				updatePolarity (polarity);
+				updatePolarity (value);
 				polarity = value;
 			}
 		}
