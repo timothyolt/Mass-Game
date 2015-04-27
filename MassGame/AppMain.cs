@@ -93,7 +93,7 @@ namespace TOltjenbruns.MassGame {
 				Game.Particles.Add (particle);
 			}
 			for (int i = 0; i < 2; i++)
-				switch (0) {//Game.Rand.Next (3)) {
+				switch (1) {//Game.Rand.Next (3)) {
 				case 0:
 					CannonMag e = new CannonMag ((byte)Game.PolarityState.ENEMY);
 					e.Position = new Vector3 (

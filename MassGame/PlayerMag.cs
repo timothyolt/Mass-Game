@@ -194,7 +194,8 @@ namespace TOltjenbruns.MassGame {
 						}
 						p.Polarity = Polarity;
 						p.clearForces ();
-						p.applyForce (aim, gunEmitter);
+						if (fireType != 2)
+							p.applyForce (aim, gunEmitter);
 					}
 				sprayCooldown = sprayCooldownReset;
 				fireType = 0;
