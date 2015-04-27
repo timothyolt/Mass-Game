@@ -32,6 +32,7 @@ namespace TOltjenbruns.MassGame {
 		private const float bfield = 100;
 		private Emitter blackEmitter;
 		private bool blackHoleState = false;
+		private bool blackHoleMemeber = false;
 		private const float epower = 500;
 		private const float esustain = 0.8f;
 		private const float efield = 15;
@@ -41,6 +42,11 @@ namespace TOltjenbruns.MassGame {
 		private const float polarityFadeBlack = 2f;
 		private float polarityFade = 0;
 		#endregion
+
+		public bool BlackHoleMemeber {
+			get { return this.blackHoleMemeber;}
+			set { blackHoleMemeber = value;}
+		}
 		
 		#region Constructors
 		
@@ -76,13 +82,16 @@ namespace TOltjenbruns.MassGame {
 					Element.updateColorBuffer ();
 					break;
 				case ((byte) Game.PolarityState.PLAYER):
-					Element.ColorMask = new Rgba (255 - fade, 255, 0, 255);
+					if (blackHoleState || blackHoleMemeber)
+						Element.ColorMask = new Rgba (255 - fade, 255 - fade, 0, 255);
+					else
+						Element.ColorMask = new Rgba (255 - fade, 255, 0, 255);
 					Element.updateColorBuffer ();
 					break;
 				default:
 					if (cannonState)
 						Element.ColorMask = new Rgba (255, 255 - fade, fade, 255);
-					else if (blackHoleState)
+					else if (blackHoleState || blackHoleMemeber)
 						Element.ColorMask = new Rgba (255 - fade, 255 - fade, 0, 255);
 					else
 						Element.ColorMask = new Rgba (255, 255 - fade, 0, 255);
@@ -104,14 +113,17 @@ namespace TOltjenbruns.MassGame {
 				if (p != this && (!p.EmitterType.Equals (EmitterType.MAG)))
 				if (blackHoleState) {
 					p.attract (Position, Emitter, delta, false);
-					if ((Position.LoopDiff (p.Position).Length () < Emitter.field / 2))// && (p.Polarity != Polarity))
+					if ((Position.LoopDiff (p.Position).Length () < Emitter.field / 2) && (p.Polarity != Polarity)) {
 						p.Polarity = Polarity;
+						if (Game.Rand.Next() % 2 == 0)
+							((BitParticle)p).BlackHoleMemeber = true;
+					}
 				}
 				else if (p.Polarity == Polarity)
-					p.attract (Position, Emitter, Polarity, delta);
+					p.attract (Position, Emitter, Polarity, delta);
 			}
 		}
-		
+
 		public void fireCannon () {
 			cannonState = true;
 			Emitter = cannonEmitter;
