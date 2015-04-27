@@ -142,18 +142,16 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		private void move (float delta, GamePadData gamePad) {
-			int x = 0;
-			int y = 0;
+			Vector3 velocity = Vector3.Zero;
 			if ((gamePad.Buttons & GamePadButtons.Up) != 0)
-				y += 1;
+				velocity.Y += 1;
 			if ((gamePad.Buttons & GamePadButtons.Down) != 0)
-				y -= 1;
+				velocity.Y -= 1;
 			if ((gamePad.Buttons & GamePadButtons.Right) != 0)
-				x += 1;
+				velocity.X += 1;
 			if ((gamePad.Buttons & GamePadButtons.Left) != 0)
-				x -= 1;
-			if (x != 0 && y != 0) {
-				Vector3 velocity = new Vector3(x, y, 0);
+				velocity.X -= 1;
+			if (velocity != Vector3.Zero) {
 				velocity = velocity.Normalize ();
 				velocity = velocity.Multiply (120 * delta);
 				Position += velocity;
