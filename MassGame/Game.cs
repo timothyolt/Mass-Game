@@ -13,20 +13,31 @@
 // You should have received a copy of the GNU General Public License along
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+using System;
+using System.Collections.Generic;
+using Sce.PlayStation.Core;
+using Sce.PlayStation.Core.Graphics;
+using Sce.PlayStation.Core.Input;
+
 namespace TOltjenbruns.MassGame {
 	public static class Game {
 		//TODO: add dictionary keyed by string (polarity name) with a simple struct holding a color and byte
+		public enum PolarityState : byte {
+			NEUTRAL = 0,
+			ENEMY = 1,
+			PLAYER = 2,
+		}
 		
 		private static CannonPickup cannonPick = null;
 
-		public static CannonPickup CannonPick {
+		public static CannonPickup CannonPickup {
 			get { return cannonPick;}
 			set { cannonPick = value;}
 		}
 		
 		private static BlackHolePickup bWholePick = null;
 
-		public static BlackHolePickup BWholePick {
+		public static BlackHolePickup BlackHolePickup {
 			get { return bWholePick;}
 			set { bWholePick = value;}
 		}
@@ -116,7 +127,7 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		public static List<BaseParticle> obtainedPowerUps = new List<BaseParticle> ();
-		public static List<BaseParticle> groundPowerUps = new List<BaseParticle> ();
+		public static List<BaseParticle> pickups = new List<BaseParticle> ();
 		
 		public static void Dispose () {
 			shader.Dispose ();
