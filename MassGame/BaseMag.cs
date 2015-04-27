@@ -56,11 +56,15 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		public BaseMag (byte polarity, Rgba colorMask) 
-			: this (polarity, colorMask, new Emitter(power, sustain, field, EmitterType.MAG)) {
+			: this (PlayerMag.playerPoly, polarity, colorMask, new Emitter(power, sustain, field, EmitterType.MAG)) {
 		}
 		
-		public BaseMag (byte polarity, Rgba colorMask, Emitter emitter) 
-			: base (PlayerMag.playerPoly, polarity, emitter) {
+		public BaseMag (Polygon poly, byte polarity, Rgba colorMask) 
+			: this (poly, polarity, colorMask, new Emitter(power, sustain, field, EmitterType.MAG)) {
+		}
+		
+		public BaseMag (Polygon poly, byte polarity, Rgba colorMask, Emitter emitter) 
+			: base (poly, polarity, emitter) {
 			ColorMask = colorMask;
 			gunEmitter = new Emitter (gunPower, gunSustain, gunField, EmitterType.FORCE);
 			Element.LineWidth = 4;

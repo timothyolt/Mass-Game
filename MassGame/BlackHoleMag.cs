@@ -14,9 +14,71 @@
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 using Sce.PlayStation.Core;
+using Sce.PlayStation.Core.Graphics;
 
 namespace TOltjenbruns.MassGame {
 	public class BlackHoleMag : BaseMag {
+		private static readonly float[] verticies = {
+			0, 5, 0,			//0
+			0, 15, 0,			//1
+			2.1651f, 6.25f, 0,	//2
+			2.1651f, 13.75f, 0,	//3
+			4.3301f, 7.5f, 0,		//4
+			4.3301f, 12.5f, 0,	//5
+			8.6603f, 0, 0,		//6
+			8.6603f, 2.5f, 0,		//7
+			8.6603f, 5, 0, 		//8
+			8.6603f, 10, 0,		//9
+			8.6603f, 15, 0,		//10
+			8.6603f, 17.5f, 0,	//11
+			8.6603f, 20, 0,		//12
+			12.9904f, 7.5f, 0,	//13
+			12.9904f, 12.5f, 0,	//14
+			15.1554f, 6.25f, 0,	//15
+			15.1554f, 13.75f, 0,	//16
+			17.3205f, 5, 0,		//17
+			17.3205f, 15, 0,		//18
+		};
+		
+		private static readonly float[] colors = {
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+			1, 1, 1, 1,
+		};
+		
+		private static readonly ushort[] indicies = {
+			2, 0, 3, 1, 11, 12, 16, 18, 15, 17, 7, 6, 2, //Outer edge
+			4, 5, 2, 5, 10, 14, 16, 14, 13, 8, 7, 8, 4, //Inner edge
+			9, 11, 9, 15, //Center
+		};
+		
+		public static readonly Polygon blackHolePoly = new Polygon (
+        Element.condenseVerticies (verticies), 
+        Element.condenseColors (colors),
+        indicies,
+        DrawMode.LineStrip,
+        3.14 / 6,
+        new Rgba (255, 255, 255, 255),
+        Vector3.Zero,
+        new Vector3 (0.02f, 0.02f, 0.02f),
+		Vector3.Zero);
+		
 		private const float power = 1000;
 		private const float sustain = 0.5f;
 		private const float field = 35;
@@ -30,7 +92,7 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		public BlackHoleMag (byte polarity, Rgba colorMask)
-			: base (polarity, colorMask) {
+			: base (blackHolePoly, polarity, colorMask) {
 		}
 		#endregion
 		
