@@ -71,20 +71,21 @@ namespace TOltjenbruns.MassGame {
 				int fade = (int)((polarityFade / 5.0f) * 256.0f);
 				polarityFade -= delta;
 				switch (Polarity) {
-				case 1:
-					Element.ColorMask = new Rgba (25, 25 - fade, 0, 255);
+				case ((byte) Game.PolarityState.NEUTRAL):
+					Element.ColorMask = new Rgba (255, 255, 0, 255);
 					Element.updateColorBuffer ();
 					break;
-				case 2:
+				case ((byte) Game.PolarityState.PLAYER):
 					Element.ColorMask = new Rgba (255 - fade, 255, 0, 255);
 					Element.updateColorBuffer ();
 					break;
-				case 3:
-					Element.ColorMask = new Rgba (255, 255 - fade, fade, 255);
-					Element.updateColorBuffer ();
-					break;
-				case 4:
-					Element.ColorMask = new Rgba (255 - fade, 255 - fade, 0, 255);
+				default:
+					if (cannonState)
+						Element.ColorMask = new Rgba (255, 255 - fade, fade, 255);
+					else if (blackHoleState)
+						Element.ColorMask = new Rgba (255 - fade, 255 - fade, 0, 255);
+					else
+						Element.ColorMask = new Rgba (255, 255 - fade, 0, 255);
 					Element.updateColorBuffer ();
 					break;
 				}

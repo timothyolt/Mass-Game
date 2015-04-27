@@ -17,6 +17,12 @@ using Sce.PlayStation.Core;
 
 namespace TOltjenbruns.MassGame {
 	public class BlackHoleMag : BaseMag {
+		private const float power = 1000;
+		private const float sustain = 0.5f;
+		private const float field = 35;
+		private const float gunPower = 1000;
+		private const float gunSustain = 0.75f;
+		private const float gunField = 50;
 		
 		#region Constructor
 		public BlackHoleMag (byte polarity)
@@ -29,11 +35,28 @@ namespace TOltjenbruns.MassGame {
 		#endregion
 		
 		#region Original Methods
-		public override void preUpdate (float delta) {
-			base.preUpdate (delta);
+		protected override void Move (float delta) {
 			foreach (BaseParticle p in Game.Particles) {
 				if (p is BitParticle)//Quick and dirty way to avoid all particles (brownian motion)
 					attract (p.Position, Emitter, delta, true);
+			}
+		}
+
+		protected override void Fire (float delta) {
+			gunCooldown = (float)(8 + (Game.Rand.NextDouble () * 7));
+			Target = Position.LoopDiff (Game.Player.Position);
+			Vector3 aim = Target.Normalize ();
+			aim = aim.Multiply (gunPower * delta);
+			foreach (BaseParticle p in Game.Particles) {
+				if (
+					p != this && 
+					p.EmitterType == EmitterType.BIT && 
+					Position.LoopDiff (p.Position).Length () <= gunField
+				) {
+					((BitParticle)p).fireBlackHole ();
+					p.Polarity = Polarity;
+					p.clearForces ();
+				}
 			}
 		}
 		

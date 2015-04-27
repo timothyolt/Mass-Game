@@ -19,15 +19,21 @@ namespace TOltjenbruns.MassGame {
 	public class CannonMag : BaseMag {
 		#region Private Fields
 		
+		private const float power = 1000;
+		private const float sustain = 0.5f;
+		private const float field = 35;
+		private const float gunPower = 1000;
+		private const float gunSustain = 0.75f;
+		private const float gunField = 50;
+		private readonly Emitter gunEmitter;
 		private const float targetPower = 250f;
 		private const float targetSustain = 0.01f;
 		private const float targetField = 200;
 		private Emitter targetEmitter;
-		private const float seekPower = 700f;
+		private const float seekPower = 10000000000f;
 		private const float seekSustain = 0.8f;
 		private const float seekField = 40;
 		private Emitter seekEmitter;
-		private CannonMag neighbor = null;
 		#endregion
 		
 		#region Constructor
@@ -37,15 +43,16 @@ namespace TOltjenbruns.MassGame {
 		
 		public CannonMag (byte polarity, Rgba colorMask)
 			: base (polarity, colorMask) {
-			Polarity = 3;
+			Polarity = (byte)Game.PolarityState.ENEMY;
+			gunEmitter = new Emitter (gunPower, gunSustain, gunField, EmitterType.FORCE);
 			targetEmitter = new Emitter (targetPower, targetSustain, targetField, EmitterType.FORCE);
 			seekEmitter = new Emitter (seekPower, seekSustain, seekField, EmitterType.FORCE);
 		}
 		#endregion
 		
 		#region Original Methods
-		public override void preUpdate (float delta) {
-			base.preUpdate (delta);
+
+		protected override void Move (float delta) {
 			foreach (BaseParticle p in Game.Particles)
 				if ((p.Polarity != (byte)Game.PolarityState.NEUTRAL) || p is BitParticle)
 					attract (p.Position, targetEmitter, delta, false);
@@ -53,17 +60,23 @@ namespace TOltjenbruns.MassGame {
 					attract (p.Position, seekEmitter, delta, true);
 		}
 
-		protected override void Move (float delta) {
-			
-		}
-		
-		public override void applyVelocity (float delta) {
-			if (neighbor == null)
-			if (Velocity.LengthSquared () > 64)
-				Velocity = Velocity.Normalize ().Multiply (8);
-			else if (Velocity.LengthSquared () > 16)
-				Velocity = Velocity.Normalize ().Multiply (2);
-			base.applyVelocity (delta);
+		protected override void Fire (float delta) {
+			gunCooldown = (float)(8 + (Game.Rand.NextDouble () * 7));
+			Target = Position.LoopDiff (Game.Player.Position);
+			Vector3 aim = Target.Normalize ();
+			aim = aim.Multiply (gunPower * delta);
+			foreach (BaseParticle p in Game.Particles) {
+				if (
+					p != this && 
+					p.EmitterType == EmitterType.BIT && 
+					Position.LoopDiff (p.Position).Length () <= gunField
+				) {
+					((BitParticle)p).fireCannon ();
+					p.Polarity = Polarity;
+					p.clearForces ();
+					p.applyForce (aim, gunEmitter);
+				}
+			}
 		}
 		#endregion
 		

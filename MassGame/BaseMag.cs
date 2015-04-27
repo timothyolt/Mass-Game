@@ -23,16 +23,21 @@ namespace TOltjenbruns.MassGame {
 		private const float power = 1000;
 		private const float sustain = 0.5f;
 		private const float field = 35;
-		private readonly Emitter gunEmitter;
 		private const float gunPower = 1000;
 		private const float gunSustain = 0.75f;
 		private const float gunField = 50;
+		private readonly Emitter gunEmitter;
 		
 		//new player objects should always completely buffer the element on first update
 		//TODO: move update polling to Element
 		
-		private float gunCooldown = (float)(3 + (Game.Rand.NextDouble () * 4));
+		protected float gunCooldown = (float)(3 + (Game.Rand.NextDouble () * 4));
 		private Vector3 target;
+
+		protected Vector3 Target {
+			get { return this.target;}
+			set { target = value;}
+		}		
 		#endregion
 		
 		#region Properties
@@ -42,6 +47,7 @@ namespace TOltjenbruns.MassGame {
 		public float Health {
 			get { return health;}
 		}
+		
 		#endregion
 		
 		#region Constructors
@@ -50,7 +56,11 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		public BaseMag (byte polarity, Rgba colorMask) 
-			: base (PlayerMag.playerPoly, polarity, new Emitter(power, sustain, field, EmitterType.MAG)) {
+			: this (polarity, colorMask, new Emitter(power, sustain, field, EmitterType.MAG)) {
+		}
+		
+		public BaseMag (byte polarity, Rgba colorMask, Emitter emitter) 
+			: base (PlayerMag.playerPoly, polarity, emitter) {
 			ColorMask = colorMask;
 			gunEmitter = new Emitter (gunPower, gunSustain, gunField, EmitterType.FORCE);
 			Element.LineWidth = 4;
@@ -95,10 +105,7 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		protected virtual void Fire (float delta) {
-			if (Polarity != 3)
-				gunCooldown = (float)(3 + (Game.Rand.NextDouble () * 4));
-			else
-				gunCooldown = 5;
+			gunCooldown = 5;
 			target = Position.LoopDiff (Game.Player.Position);
 			gunCooldown = (float)(3 + (Game.Rand.NextDouble () * 4));
 			Vector3 aim = target.Normalize ();
@@ -137,7 +144,6 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		protected virtual void polarize (float delta) {
-			target = Position.LoopDiff (Game.Player.Position);
 			foreach (BaseParticle p in Game.Particles) {
 				if (p != this && p.EmitterType.Equals (EmitterType.BIT)) {
 					p.attract (Position, Emitter, Polarity, delta);
