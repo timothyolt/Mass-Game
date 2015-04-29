@@ -21,53 +21,54 @@ using Sce.PlayStation.Core.Input;
 namespace TOltjenbruns.MassGame {
 	public class PlayerMag : BaseParticle {
         #region PlayerPolygon
-		private static readonly float[] verticies = {
-        0.333f, 0.000f, 0f, //Vericies
-        0.666f, 0.000f, 0f,
-        0.166f, 0.289f, 0f,
-        0.833f, 0.289f, 0f,
-        0.333f, 0.577f, 0f,
-        0.666f, 0.577f, 0f,
-
-        0.500f, 0.289f, 0f, //Top Center
-
-        0.666f, 0.000f, 0f, //Low Center
-        0.166f, 0.289f, 0f,
-        0.666f, 0.577f, 0f,
-        0.500f, 0.289f, 0f,
-        };
-		
-		private static readonly float[] colors = {
-
-        180 / 256f, 180 / 256f, 180 / 256f, 1.0f,
-        180 / 256f, 180 / 256f, 180 / 256f, 1.0f,
-        180 / 256f, 180 / 256f, 180 / 256f, 1.0f,
-        180 / 256f, 180 / 256f, 180 / 256f, 1.0f,
-        180 / 256f, 180 / 256f, 180 / 256f, 1.0f,
-        180 / 256f, 180 / 256f, 180 / 256f, 1.0f,
-
-        256 / 256f, 256 / 256f, 256 / 256f, 1.0f,
-
-        130 / 256f, 130 / 256f, 130 / 256f, 1.0f,
-        130 / 256f, 130 / 256f, 130 / 256f, 1.0f,
-        130 / 256f, 130 / 256f, 130 / 256f, 1.0f,
-        75 / 256f,  75 / 256f,  75 / 256f, 1.0f,
-        };
-		private static readonly ushort[] indicies = {
-        9, 10, 8, 10, 7, //Low Center
-        0, 1, 3, 5, 4, 2, //Outline
-        0, 6, 3, 6, 4 //Top Center
-        };
-		public static readonly Polygon playerPoly = new Polygon (
-        Element.condenseVerticies (verticies), 
-        Element.condenseColors (colors),
-        indicies,
-        DrawMode.LineStrip,
-        3.14 / 6,
-        new Rgba (255, 255, 255, 255),
-        Vector3.Zero,
-        new Vector3 (0.25f, 0.25f, 0.25f),
-			Vector3.Zero);
+//		private static readonly float[] verticies = {
+//        0.333f, 0.000f, 0f, //Vericies
+//        0.666f, 0.000f, 0f,
+//        0.166f, 0.289f, 0f,
+//        0.833f, 0.289f, 0f,
+//        0.333f, 0.577f, 0f,
+//        0.666f, 0.577f, 0f,
+//
+//        0.500f, 0.289f, 0f, //Top Center
+//
+//        0.666f, 0.000f, 0f, //Low Center
+//        0.166f, 0.289f, 0f,
+//        0.666f, 0.577f, 0f,
+//        0.500f, 0.289f, 0f,
+//        };
+//		
+//		private static readonly float[] colors = {
+//
+//        180 / 256f, 180 / 256f, 180 / 256f, 1.0f,
+//        180 / 256f, 180 / 256f, 180 / 256f, 1.0f,
+//        180 / 256f, 180 / 256f, 180 / 256f, 1.0f,
+//        180 / 256f, 180 / 256f, 180 / 256f, 1.0f,
+//        180 / 256f, 180 / 256f, 180 / 256f, 1.0f,
+//        180 / 256f, 180 / 256f, 180 / 256f, 1.0f,
+//
+//        256 / 256f, 256 / 256f, 256 / 256f, 1.0f,
+//
+//        130 / 256f, 130 / 256f, 130 / 256f, 1.0f,
+//        130 / 256f, 130 / 256f, 130 / 256f, 1.0f,
+//        130 / 256f, 130 / 256f, 130 / 256f, 1.0f,
+//        75 / 256f,  75 / 256f,  75 / 256f, 1.0f,
+//        };
+//		private static readonly ushort[] indicies = {
+//        9, 10, 8, 10, 7, //Low Center
+//        0, 1, 3, 5, 4, 2, //Outline
+//        0, 6, 3, 6, 4 //Top Center
+//        };
+//		public static readonly Polygon playerPoly = new Polygon (
+//        Element.condenseVerticies (verticies), 
+//        Element.condenseColors (colors),
+//        indicies,
+//        DrawMode.LineStrip,
+//        3.14 / 6,
+//        new Rgba (255, 255, 255, 255),
+//        Vector3.Zero,
+//        new Vector3 (0.25f, 0.25f, 0.25f),
+//			Vector3.Zero);
+		public static readonly Polygon playerPoly = Polygon.Parse("Application/polygons/Bit.poly");
         #endregion
 		
 		#region Private Fields
@@ -172,12 +173,14 @@ namespace TOltjenbruns.MassGame {
 			Vector3 aim = Vector3.Zero;
 			
 			if ((gamePad.Buttons & GamePadButtons.L) != 0)
-			if (Game.obtainedPowerUps.Contains (Game.CannonPickup))
+			if (Game.obtainedPowerUps.Contains (Game.CannonPickup)) {
 				fireType = 1;
+				resetElement (CannonMag.cannonPoly);
+			}
 			if ((gamePad.Buttons & GamePadButtons.R) != 0)
 			if (Game.obtainedPowerUps.Contains (Game.BlackHolePickup)) {
 				fireType = 2;
-				resetElement(BlackHoleMag.blackHolePoly);
+				resetElement (BlackHoleMag.blackHolePoly);
 			}
 			if ((gamePad.Buttons & GamePadButtons.Triangle) != 0)
 				aim.Y += 1;
@@ -197,6 +200,7 @@ namespace TOltjenbruns.MassGame {
 						switch (fireType) {
 						case 1:
 							((BitParticle)p).fireCannon ();
+							resetElement (playerPoly);
 							break;
 						case 2:	
 							((BitParticle)p).fireBlackHole ();

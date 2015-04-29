@@ -34,6 +34,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Sce.PlayStation.Core" />
+    <Reference Include="Sce.PlayStation.HighLevel.UI" />
   </ItemGroup>
   <ItemGroup>
     <ShaderProgram Include="shaders\Primitive.fcg" />
@@ -57,7 +58,41 @@
     <Compile Include="BitParticle.cs" />
     <Compile Include="PlayerMag.cs" />
     <Compile Include="BaseMag.cs" />
-    <Compile Include="BlackHoleMag.cs" />
+    <Compile Include="BlackHoleMag.cs">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Compile>
     <Compile Include="CannonMag.cs" />
+    <Compile Include="HiscoreEntry.cs" />
+    <Compile Include="TextRender.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\MassGame-unsigned\Documents\hiscore" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="polygons\" />
+    <Folder Include="polygons\font\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="polygons\font\A">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\B">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\Bit.poly">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\BlackHoleMag.poly">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\CannonMag.poly">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
   </ItemGroup>
 </Project>

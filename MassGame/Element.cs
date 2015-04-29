@@ -17,7 +17,8 @@
  */
 
 using System;
-
+using System.IO;
+using System.Collections.Generic;
 using Sce.PlayStation.Core;
 using Sce.PlayStation.Core.Graphics;
 using Sce.PlayStation.Core.Imaging;
@@ -26,6 +27,99 @@ namespace TOltjenbruns.MassGame{
 	public class Element{
 		//TODO: move update flagging to this class and out of player
 		private const bool DEBUG = false;
+		
+		#region Serializer Methods
+		public static Element Parse (string file) {
+			StreamReader sr = null;
+			Element e = null;
+			int line = 0;
+			try {
+				sr = new StreamReader (file);
+				e = Parse (sr, ref line);
+			} catch (FileNotFoundException) {
+				Console.WriteLine ("Element file " + file + " cannot be found");
+				throw;
+			} finally {
+				if (sr != null)
+					sr.Close ();
+			}
+			return e;
+		}
+		
+		public static Element Parse (StreamReader sr, ref int line) {
+			Vector3 transform = Vector3.Zero;
+			double rotation = 0;
+			Rgba mask = new Rgba (255, 255, 255, 255);
+			Vector3 scale = new Vector3 (1, 1, 1);
+			Vector3 origin = Vector3.Zero;
+			Vector2 dimensions = Vector2.Zero;
+			float lineWidth = 1;
+			List<Polygon> polygons = new List<Polygon> ();
+			char type = ' ';
+			while (!sr.EndOfStream) {
+				char prime = (char)sr.Read ();
+				if (!prime.Equals (' '))
+					type = prime;
+				sr.Read (); //Read Out Whitespace
+				string unparsed = sr.ReadLine ();
+				line++;
+				string[] data = unparsed.Split (' ');
+				try {
+					switch (type) {
+					case 't':
+						transform = new Vector3 (float.Parse (data [0]), float.Parse (data [1]), float.Parse (data [2]));
+						break;
+					case 'r':
+						rotation = double.Parse (data [0]);
+						break;
+					case 'm':
+						mask = new Rgba (new Vector4 (float.Parse (data [0]), float.Parse (data [1]), float.Parse (data [2]), float.Parse (data [3])));
+						break;
+					case 's':
+						scale = new Vector3 (float.Parse (data [0]), float.Parse (data [1]), float.Parse (data [2]));
+						break;
+					case 'o':
+						origin = new Vector3 (float.Parse (data [0]), float.Parse (data [1]), float.Parse (data [2]));
+						break;
+					case 'd':
+						dimensions = new Vector2 (float.Parse (data [0]), float.Parse (data [1]));
+						break;
+					case 'w':
+						lineWidth = float.Parse (data [0]);
+						break;
+					case 'p':
+						polygons.Add (Polygon.Parse (sr, ref line));
+						break;
+					}
+				} catch (FormatException e) {
+					if ((e.Data.Contains (typeof(Polygon))) && (!e.Data [typeof(TextRender)].Equals (line))) {
+						Exception e2 = new FormatException ("Unable to parse line " + line + " \"" + unparsed + "\" " + e.Message, e);
+						e2.Data.Add (typeof(Element), line);
+						throw e2;
+					}
+					else
+						throw;
+				} catch (IndexOutOfRangeException e) {
+					if ((e.Data.Contains (typeof(Polygon))) && (!e.Data [typeof(TextRender)].Equals (line))) {
+						Exception e2 = new FormatException ("Missing parameter on line " + line + " " + e.Message, e);
+						e2.Data.Add (typeof(Element), line);
+						throw e2;
+					}
+					else
+						throw;
+				}
+			}
+			Element el = new Element (polygons.ToArray () [0]);
+			el.Position = transform;
+			el.Rotation = rotation;
+			el.ColorMask = mask;
+			el.Scale = scale;
+			el.Center = origin;
+			el.LineWidth = lineWidth;
+			el.Dimension = dimensions;
+			return el;
+		}
+		#endregion
 		
 		#region Properties
 		public Polygon[] polygons {get; private set;}
@@ -73,11 +167,17 @@ namespace TOltjenbruns.MassGame{
 		private Vector3 center;
 		private bool cenUpdate;
 		public Vector3 Center {
-			get {return center;}
+			get { return center;}
 			set {
 				cenUpdate = true;
 				center = value;
 			}
+		}
+		
+		private Vector2 dimension;
+		public Vector2 Dimension {
+			get { return dimension;}
+			set {dimension = value;}
 		}
 		
 		public float LineWidth {get; set;}
@@ -111,33 +211,35 @@ namespace TOltjenbruns.MassGame{
 		#endregion
 			
 		#region Original Methods
-		private void createBuffer(){
+		private void createBuffer () {
 			int bufferLength = 0;
-			for (int i = 0; i < polygons.Length; i++){
-				vPolyIndex[i] = bufferLength;
-				primitives[i] = new Primitive(
-					polygons[i].DrawMode, bufferLength, polygons[i].vertexCount, 0);
-				bufferLength += polygons[i].vertexCount;
+			for (int i = 0; i < polygons.Length; i++) {
+				vPolyIndex [i] = bufferLength;
+				primitives [i] = new Primitive (
+					polygons [i].DrawMode, bufferLength, polygons [i].vertexCount, 0);
+				bufferLength += polygons [i].vertexCount;
 			}
 			
 			//TODO: Check all poly's for indicies and generate sets for unindexed poly's
-			if (polygons[0].Indicies != null){
+			if (polygons [0].Indicies != null) {
 				int indexCount = 0;
 				int[] iPolyIndex = new int[polygons.Length];
-				for (int i = 0; i < polygons.Length; i++){
-					iPolyIndex[i] = indexCount;
-					primitives[i].Count = (ushort) polygons[i].indexCount;
-					indexCount += polygons[i].indexCount;
+				for (int i = 0; i < polygons.Length; i++) {
+					iPolyIndex [i] = indexCount;
+					primitives [i].Count = (ushort)polygons [i].indexCount;
+					indexCount += polygons [i].indexCount;
 				}
 				ushort[] indicies = new ushort[indexCount];
 				for (int poly = 0; poly < polygons.Length; poly++)
 					for (int i = 0; i < polygons[poly].indexCount; i++)
-						indicies[iPolyIndex[poly] + i] = polygons[poly].Indicies[i];
-				vertexBuffer = new VertexBuffer(
+						indicies [iPolyIndex [poly] + i] = polygons [poly].Indicies [i];
+				//handle graphicssystemexceptions caused by using with a bad graphics driver or using before the system is initialized
+				vertexBuffer = new VertexBuffer (
 				bufferLength, indexCount, VertexFormat.Float3, VertexFormat.Float4);
-				vertexBuffer.SetIndices(indicies);
+				vertexBuffer.SetIndices (indicies);
 			}
-			else vertexBuffer = new VertexBuffer(
+			else
+				vertexBuffer = new VertexBuffer (
 				bufferLength, VertexFormat.Float3, VertexFormat.Float4);		
 		}
 		

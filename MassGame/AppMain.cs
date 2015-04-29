@@ -14,8 +14,6 @@
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.  
 
-//TODO: fix enemy inheritance
-//TODO: weapon cycle visibiliy
 //TODO: game states:
 //		intro
 //		instruction
@@ -31,11 +29,13 @@
 //TODO: options
 //		control style
 //		difficulty
-//TODO: clean up and comment
+//TODO: clean up
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Sce.PlayStation.Core;
+using Sce.PlayStation.HighLevel.UI;
 using Sce.PlayStation.Core.Environment;
 using Sce.PlayStation.Core.Graphics;
 using Sce.PlayStation.Core.Input;
@@ -43,6 +43,28 @@ using Sce.PlayStation.Core.Input;
 namespace TOltjenbruns.MassGame {
 	class AppMain {
 		private static bool running = true;
+		
+		public enum EGameState {
+			INTRO,
+			GAME,
+			HS_ADD,
+			HISCORE,
+		}
+		
+		private static List<HiscoreEntry> hiscores;
+		
+		private static EGameState gameState;
+		
+		private static TextRender tr;
+
+		public static EGameState GameState {
+			get {
+				return gameState;
+			}
+			set {
+				gameState = value;
+			}
+		}	
 	
 		private static void Main (string[] args) {
 			Stopwatch s = new Stopwatch ();
@@ -70,7 +92,22 @@ namespace TOltjenbruns.MassGame {
 //			Console.WriteLine(Color.GREEN.ToRgba());
 //			Console.WriteLine(Color.BLUE.ToRgba());
 //			Console.WriteLine(Color.BLACK.ToRgba());
-			
+			hiscores = new List<HiscoreEntry>();
+			StreamReader sr;
+			try {
+				sr = new StreamReader ("/Documents/hiscore");
+			} catch (FileNotFoundException) {
+				StreamWriter sw = new StreamWriter ("Documents/hiscore");
+				for (int i = 0; i < 5; i++)
+					sw.WriteLine ("AAA " + (300 - (i * 100)));
+				sw.Close ();
+				sr = new StreamReader ("/Documents/hiscore");
+			}
+			while (!sr.EndOfStream) {
+				string[] split = sr.ReadLine ().Split (' ');
+				hiscores.Add (new HiscoreEntry (split [0], int.Parse (split [1])));
+			}
+			hiscores.Sort ();
 			
 			Game.Graphics = new GraphicsContext ();
 			Game.Shader = new ShaderProgram ("/Application/shaders/Primitive.cgx");
@@ -93,7 +130,7 @@ namespace TOltjenbruns.MassGame {
 				Game.Particles.Add (particle);
 			}
 			for (int i = 0; i < 2; i++)
-				switch (1) {//Game.Rand.Next (3)) {
+				switch (0) {//Game.Rand.Next (3)) {
 				case 0:
 					CannonMag e = new CannonMag ((byte)Game.PolarityState.ENEMY);
 					e.Position = new Vector3 (
@@ -125,52 +162,73 @@ namespace TOltjenbruns.MassGame {
 			Game.pickups.Add (Game.CannonPickup);
 			Game.pickups.Add (Game.BlackHolePickup);
 			
+			gameState = EGameState.GAME;
 			return true;
 		}
 
 		private static void Dispose () {
+			StreamWriter sw = new StreamWriter ("Documents/hiscore");
+			for (int i = 0; (i < 5) && (i < hiscores.Count); i++)
+				sw.WriteLine(hiscores[i]);
 			Game.Dispose ();
 		}
 	
 		private static bool Update (float delta) {
-			//TODO: ADD STUFF
 			Game.GamePadData = GamePad.GetData (0);
-			Game.Player.update (delta);
-			foreach (BaseParticle p in Game.Particles)
-				p.update (delta);
-			foreach (BaseParticle p in Game.pickups)
-				p.update (delta);
+			switch (gameState) {
+			case EGameState.GAME:
+				Game.Player.update (delta);
+				foreach (BaseParticle p in Game.Particles)
+					p.update (delta);
+				foreach (BaseParticle p in Game.pickups)
+					p.update (delta);
+				int enemycount = 0;
+				foreach (BaseParticle p in Game.Particles)
+					if (p is BaseMag)
+						enemycount++;
+				if (enemycount == 0)
+					if (Game.Player.Health > hiscores[4].score)
+						gameState = EGameState.HS_ADD;
+					else
+						gameState = EGameState.HISCORE;
+				break;
+			case EGameState.HS_ADD:
+				break;
+			}
 			return true;
 		}
 	
 		private static bool Render () {
-			float aspect = Game.Graphics.Screen.AspectRatio;
-			float fov = FMath.Radians (45.0f);
-			//TODO: convert to orthographic camera maybe?
-			//Matrix4 proj = Matrix4.Ortho(0f, aspect, 1f, 0f, 1f, -1f);;
-			Matrix4 proj = Matrix4.Perspective (fov, aspect, 1.0f, 1000000.0f);
-			Matrix4 view = Matrix4.LookAt (/*new Vector3(0.0f, 0.0f, 5.0f),//*/new Vector3 (0.0f, -2.5f, 3.0f),
-			/*new Vector3(0.0f, 0.0f, 0.0f),//*/new Vector3 (0.0f, -0.50f, 0.0f),
-	                                    Vector3.UnitY);
-			//Matrix4 worldViewProj = proj;	
-			Matrix4 worldViewProj = proj * view;	
+			switch (gameState) {
+			case EGameState.GAME:
+				float aspect = Game.Graphics.Screen.AspectRatio;
+				float fov = FMath.Radians (45.0f);
+				//TODO: convert to orthographic camera maybe?
+				//Matrix4 proj = Matrix4.Ortho(0f, aspect, 1f, 0f, 1f, -1f);;
+				Matrix4 proj = Matrix4.Perspective (fov, aspect, 1.0f, 1000000.0f);
+				Matrix4 view = Matrix4.LookAt (/*new Vector3(0.0f, 0.0f, 5.0f),//*/new Vector3 (0.0f, -2.5f, 3.0f),
+				/*new Vector3(0.0f, 0.0f, 0.0f),//*/new Vector3 (0.0f, -0.50f, 0.0f),
+		                                    Vector3.UnitY);
+				//Matrix4 worldViewProj = proj;	
+				Matrix4 worldViewProj = proj * view;	
+				
+				Game.Shader.SetUniformValue (0, ref worldViewProj);
+		
+				//graphics.SetViewport(0, 0, graphics.Screen.Height, graphics.Screen.Height);
+				Game.Graphics.SetViewport (0, 0, Game.Graphics.Screen.Width, Game.Graphics.Screen.Height);
+				Game.Graphics.SetClearColor (0.2f, 0.2f, 0.2f, 1.0f);
+				Game.Graphics.Clear ();
+		
+				Game.Graphics.SetShaderProgram (Game.Shader);
+				foreach (BaseParticle p in Game.Particles)
+					p.render ();
+				foreach (BaseParticle p in Game.pickups)
+					p.render ();
+				Game.Player.render ();
+				break;
+			}
 			
-			Game.Shader.SetUniformValue (0, ref worldViewProj);
-	
-			//graphics.SetViewport(0, 0, graphics.Screen.Height, graphics.Screen.Height);
-			Game.Graphics.SetViewport (0, 0, Game.Graphics.Screen.Width, Game.Graphics.Screen.Height);
-			Game.Graphics.SetClearColor (0.2f, 0.2f, 0.2f, 1.0f);
-			Game.Graphics.Clear ();
-	
-			Game.Graphics.SetShaderProgram (Game.Shader);
-			foreach (BaseParticle p in Game.Particles)
-				p.render ();
-			foreach (BaseParticle p in Game.pickups)
-				p.render ();
-			Game.Player.render ();
-	
 			Game.Graphics.SwapBuffers ();
-	
 			return true;
 		}
 	}

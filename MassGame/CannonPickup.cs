@@ -25,10 +25,10 @@ namespace TOltjenbruns.MassGame {
 		
 		#region Constructor
 		public CannonPickup (byte polarity, Vector3 pos) 
-			: base (PlayerMag.playerPoly, polarity, new Emitter(power, sustain, field, EmitterType.FORCE)) {
+			: base (CannonMag.cannonPoly, polarity, new Emitter(power, sustain, field, EmitterType.FORCE)) {
 			ColorMask = new Rgba (0, 0, 255, 255);
 			Position = pos;
-			Element.LineWidth = 1;
+			Element.LineWidth = 2;
 			Element.Scale = new Vector3 (0.5f, 0.5f, 1);
 		}
 		#endregion

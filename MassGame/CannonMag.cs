@@ -17,6 +17,8 @@ using Sce.PlayStation.Core;
 
 namespace TOltjenbruns.MassGame {
 	public class CannonMag : BaseMag {
+		public static readonly Polygon cannonPoly = Polygon.Parse("/Application/polygons/CannonMag.poly");
+		
 		#region Private Fields
 		
 		private const float power = 1000;
@@ -42,7 +44,7 @@ namespace TOltjenbruns.MassGame {
 		}
 		
 		public CannonMag (byte polarity, Rgba colorMask)
-			: base (polarity, colorMask) {
+			: base (cannonPoly, polarity, colorMask) {
 			Polarity = (byte)Game.PolarityState.ENEMY;
 			gunEmitter = new Emitter (gunPower, gunSustain, gunField, EmitterType.FORCE);
 			targetEmitter = new Emitter (targetPower, targetSustain, targetField, EmitterType.FORCE);

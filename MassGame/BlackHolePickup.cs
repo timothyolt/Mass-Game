@@ -25,10 +25,10 @@ namespace TOltjenbruns.MassGame {
 		
 		#region Constructor
 		public BlackHolePickup (byte polarity, Vector3 pos) 
-			: base(PlayerMag.playerPoly, polarity, new Emitter(power, sustain, field, EmitterType.FORCE)) {
-			ColorMask = new Rgba (255, 255, 255, 255);
+			: base(BlackHoleMag.blackHolePoly, polarity, new Emitter(power, sustain, field, EmitterType.FORCE)) {
+			ColorMask = new Rgba (0, 0, 255, 255);
 			Position = pos;
-			Element.LineWidth = 4;
+			Element.LineWidth = 2;
 			Element.Scale = new Vector3 (0.5f, 0.5f, 1);
 		}
 		#endregion

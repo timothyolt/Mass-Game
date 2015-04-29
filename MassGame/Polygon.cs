@@ -1,29 +1,112 @@
-/*
- *	Copyright (C) 2015 Timothy A. Oltjenbruns
- *
- *	This program is free software; you can redistribute it and/or modify
- *	it under the terms of the GNU General Public License as published by
- *	the Free Software Foundation; either version 2 of the License, or
- *	(at your option) any later version.
- *	
- *	This program is distributed in the hope that it will be useful,
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *	GNU General Public License for more details.
- *	
- *	You should have received a copy of the GNU General Public License along
- *	with this program; if not, write to the Free Software Foundation, Inc.,
- *	51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
+// Copyright (C) 2015 Timothy A. Oltjenbruns
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//  
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, write to the Free Software Foundation, Inc.,
+// 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 using System;
 using System.Collections.ObjectModel;
-
+using System.IO;
+using System.Collections.Generic;
 using Sce.PlayStation.Core;
 using Sce.PlayStation.Core.Graphics;
 
 namespace TOltjenbruns.MassGame {
 	public struct Polygon{
+		#region Serializer Methods
+		public static Polygon Parse (string file) {
+			StreamReader sr = null;
+			Polygon p;
+			int line = 0;
+			try {
+				sr = new StreamReader (file);
+				p = Parse (sr, ref line);
+			} catch (FileNotFoundException) {
+				Console.WriteLine ("Polygon file " + file + " cannot be found");
+				throw;
+			} finally {
+				if (sr != null)
+					sr.Close ();
+			}
+			return p;
+		}
+		
+		public static Polygon Parse (StreamReader sr, ref int line) {
+			Vector3 transform = Vector3.Zero;
+			double rotation = 0;
+			Rgba mask = new Rgba (255, 255, 255, 255);
+			Vector3 scale = new Vector3 (1, 1, 1);
+			Vector3 origin = Vector3.Zero;
+			DrawMode graphics = DrawMode.LineStrip;
+			List<Vector3> verticies = new List<Vector3> ();
+			List<Rgba> colors = new List<Rgba> ();
+			List<ushort> indicies = new List<ushort> ();
+			char type = ' ';
+			while ((!sr.EndOfStream) && (!"trmsodwp".Contains (sr.Peek().ToString()))) {
+				sr.Read (); //Read Out Whitespace
+				char prime = (char)sr.Read ();
+				if (!prime.Equals (' '))
+					type = prime;
+				sr.Read (); //Read Out Whitespace
+				string unparsed = sr.ReadLine ();
+				line++;
+				string[] data = unparsed.Split (' ');
+				try {
+					switch (type) {
+					case 't':
+						transform = new Vector3 (float.Parse (data [0]), float.Parse (data [1]), float.Parse (data [2]));
+						break;
+					case 'r':
+						rotation = double.Parse (data [0]);
+						break;
+					case 'm':
+						mask = new Rgba (new Vector4 (float.Parse (data [0]), float.Parse (data [1]), float.Parse (data [2]), float.Parse (data [3])));
+						break;
+					case 's':
+						scale = new Vector3 (float.Parse (data [0]), float.Parse (data [1]), float.Parse (data [2]));
+						break;
+					case 'o':
+						origin = new Vector3 (float.Parse (data [0]), float.Parse (data [1]), float.Parse (data [2]));
+						break;
+					case 'g':
+						graphics = (DrawMode)Enum.Parse (typeof(DrawMode), data [0]);
+						break;
+					case 'v':
+						verticies.Add (new Vector3 (float.Parse (data [0]), float.Parse (data [1]), float.Parse (data [2])));
+						break;
+					case 'c':
+						colors.Add (new Rgba (new Vector4 (float.Parse (data [0]), float.Parse (data [1]), float.Parse (data [2]), float.Parse (data [3]))));
+						break;
+					case 'i':
+						foreach (string s in data)
+							indicies.Add (ushort.Parse (s));
+						break;
+					}
+				} catch (FormatException e) {
+					Exception e2 = new FormatException ("Unable to parse line " + line + " \"" + unparsed + "\" " + e.Message, e);
+					e2.Data.Add (typeof(Polygon), line);
+					throw e2;
+				} catch (IndexOutOfRangeException e) {
+					Exception e2 = new FormatException ("Missing parameter on line " + line + " " + e.Message, e);
+					e2.Data.Add (typeof(Polygon), line);
+					throw e2;
+				}
+			}
+			Polygon p = new Polygon (verticies.ToArray (), colors.ToArray (), indicies.ToArray (), graphics, rotation, mask, transform, scale, origin);
+			//Console.WriteLine(p.Equals())
+			return p;
+		}
+		#endregion
+		
 		#region Readonly Properties
 		private Vector3[] verticies;
 		public ReadOnlyCollection<Vector3> Verticies {
