@@ -29,7 +29,7 @@ namespace TOltjenbruns.MassGame {
 			int line = 0;
 			try {
 				sr = new StreamReader (file);
-				p = Parse (sr, ref line);
+				p = Polygon.Parse (sr, ref line);
 			} catch (FileNotFoundException) {
 				Console.WriteLine ("Polygon file " + file + " cannot be found");
 				throw;
@@ -51,7 +51,7 @@ namespace TOltjenbruns.MassGame {
 			List<Rgba> colors = new List<Rgba> ();
 			List<ushort> indicies = new List<ushort> ();
 			char type = ' ';
-			while ((!sr.EndOfStream) && (!"trmsodwp".Contains (sr.Peek().ToString()))) {
+			while (!("trmsodwp".Contains (((char) sr.Peek ()).ToString()) || sr.EndOfStream)) {
 				sr.Read (); //Read Out Whitespace
 				char prime = (char)sr.Read ();
 				if (!prime.Equals (' '))
@@ -59,6 +59,8 @@ namespace TOltjenbruns.MassGame {
 				sr.Read (); //Read Out Whitespace
 				string unparsed = sr.ReadLine ();
 				line++;
+				if (unparsed == null)
+					break;
 				string[] data = unparsed.Split (' ');
 				try {
 					switch (type) {

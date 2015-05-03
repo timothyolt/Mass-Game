@@ -35,7 +35,7 @@ namespace TOltjenbruns.MassGame{
 			int line = 0;
 			try {
 				sr = new StreamReader (file);
-				e = Parse (sr, ref line);
+				e = Element.Parse (sr, ref line);
 			} catch (FileNotFoundException) {
 				Console.WriteLine ("Element file " + file + " cannot be found");
 				throw;
@@ -88,6 +88,7 @@ namespace TOltjenbruns.MassGame{
 						lineWidth = float.Parse (data [0]);
 						break;
 					case 'p':
+						//TODO: add file referencing for external polygons
 						polygons.Add (Polygon.Parse (sr, ref line));
 						break;
 					}
@@ -109,7 +110,7 @@ namespace TOltjenbruns.MassGame{
 						throw;
 				}
 			}
-			Element el = new Element (polygons.ToArray () [0]);
+			Element el = new Element (polygons.ToArray ());
 			el.Position = transform;
 			el.Rotation = rotation;
 			el.ColorMask = mask;
@@ -226,13 +227,14 @@ namespace TOltjenbruns.MassGame{
 				int[] iPolyIndex = new int[polygons.Length];
 				for (int i = 0; i < polygons.Length; i++) {
 					iPolyIndex [i] = indexCount;
-					primitives [i].Count = (ushort)polygons [i].indexCount;
+					primitives [i].First = (ushort) (iPolyIndex[i]);
+					primitives [i].Count = (ushort) polygons [i].indexCount;
 					indexCount += polygons [i].indexCount;
 				}
 				ushort[] indicies = new ushort[indexCount];
 				for (int poly = 0; poly < polygons.Length; poly++)
 					for (int i = 0; i < polygons[poly].indexCount; i++)
-						indicies [iPolyIndex [poly] + i] = polygons [poly].Indicies [i];
+						indicies [iPolyIndex [poly] + i] = (ushort)(polygons [poly].Indicies [i] + vPolyIndex [poly]);
 				//handle graphicssystemexceptions caused by using with a bad graphics driver or using before the system is initialized
 				vertexBuffer = new VertexBuffer (
 				bufferLength, indexCount, VertexFormat.Float3, VertexFormat.Float4);

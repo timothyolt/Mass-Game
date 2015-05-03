@@ -42,6 +42,8 @@ using Sce.PlayStation.Core.Input;
 
 namespace TOltjenbruns.MassGame {
 	class AppMain {
+		private static TextRender tr;
+		
 		private static bool running = true;
 		
 		public enum EGameState {
@@ -54,8 +56,6 @@ namespace TOltjenbruns.MassGame {
 		private static List<HiscoreEntry> hiscores;
 		
 		private static EGameState gameState;
-		
-		private static TextRender tr;
 
 		public static EGameState GameState {
 			get {
@@ -70,6 +70,7 @@ namespace TOltjenbruns.MassGame {
 			Stopwatch s = new Stopwatch ();
 			s.Start ();
 			Init ();
+			tr = new TextRender("Application/polygons/font");
 			while (running) {
 				SystemEvents.CheckEvents ();
 				float delta = s.ElapsedMilliseconds / 1000f;
@@ -129,8 +130,8 @@ namespace TOltjenbruns.MassGame {
 					(float)(Game.Rand.NextDouble () * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT / 2, 0f);
 				Game.Particles.Add (particle);
 			}
-			for (int i = 0; i < 2; i++)
-				switch (0) {//Game.Rand.Next (3)) {
+			for (int i = 0; i < 1; i++)
+				switch (5) {//Game.Rand.Next (3)) {
 				case 0:
 					CannonMag e = new CannonMag ((byte)Game.PolarityState.ENEMY);
 					e.Position = new Vector3 (
@@ -162,7 +163,7 @@ namespace TOltjenbruns.MassGame {
 			Game.pickups.Add (Game.CannonPickup);
 			Game.pickups.Add (Game.BlackHolePickup);
 			
-			gameState = EGameState.GAME;
+			gameState = EGameState.INTRO;
 			return true;
 		}
 
@@ -174,8 +175,27 @@ namespace TOltjenbruns.MassGame {
 		}
 	
 		private static bool Update (float delta) {
-			Game.GamePadData = GamePad.GetData (0);
+			GamePadData gamePad = GamePad.GetData (0);
+			Game.GamePadData = gamePad;
 			switch (gameState) {
+			case EGameState.INTRO:
+				if ((gamePad.Buttons & GamePadButtons.Up) != 0)
+					gameState = EGameState.GAME;
+				if ((gamePad.Buttons & GamePadButtons.Down) != 0)
+					running = false;
+				if ((gamePad.Buttons & GamePadButtons.Left) != 0)
+					gameState = EGameState.HISCORE;
+				//if ((gamePad.Buttons & GamePadButtons.Up) != 0)
+				//	gameState = EGameState.INSTRUCTIONS;
+				break;
+			case EGameState.HISCORE:
+				if ((gamePad.Buttons & GamePadButtons.Right) != 0)
+					gameState = EGameState.INTRO;
+				break;
+			case EGameState.HS_ADD:
+				if ((gamePad.Buttons & GamePadButtons.Down) != 0)
+					gameState = EGameState.HISCORE;
+				break;
 			case EGameState.GAME:
 				Game.Player.update (delta);
 				foreach (BaseParticle p in Game.Particles)
@@ -187,39 +207,40 @@ namespace TOltjenbruns.MassGame {
 					if (p is BaseMag)
 						enemycount++;
 				if (enemycount == 0)
-					if (Game.Player.Health > hiscores[4].score)
-						gameState = EGameState.HS_ADD;
-					else
-						gameState = EGameState.HISCORE;
-				break;
-			case EGameState.HS_ADD:
+				if (Game.Player.Health > hiscores [4].score)
+					gameState = EGameState.HS_ADD;
+				else
+					gameState = EGameState.HISCORE;
 				break;
 			}
 			return true;
 		}
 	
 		private static bool Render () {
-			switch (gameState) {
-			case EGameState.GAME:
-				float aspect = Game.Graphics.Screen.AspectRatio;
-				float fov = FMath.Radians (45.0f);
-				//TODO: convert to orthographic camera maybe?
-				//Matrix4 proj = Matrix4.Ortho(0f, aspect, 1f, 0f, 1f, -1f);;
-				Matrix4 proj = Matrix4.Perspective (fov, aspect, 1.0f, 1000000.0f);
-				Matrix4 view = Matrix4.LookAt (/*new Vector3(0.0f, 0.0f, 5.0f),//*/new Vector3 (0.0f, -2.5f, 3.0f),
-				/*new Vector3(0.0f, 0.0f, 0.0f),//*/new Vector3 (0.0f, -0.50f, 0.0f),
+			float aspect = Game.Graphics.Screen.AspectRatio;
+			float fov = FMath.Radians (45.0f);
+			//TODO: convert to orthographic camera maybe?
+			//Matrix4 proj = Matrix4.Ortho(0f, aspect, 1f, 0f, 1f, -1f);;
+			Matrix4 proj = Matrix4.Perspective (fov, aspect, 1.0f, 1000000.0f);
+			Matrix4 view = Matrix4.LookAt (/*new Vector3(0.0f, 0.0f, 5.0f),//*/new Vector3 (0.0f, -2.5f, 3.0f),
+			/*new Vector3(0.0f, 0.0f, 0.0f),//*/new Vector3 (0.0f, -0.50f, 0.0f),
 		                                    Vector3.UnitY);
-				//Matrix4 worldViewProj = proj;	
-				Matrix4 worldViewProj = proj * view;	
+			//Matrix4 worldViewProj = proj;	
+			Matrix4 worldViewProj = proj * view;	
 				
-				Game.Shader.SetUniformValue (0, ref worldViewProj);
+			Game.Shader.SetUniformValue (0, ref worldViewProj);
 		
-				//graphics.SetViewport(0, 0, graphics.Screen.Height, graphics.Screen.Height);
-				Game.Graphics.SetViewport (0, 0, Game.Graphics.Screen.Width, Game.Graphics.Screen.Height);
-				Game.Graphics.SetClearColor (0.2f, 0.2f, 0.2f, 1.0f);
-				Game.Graphics.Clear ();
+			//graphics.SetViewport(0, 0, graphics.Screen.Height, graphics.Screen.Height);
+			Game.Graphics.SetViewport (0, 0, Game.Graphics.Screen.Width, Game.Graphics.Screen.Height);
+			Game.Graphics.SetClearColor (0.2f, 0.2f, 0.2f, 1.0f);
+			Game.Graphics.Clear ();
 		
-				Game.Graphics.SetShaderProgram (Game.Shader);
+			Game.Graphics.SetShaderProgram (Game.Shader);
+			switch (gameState) {
+			case EGameState.INTRO:
+				tr.render ("0123456789A", new Vector3 (-2.8f, 0, 0));
+				break;
+			case EGameState.GAME:
 				foreach (BaseParticle p in Game.Particles)
 					p.render ();
 				foreach (BaseParticle p in Game.pickups)

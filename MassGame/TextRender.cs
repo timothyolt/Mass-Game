@@ -22,7 +22,7 @@ using Sce.PlayStation.Core.Graphics;
 namespace TOltjenbruns.MassGame {
 	public class TextRender {
 		
-		private static string defaultCharMap = "ABCDEFGHIJKLMNOPQRSTUV1234567890";
+		private static string defaultCharMap = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 		private Element[] alphabet;
 		private string charMap;
@@ -44,6 +44,7 @@ namespace TOltjenbruns.MassGame {
 				try {
 					sr = new StreamReader (file + '/' + charMap [i]);
 					elementList.Add (Element.Parse (sr, ref line));
+					Console.WriteLine ("[TextRender] " + charMap [i] + " parsed successfully,");
 					actualCharMap += charMap [i];
 				} catch (FileNotFoundException) {
 					if (strict) {
@@ -112,7 +113,7 @@ namespace TOltjenbruns.MassGame {
 					Vector3 escale = element.Scale;
 					float eLineWidth = element.LineWidth;
 					
-					element.Position = epos + pos;
+					element.Position = epos + pos + (Vector3.UnitX * cursor);
 					element.ColorMask = new Rgba (emask.ToVector4 () * mask.ToVector4 ());
 					element.Scale = escale * scale;
 					element.LineWidth = eLineWidth * lineWidth;
@@ -126,7 +127,7 @@ namespace TOltjenbruns.MassGame {
 					element.Scale = escale;
 					element.LineWidth = eLineWidth;
 					
-					cursor += element.Dimension.X;
+					cursor += element.Dimension.X * element.Scale.X;
 				}
 			}
 		}

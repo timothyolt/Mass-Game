@@ -67,18 +67,12 @@
     <Compile Include="TextRender.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="bin\Debug\MassGame-unsigned\Documents\hiscore" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="polygons\" />
     <Folder Include="polygons\font\" />
+    <Folder Include="bin\Debug\MassGame-unsigned\Documents\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="polygons\font\A">
-      <DeployService-Deploy>true</DeployService-Deploy>
-      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
-    </Content>
-    <Content Include="polygons\font\B">
       <DeployService-Deploy>true</DeployService-Deploy>
       <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
     </Content>
@@ -94,5 +88,48 @@
       <DeployService-Deploy>true</DeployService-Deploy>
       <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
     </Content>
+    <Content Include="polygons\font\0">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\1">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\2">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\3">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\4">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\5">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\6">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\7">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\8">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\9">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\MassGame-unsigned\Documents\hiscore" />
   </ItemGroup>
 </Project>
