@@ -238,7 +238,8 @@ namespace TOltjenbruns.MassGame {
 			Game.Graphics.SetShaderProgram (Game.Shader);
 			switch (gameState) {
 			case EGameState.INTRO:
-				tr.render ("0123456789A", new Vector3 (-2.8f, 0, 0));
+				tr.render ("0123456789ABCDEFGHIJKLMNOPQR", new Vector3 (-2.8f, 0, 0));
+				tr.render ("STUVWXYZ", new Vector3 (0, -0.3f, 0));
 				break;
 			case EGameState.GAME:
 				foreach (BaseParticle p in Game.Particles)

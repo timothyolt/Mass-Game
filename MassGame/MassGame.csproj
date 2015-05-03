@@ -128,6 +128,34 @@
       <DeployService-Deploy>true</DeployService-Deploy>
       <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
     </Content>
+    <Content Include="polygons\font\B">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\C" />
+    <Content Include="polygons\font\D" />
+    <Content Include="polygons\font\E" />
+    <Content Include="polygons\font\F" />
+    <Content Include="polygons\font\G" />
+    <Content Include="polygons\font\H" />
+    <Content Include="polygons\font\I" />
+    <Content Include="polygons\font\J" />
+    <Content Include="polygons\font\K" />
+    <Content Include="polygons\font\L" />
+    <Content Include="polygons\font\M" />
+    <Content Include="polygons\font\N" />
+    <Content Include="polygons\font\O" />
+    <Content Include="polygons\font\P" />
+    <Content Include="polygons\font\Q" />
+    <Content Include="polygons\font\R" />
+    <Content Include="polygons\font\S" />
+    <Content Include="polygons\font\T" />
+    <Content Include="polygons\font\U" />
+    <Content Include="polygons\font\V" />
+    <Content Include="polygons\font\W" />
+    <Content Include="polygons\font\X" />
+    <Content Include="polygons\font\Y" />
+    <Content Include="polygons\font\Z" />
   </ItemGroup>
   <ItemGroup>
     <None Include="bin\Debug\MassGame-unsigned\Documents\hiscore" />
