@@ -127,7 +127,7 @@ namespace TOltjenbruns.MassGame {
 					element.Scale = escale;
 					element.LineWidth = eLineWidth;
 					
-					cursor += element.Dimension.X * element.Scale.X;
+					cursor += element.Dimension.X * element.Scale.X * scale.X;
 				}
 			}
 		}
