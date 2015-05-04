@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using Sce.PlayStation.Core;
+using Sce.PlayStation.Core.Audio;
 using Sce.PlayStation.Core.Graphics;
 using Sce.PlayStation.Core.Input;
 
@@ -26,6 +27,54 @@ namespace TOltjenbruns.MassGame {
 			NEUTRAL = 0,
 			ENEMY = 1,
 			PLAYER = 2,
+		}
+		
+		public enum MagType {
+			SPRAY, CANNON, HOLE
+		}
+		
+		private static SoundPlayer sSpray;
+		private static SoundPlayer sSprayLow;
+		private static SoundPlayer sCannon;
+		private static SoundPlayer sCannonLow;
+		private static SoundPlayer sHole;
+		private static SoundPlayer sHoleLow;
+		
+		public static void loadSounds () {
+			sSpray = new Sound ("Application/audio/spray.wav").CreatePlayer ();
+			sSprayLow = new Sound ("Application/audio/sprayLow.wav").CreatePlayer ();
+			sCannon = new Sound ("Application/audio/cannon.wav").CreatePlayer ();
+			sCannonLow = new Sound ("Application/audio/cannonLow.wav").CreatePlayer ();
+			sHole = new Sound ("Application/audio/hole.wav").CreatePlayer ();
+			sHole.Volume = 0.5f;
+			sHoleLow = new Sound ("Application/audio/holeLow.wav").CreatePlayer ();
+			sHoleLow.Volume = 0.5f;
+		}
+		
+		public static SoundPlayer Sound (MagType type, bool low) {
+			switch (low) {
+			case true:
+				switch (type) {
+				case MagType.SPRAY:
+					return sSprayLow;
+				case MagType.CANNON:
+					return sCannonLow;
+				case MagType.HOLE:
+					return sHoleLow;
+				}
+				break;
+			case false:
+				switch (type) {
+				case MagType.SPRAY:
+					return sSpray;
+				case MagType.CANNON:
+					return sCannon;
+				case MagType.HOLE:
+					return sHole;
+				}
+				break;
+			}
+			return null;
 		}
 		
 		private static CannonPickup cannonPick = null;

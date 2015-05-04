@@ -15,17 +15,12 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.  
 
 //TODO: game states:
-//		intro
 //		instruction
-//		high score
-//		game
-//		high score set
 //TODO: sound effects and background sound
 //TODO: enemy spawning
 //TODO: fire upon release for easier aiming (and visual feedback)
 //TODO: particle inventory (might cause less derpy physics)
 //		still render them, but physics only interacts with the holder until thrown
-//TODO: external mesh files
 //TODO: options
 //		control style
 //		difficulty
@@ -33,6 +28,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using Sce.PlayStation.Core.Audio;
 using System.Diagnostics;
 using Sce.PlayStation.Core;
 using Sce.PlayStation.HighLevel.UI;
@@ -42,6 +38,11 @@ using Sce.PlayStation.Core.Input;
 
 namespace TOltjenbruns.MassGame {
 	class AppMain {
+		
+		private static Bgm menuMusic;
+		private static Bgm gameMusic;
+		private static BgmPlayer musicPlayer;
+		
 		private static TextRender tr;
 		
 		private static Element uiArrowUp;
@@ -139,8 +140,8 @@ namespace TOltjenbruns.MassGame {
 					(float)(Game.Rand.NextDouble () * Game.SCREEN_HEIGHT) - Game.SCREEN_HEIGHT / 2, 0f);
 				Game.Particles.Add (particle);
 			}
-			for (int i = 0; i < 1; i++)
-				switch (5) {//Game.Rand.Next (3)) {
+			for (int i = 0; i < 5; i++)
+				switch (Game.Rand.Next (3)) {
 				case 0:
 					CannonMag e = new CannonMag ((byte)Game.PolarityState.ENEMY);
 					e.Position = new Vector3 (
@@ -172,7 +173,7 @@ namespace TOltjenbruns.MassGame {
 			Game.pickups.Add (Game.CannonPickup);
 			Game.pickups.Add (Game.BlackHolePickup);
 			
-			gameState = EGameState.HISCORE;
+			gameState = EGameState.INTRO;
 			
 			tr = new TextRender ("Application/polygons/font");
 			
@@ -189,7 +190,7 @@ namespace TOltjenbruns.MassGame {
 			uiArrowLeft = new Element (arrow);
 			uiArrowRight = new Element (arrow);
 			uiArrowRight.Position = new Vector3 (0.4f, -1.9f, 0);
-			uiArrowRight.Rotation = 3.14/2;
+			uiArrowRight.Rotation = 3.14 / 2;
 			uiArrowRight.updateColorBuffer ();
 			uiArrowRight.updateTransBuffer ();
 			uiArrowName = new Element (arrow);
@@ -197,6 +198,14 @@ namespace TOltjenbruns.MassGame {
 			uiArrowName.Scale = new Vector3 (1, -1, 1);
 			uiArrowName.updateTransBuffer ();
 			uiArrowName.updateColorBuffer ();
+			
+			menuMusic = new Bgm ("Application/audio/menu.mp3");
+			gameMusic = new Bgm ("Application/audio/game.mp3");
+			musicPlayer = menuMusic.CreatePlayer ();
+			musicPlayer.Loop = true;
+			musicPlayer.Play ();
+			
+			Game.loadSounds();
 			return true;
 		}
 
@@ -213,8 +222,13 @@ namespace TOltjenbruns.MassGame {
 			Game.GamePadData = gamePad;
 			switch (gameState) {
 			case EGameState.INTRO:
-				if ((gamePad.Buttons & GamePadButtons.Up) != 0)
-					gameState = EGameState.GAME;
+				if ((gamePad.Buttons & GamePadButtons.Up) != 0) {
+					gameState = EGameState.GAME;
+					musicPlayer.Dispose ();
+					musicPlayer = gameMusic.CreatePlayer ();
+					musicPlayer.Loop = true;
+					musicPlayer.Play ();
+				}
 				if ((gamePad.Buttons & GamePadButtons.Down) != 0)
 					running = false;
 				//if ((gamePad.Buttons & GamePadButtons.Left) != 0)
@@ -229,7 +243,7 @@ namespace TOltjenbruns.MassGame {
 			case EGameState.HS_ADD:
 				if ((gamePad.Buttons & GamePadButtons.Down) != 0) {
 					gameState = EGameState.HISCORE;
-					hiscores.Add (new HiscoreEntry (name, (int) Game.Player.Health));
+					hiscores.Add (new HiscoreEntry (name, (int)Game.Player.Health));
 					hiscores.Sort ();
 					if (hiscores.Count > 5)
 						hiscores.RemoveRange (5, hiscores.Count - 5);
@@ -277,11 +291,16 @@ namespace TOltjenbruns.MassGame {
 				foreach (BaseParticle p in Game.Particles)
 					if (p is BaseMag)
 						enemycount++;
-				if (enemycount == 0)
-				if (Game.Player.Health > hiscores [4].score)
-					gameState = EGameState.HS_ADD;
-				else
-					gameState = EGameState.HISCORE;
+				if (enemycount == 0) {
+					musicPlayer.Dispose ();
+					musicPlayer = menuMusic.CreatePlayer ();
+					musicPlayer.Loop = true;
+					musicPlayer.Play ();
+					if (Game.Player.Health > hiscores [4].score)
+						gameState = EGameState.HS_ADD;
+					else
+						gameState = EGameState.HISCORE;
+				}
 				break;
 			}
 			return true;

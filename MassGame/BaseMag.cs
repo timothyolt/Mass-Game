@@ -110,6 +110,7 @@ namespace TOltjenbruns.MassGame {
 		
 		protected virtual void Fire (float delta) {
 			gunCooldown = 5;
+			Game.Sound(Game.MagType.SPRAY, true).Play();
 			target = Position.LoopDiff (Game.Player.Position);
 			gunCooldown = (float)(3 + (Game.Rand.NextDouble () * 4));
 			Vector3 aim = target.Normalize ();
@@ -133,12 +134,7 @@ namespace TOltjenbruns.MassGame {
 					p.EmitterType == EmitterType.BIT && 
 					Position.LoopDiff (p.Position).Length () <= gunField
 				) {
-					if (this is CannonMag)
-						((BitParticle)p).fireCannon ();
-					else if (this is BlackHoleMag)
-						((BitParticle)p).fireBlackHole ();
-					else
-						((BitParticle)p).fireSpray ();
+					((BitParticle)p).fireSpray ();
 					p.Polarity = Polarity;
 					p.clearForces ();
 					p.applyForce (aim, gunEmitter);

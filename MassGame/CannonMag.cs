@@ -64,6 +64,7 @@ namespace TOltjenbruns.MassGame {
 
 		protected override void Fire (float delta) {
 			gunCooldown = (float)(8 + (Game.Rand.NextDouble () * 7));
+			Game.Sound (Game.MagType.CANNON, true).Play ();
 			Target = Position.LoopDiff (Game.Player.Position);
 			Vector3 aim = Target.Normalize ();
 			aim = aim.Multiply (gunPower * delta);

@@ -193,6 +193,17 @@ namespace TOltjenbruns.MassGame {
 			if (aim != Vector3.Zero) {
 				aim = aim.Normalize ();
 				aim = aim.Multiply (gunPower * delta);
+				switch (fireType) {
+				case 1:
+					Game.Sound (Game.MagType.CANNON, false).Play ();
+					break;
+				case 2:	
+					Game.Sound (Game.MagType.HOLE, false).Play ();
+					break;
+				default:
+					Game.Sound (Game.MagType.SPRAY, false).Play ();
+					break;
+				}
 				foreach (BaseParticle p in Game.Particles)
 					if (p != this && 
 						p.EmitterType == EmitterType.BIT && 
