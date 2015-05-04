@@ -13,27 +13,23 @@
 // You should have received a copy of the GNU General Public License along
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-using System;
-
-namespace TOltjenbruns.MassGame {
-	public struct HiscoreEntry : IComparable{
-		public string name;
-		public int score;
-		public HiscoreEntry (string name, int score) {
-			this.name = name;
-			this.score = score;
-		}
-
-		#region IComparable implementation
-		public int CompareTo (object obj) {
-			return -(score.CompareTo(((HiscoreEntry)obj).score));
-		}
-		#endregion
-		
-		public override string ToString (){
-			return name + " " + score;
-		}
-	}
-	
-}
-
+ g LineStrip
+ t 0 0 0
+ r 0
+ m 1 1 1 1
+ s 0.04 0.04 0.04
+ v 4 10 0
+ v 4 3 0
+ v 0 6 0
+ v 5 0 0
+ v 10 6 0
+ v 6 3 0
+ v 6 10 0
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ i 0 1 2 3 4 5 6 0

@@ -22,11 +22,16 @@ using Sce.PlayStation.Core.Graphics;
 namespace TOltjenbruns.MassGame {
 	public class TextRender {
 		
-		private static string defaultCharMap = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		private static string defaultCharMap = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-";
 
 		private Element[] alphabet;
 		private string charMap;
-		
+
+		public string CharMap {
+			get {
+				return this.charMap;
+			}
+		}		
 		public TextRender (string file)
 		 : this (file, defaultCharMap) {
 		}
@@ -129,6 +134,8 @@ namespace TOltjenbruns.MassGame {
 					
 					cursor += element.Dimension.X * element.Scale.X * scale.X;
 				}
+				else if (c == ' ') 
+					cursor += 10 * alphabet[0].Scale.X * scale.X;
 			}
 		}
 	}

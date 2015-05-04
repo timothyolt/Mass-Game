@@ -132,7 +132,7 @@ namespace TOltjenbruns.MassGame{
 		private double rotUpdate = 0;
 		public double Rotation {
 			get {return rotation;}
-			set {rotUpdate = value;}
+			set {rotation = value;}
 		}
 		
 		private Rgba colorMask;

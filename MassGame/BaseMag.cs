@@ -68,8 +68,8 @@ namespace TOltjenbruns.MassGame {
 			ColorMask = colorMask;
 			gunEmitter = new Emitter (gunPower, gunSustain, gunField, EmitterType.FORCE);
 			Element.LineWidth = 4;
-			health = 50;
-			healthMax = 50;
+			health = 20;
+			healthMax = 20;
 		}
 		#endregion
 		

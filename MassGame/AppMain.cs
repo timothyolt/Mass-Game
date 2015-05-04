@@ -44,6 +44,16 @@ namespace TOltjenbruns.MassGame {
 	class AppMain {
 		private static TextRender tr;
 		
+		private static Element uiArrowUp;
+		private static Element uiArrowDown;
+		private static Element uiArrowLeft;
+		private static Element uiArrowRight;
+		private static Element uiArrowName;
+		
+		private static string name = "AAA";
+		private static int nameLetterIndex = 0;
+		private static int nameIndex = 0;
+		
 		private static bool running = true;
 		
 		public enum EGameState {
@@ -70,7 +80,6 @@ namespace TOltjenbruns.MassGame {
 			Stopwatch s = new Stopwatch ();
 			s.Start ();
 			Init ();
-			tr = new TextRender("Application/polygons/font");
 			while (running) {
 				SystemEvents.CheckEvents ();
 				float delta = s.ElapsedMilliseconds / 1000f;
@@ -93,7 +102,7 @@ namespace TOltjenbruns.MassGame {
 //			Console.WriteLine(Color.GREEN.ToRgba());
 //			Console.WriteLine(Color.BLUE.ToRgba());
 //			Console.WriteLine(Color.BLACK.ToRgba());
-			hiscores = new List<HiscoreEntry>();
+			hiscores = new List<HiscoreEntry> ();
 			StreamReader sr;
 			try {
 				sr = new StreamReader ("/Documents/hiscore");
@@ -163,14 +172,39 @@ namespace TOltjenbruns.MassGame {
 			Game.pickups.Add (Game.CannonPickup);
 			Game.pickups.Add (Game.BlackHolePickup);
 			
-			gameState = EGameState.INTRO;
+			gameState = EGameState.HISCORE;
+			
+			tr = new TextRender ("Application/polygons/font");
+			
+			Polygon arrow = Polygon.Parse ("Application/polygons/Arrow.poly");
+			uiArrowUp = new Element (arrow);
+			uiArrowUp.Position = new Vector3 (-0.2f, 1.6f, 0);
+			uiArrowUp.Scale = new Vector3 (1, -1, 1);
+			uiArrowUp.updateTransBuffer ();
+			uiArrowUp.updateColorBuffer ();
+			uiArrowDown = new Element (arrow);
+			uiArrowDown.Position = new Vector3 (-0.2f, -1.9f, 0);
+			uiArrowDown.updateTransBuffer ();
+			uiArrowDown.updateColorBuffer ();
+			uiArrowLeft = new Element (arrow);
+			uiArrowRight = new Element (arrow);
+			uiArrowRight.Position = new Vector3 (0.4f, -1.9f, 0);
+			uiArrowRight.Rotation = 3.14/2;
+			uiArrowRight.updateColorBuffer ();
+			uiArrowRight.updateTransBuffer ();
+			uiArrowName = new Element (arrow);
+			uiArrowName.Position = new Vector3 (-0.6f, 0.5f, 0);
+			uiArrowName.Scale = new Vector3 (1, -1, 1);
+			uiArrowName.updateTransBuffer ();
+			uiArrowName.updateColorBuffer ();
 			return true;
 		}
 
 		private static void Dispose () {
 			StreamWriter sw = new StreamWriter ("Documents/hiscore");
-			for (int i = 0; (i < 5) && (i < hiscores.Count); i++)
-				sw.WriteLine(hiscores[i]);
+			foreach (HiscoreEntry entry in hiscores)
+				sw.WriteLine (entry.ToString ());
+			sw.Close();
 			Game.Dispose ();
 		}
 	
@@ -183,8 +217,8 @@ namespace TOltjenbruns.MassGame {
 					gameState = EGameState.GAME;
 				if ((gamePad.Buttons & GamePadButtons.Down) != 0)
 					running = false;
-				if ((gamePad.Buttons & GamePadButtons.Left) != 0)
-					gameState = EGameState.HISCORE;
+				//if ((gamePad.Buttons & GamePadButtons.Left) != 0)
+				//	gameState = EGameState.HISCORE;
 				//if ((gamePad.Buttons & GamePadButtons.Up) != 0)
 				//	gameState = EGameState.INSTRUCTIONS;
 				break;
@@ -193,8 +227,45 @@ namespace TOltjenbruns.MassGame {
 					gameState = EGameState.INTRO;
 				break;
 			case EGameState.HS_ADD:
-				if ((gamePad.Buttons & GamePadButtons.Down) != 0)
+				if ((gamePad.Buttons & GamePadButtons.Down) != 0) {
 					gameState = EGameState.HISCORE;
+					hiscores.Add (new HiscoreEntry (name, (int) Game.Player.Health));
+					hiscores.Sort ();
+					if (hiscores.Count > 5)
+						hiscores.RemoveRange (5, hiscores.Count - 5);
+				}
+				if ((gamePad.ButtonsUp & GamePadButtons.Right) != 0) {
+					nameIndex += 1;
+					if (nameIndex > 2)
+						nameIndex = 0;
+					nameLetterIndex = tr.CharMap.IndexOf (name [nameIndex]);
+					uiArrowName.Position = new Vector3 (-0.6f + (nameIndex * 0.4f), 0.5f, 0);
+					uiArrowName.updateTransBuffer ();
+				}
+				if ((gamePad.ButtonsUp & GamePadButtons.Left) != 0) {
+					nameIndex -= 1;
+					if (nameIndex < 0)
+						nameIndex = 2;
+					nameLetterIndex = tr.CharMap.IndexOf (name [nameIndex]);
+					uiArrowName.Position = new Vector3 (-0.6f + (nameIndex * 0.4f), 0.5f, 0);
+					uiArrowName.updateTransBuffer ();
+				}
+				if ((gamePad.ButtonsUp & GamePadButtons.Up) != 0) {
+					nameLetterIndex += 1;
+					if (nameLetterIndex > tr.CharMap.Length - 1)
+						nameLetterIndex = 0;
+					switch (nameIndex) {
+					case 0:
+						name = "" + tr.CharMap [nameLetterIndex] + name [1] + name [2];
+						break;
+					case 1:
+						name = "" + name [0] + tr.CharMap [nameLetterIndex] + name [2];
+						break;
+					case 2:
+						name = "" + name [0] + name [1] + tr.CharMap [nameLetterIndex];
+						break;
+					}
+				}
 				break;
 			case EGameState.GAME:
 				Game.Player.update (delta);
@@ -236,10 +307,18 @@ namespace TOltjenbruns.MassGame {
 			Game.Graphics.Clear ();
 		
 			Game.Graphics.SetShaderProgram (Game.Shader);
+			int t = (int)(DateTime.Now.Millisecond / 1000f * 512);
 			switch (gameState) {
 			case EGameState.INTRO:
-				tr.render ("0123456789ABCDEFGHIJKLMNOPQR", new Vector3 (-2.8f, 0, 0));
-				tr.render ("STUVWXYZ", new Vector3 (0, -0.3f, 0));
+				tr.render ("MASS", new Vector3 (-.8f, 0, 0), new Rgba (
+					(int)Math.Abs (((t) % 512f) - 256), 
+					(int)Math.Abs (((t + 128) % 512f) - 256), 
+					(int)Math.Abs (((t + 256) % 512f) - 256), 255), 2);
+				//tr.render ("MASS", new Vector3 (-.8f, 0, 0), new Rgba (255 * (t % 500) / 500, 255 * ((t + 250) % 1000) / 1000, 255 * ((t + 1000) % 2000) / 2000, 255), 2);
+				tr.render ("INITIATE SIMULATION", new Vector3 (-1.7f, 1, 0));
+				tr.render ("TERMINATE SESSION", new Vector3 (-.8f, -1.3f, 0), new Rgba (255, 255, 255, 255), 0.5f);
+				uiArrowUp.draw (Game.Graphics);
+				uiArrowDown.draw (Game.Graphics);
 				break;
 			case EGameState.GAME:
 				foreach (BaseParticle p in Game.Particles)
@@ -247,6 +326,26 @@ namespace TOltjenbruns.MassGame {
 				foreach (BaseParticle p in Game.pickups)
 					p.render ();
 				Game.Player.render ();
+				break;
+			case EGameState.HS_ADD:
+				tr.render (name, new Vector3 (-.55f, 0, 0), new Rgba (
+					(int)Math.Abs (((t) % 512f) - 256), 
+					(int)Math.Abs (((t + 128) % 512f) - 256), 
+					(int)Math.Abs (((t + 256) % 512f) - 256), 255), 2);
+				tr.render ("ENTER NAME", new Vector3 (-1f, 1, 0));
+				tr.render ("CONFIRM", new Vector3 (-.35f, -1.3f, 0), new Rgba (255, 255, 255, 255), 0.5f);
+				uiArrowName.draw (Game.Graphics);
+				uiArrowDown.draw (Game.Graphics);
+				break;
+			case EGameState.HISCORE:
+				tr.render ("LEGENDARY MAGS", new Vector3 (-2.8f, 1.6f, 0), new Rgba (255, 255, 255, 255), 2f);
+				tr.render ("REINITIALIZE", new Vector3 (-.8f, -1.3f, 0), new Rgba (255, 255, 255, 255));
+				uiArrowRight.draw(Game.Graphics);
+				for (int i = 0; i < hiscores.Count; i++)
+					tr.render (hiscores [i].ToString (), new Vector3 (-1f, 0.8f - (i * 0.4f), 0), new Rgba (
+						(int)Math.Abs (((t + (i * 32)) % 512f) - 256), 
+						(int)Math.Abs (((t + (i * 64) + 128) % 512f) - 256), 
+						(int)Math.Abs (((t + (i * 128) + 256) % 512f) - 256), 255), 1.5f);
 				break;
 			}
 			

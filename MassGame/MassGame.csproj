@@ -156,6 +156,8 @@
     <Content Include="polygons\font\X" />
     <Content Include="polygons\font\Y" />
     <Content Include="polygons\font\Z" />
+    <Content Include="polygons\Arrow.poly" />
+    <Content Include="polygons\font\-" />
   </ItemGroup>
   <ItemGroup>
     <None Include="bin\Debug\MassGame-unsigned\Documents\hiscore" />
