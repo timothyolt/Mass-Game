@@ -1,4 +1,4 @@
-// Copyright (C) 2015 Timothy A. Oltjenbruns and Steffen Lim
+// Copyright (C) 2015 Timothy A. Oltjenbruns
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,41 +9,91 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//  
 // You should have received a copy of the GNU General Public License along
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 using System;
 using System.Collections.Generic;
 using Sce.PlayStation.Core;
+using Sce.PlayStation.Core.Audio;
 using Sce.PlayStation.Core.Graphics;
 using Sce.PlayStation.Core.Input;
-using TOltjenbruns.MassGame.Particle;
-using TOltjenbruns.MassGame.Particle.Bit;
-using TOltjenbruns.MassGame.Particle.Mag;
 
 namespace TOltjenbruns.MassGame {
-
 	public static class Game {
 		//TODO: add dictionary keyed by string (polarity name) with a simple struct holding a color and byte
-		
-		private static PickupCannon pickupCannon = null;
-
-		public static PickupCannon PickupCannon {
-			get { return pickupCannon;}
-			set { pickupCannon = value;}
+		public enum PolarityState : byte {
+			NEUTRAL = 0,
+			ENEMY = 1,
+			PLAYER = 2,
 		}
 		
-		private static PickupBlackHole pickupBlackHole = null;
-
-		public static PickupBlackHole PickupBlackHole {
-			get { return pickupBlackHole;}
-			set { pickupBlackHole = value;}
+		public enum MagType {
+			SPRAY, CANNON, HOLE
 		}
 		
-		private static Player player = null;
+		private static SoundPlayer sSpray;
+		private static SoundPlayer sSprayLow;
+		private static SoundPlayer sCannon;
+		private static SoundPlayer sCannonLow;
+		private static SoundPlayer sHole;
+		private static SoundPlayer sHoleLow;
+		
+		public static void loadSounds () {
+			sSpray = new Sound ("Application/audio/spray.wav").CreatePlayer ();
+			sSprayLow = new Sound ("Application/audio/sprayLow.wav").CreatePlayer ();
+			sCannon = new Sound ("Application/audio/cannon.wav").CreatePlayer ();
+			sCannonLow = new Sound ("Application/audio/cannonLow.wav").CreatePlayer ();
+			sHole = new Sound ("Application/audio/hole.wav").CreatePlayer ();
+			sHole.Volume = 0.5f;
+			sHoleLow = new Sound ("Application/audio/holeLow.wav").CreatePlayer ();
+			sHoleLow.Volume = 0.5f;
+		}
+		
+		public static SoundPlayer Sound (MagType type, bool low) {
+			switch (low) {
+			case true:
+				switch (type) {
+				case MagType.SPRAY:
+					return sSprayLow;
+				case MagType.CANNON:
+					return sCannonLow;
+				case MagType.HOLE:
+					return sHoleLow;
+				}
+				break;
+			case false:
+				switch (type) {
+				case MagType.SPRAY:
+					return sSpray;
+				case MagType.CANNON:
+					return sCannon;
+				case MagType.HOLE:
+					return sHole;
+				}
+				break;
+			}
+			return null;
+		}
+		
+		private static CannonPickup cannonPick = null;
 
-		public static Player Player {
+		public static CannonPickup CannonPickup {
+			get { return cannonPick;}
+			set { cannonPick = value;}
+		}
+		
+		private static BlackHolePickup bWholePick = null;
+
+		public static BlackHolePickup BlackHolePickup {
+			get { return bWholePick;}
+			set { bWholePick = value;}
+		}
+		
+		private static PlayerMag player = null;
+
+		public static PlayerMag Player {
 			get { return player;}
 			set {
 				if (player == null)
@@ -125,15 +175,15 @@ namespace TOltjenbruns.MassGame {
 			return diff;
 		}
 		
-		public static List<BaseParticle> obtainedPowerUps = new List<BaseParticle>();
-		public static List<BaseParticle> groundPowerUps = new List<BaseParticle>();
+		public static List<BaseParticle> obtainedPowerUps = new List<BaseParticle> ();
+		public static List<BaseParticle> pickups = new List<BaseParticle> ();
 		
 		public static void Dispose () {
-			shader.Dispose();
-			graphics.Dispose();
-			player.dispose();
+			shader.Dispose ();
+			graphics.Dispose ();
+			player.dispose ();
 			foreach (BaseParticle p in Game.Particles)
-				p.dispose();
+				p.dispose ();
 			player = null;
 			removeParticles = null;
 			particles = null;

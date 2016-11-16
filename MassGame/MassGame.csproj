@@ -8,9 +8,8 @@
     <ProjectGuid>{F51FE676-F629-4FFE-96E2-D582AAB60A0A}</ProjectGuid>
     <ProjectTypeGuids>{69878862-DA7D-4DC6-B0A1-50D8FAB4242F};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
-    <RootNamespace>TOltjenrbruns.MassGame</RootNamespace>
+    <RootNamespace>MassGame</RootNamespace>
     <AssemblyName>MassGame</AssemblyName>
-    <ReleaseVersion>0.2</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,10 +34,11 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Sce.PlayStation.Core" />
+    <Reference Include="Sce.PlayStation.HighLevel.UI" />
   </ItemGroup>
   <ItemGroup>
-    <ShaderProgram Include="Shaders\Primitive.fcg" />
-    <ShaderProgram Include="Shaders\Primitive.vcg" />
+    <ShaderProgram Include="shaders\Primitive.fcg" />
+    <ShaderProgram Include="shaders\Primitive.vcg" />
   </ItemGroup>
   <ItemGroup>
     <PsmMetadata Include="app.xml" />
@@ -46,25 +46,129 @@
   <Import Project="$(MSBuildExtensionsPath)\Sce\Sce.Psm.CSharp.targets" />
   <ItemGroup>
     <Compile Include="AppMain.cs" />
+    <Compile Include="Element.cs" />
+    <Compile Include="Emitter.cs" />
+    <Compile Include="Polygon.cs" />
+    <Compile Include="Colors.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="Graphics\Colors.cs" />
-    <Compile Include="Graphics\Element.cs" />
-    <Compile Include="Particle\Mag\Player.cs" />
-    <Compile Include="Graphics\Polygon.cs" />
-    <Compile Include="Particle\Emitter.cs" />
-    <Compile Include="Particle\Bit\ParticleBit.cs" />
-    <Compile Include="Particle\Bit\PickupCannon.cs" />
-    <Compile Include="Particle\Bit\PickupBlackHole.cs" />
-    <Compile Include="Particle\Mag\EnemyBlackHole.cs" />
-    <Compile Include="Particle\Mag\EnemyCannon.cs" />
-    <Compile Include="Particle\Mag\EnemySpray.cs" />
-    <Compile Include="Particle\BaseParticle.cs" />
-    <Compile Include="Particle\Mag\BaseEnemy.cs" />
+    <Compile Include="SprayEnemy.cs" />
+    <Compile Include="BlackHolePickup.cs" />
+    <Compile Include="CannonPickup.cs" />
+    <Compile Include="BaseParticle.cs" />
+    <Compile Include="BitParticle.cs" />
+    <Compile Include="PlayerMag.cs" />
+    <Compile Include="BaseMag.cs" />
+    <Compile Include="BlackHoleMag.cs">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Compile>
+    <Compile Include="CannonMag.cs" />
+    <Compile Include="HiscoreEntry.cs" />
+    <Compile Include="TextRender.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Graphics\" />
-    <Folder Include="Particle\" />
-    <Folder Include="Particle\Mag\" />
-    <Folder Include="Particle\Bit\" />
+    <Folder Include="polygons\" />
+    <Folder Include="polygons\font\" />
+    <Folder Include="bin\Debug\MassGame-unsigned\Documents\" />
+    <Folder Include="audio\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="polygons\font\A">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\Bit.poly">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\BlackHoleMag.poly">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\CannonMag.poly">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\0">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\1">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\2">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\3">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\4">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\5">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\6">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\7">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\8">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\9">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\B">
+      <DeployService-Deploy>true</DeployService-Deploy>
+      <DeployService-UseProjectRelativePath>true</DeployService-UseProjectRelativePath>
+    </Content>
+    <Content Include="polygons\font\C" />
+    <Content Include="polygons\font\D" />
+    <Content Include="polygons\font\E" />
+    <Content Include="polygons\font\F" />
+    <Content Include="polygons\font\G" />
+    <Content Include="polygons\font\H" />
+    <Content Include="polygons\font\I" />
+    <Content Include="polygons\font\J" />
+    <Content Include="polygons\font\K" />
+    <Content Include="polygons\font\L" />
+    <Content Include="polygons\font\M" />
+    <Content Include="polygons\font\N" />
+    <Content Include="polygons\font\O" />
+    <Content Include="polygons\font\P" />
+    <Content Include="polygons\font\Q" />
+    <Content Include="polygons\font\R" />
+    <Content Include="polygons\font\S" />
+    <Content Include="polygons\font\T" />
+    <Content Include="polygons\font\U" />
+    <Content Include="polygons\font\V" />
+    <Content Include="polygons\font\W" />
+    <Content Include="polygons\font\X" />
+    <Content Include="polygons\font\Y" />
+    <Content Include="polygons\font\Z" />
+    <Content Include="polygons\Arrow.poly" />
+    <Content Include="polygons\font\-" />
+    <Content Include="audio\game.mp3" />
+    <Content Include="audio\menu.mp3" />
+    <Content Include="audio\cannon.wav" />
+    <Content Include="audio\cannonLow.wav" />
+    <Content Include="audio\hole.wav" />
+    <Content Include="audio\holeLow.wav" />
+    <Content Include="audio\spray.wav" />
+    <Content Include="audio\sprayLow.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\MassGame-unsigned\Documents\hiscore" />
   </ItemGroup>
 </Project>

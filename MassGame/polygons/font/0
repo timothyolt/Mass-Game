@@ -1,0 +1,76 @@
+// Copyright (C) 2015 Timothy A. Oltjenbruns
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//  
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, write to the Free Software Foundation, Inc.,
+// 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+t 0 0 0
+r 0
+m 1 1 1 1
+s 0.02 -0.02 0.02
+d 10 10
+p
+ t 0 0 0
+ r 0
+ m 1 1 1 1
+ s 1 1 1
+ v 1 0.5 0
+ v 0 1.5 0
+ v 0 9 0
+ v 1 10 0
+ v 6.5 10 0
+ v 7.5 9 0
+ v 7.5 1.75 0
+ v 6.25 0.5 0
+ v 1 0.5 0
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ i 0 1 2 3 4 5 6 7 8 0
+p
+ t 0 0 0
+ r 0
+ m 1 1 1 1
+ s 1 1 1
+ v 3 3 0
+ v 3.9375 3 0
+ v 2.5 5.90625 0
+ v 2.5 3.5 0
+ v 3 3 0
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ i 0 1 2 3 4 0
+p
+ t 0 0 0
+ r 0
+ m 1 1 1 1
+ s 1 1 1
+ v 5 4.59375 0
+ v 5 7 0
+ v 4.5 7.5 0
+ v 3.5625 7.5 0
+ v 5 4.59375 0
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ c 1 1 1 1
+ i 0 1 2 3 4 0
